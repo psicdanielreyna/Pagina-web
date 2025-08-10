@@ -7,12 +7,12 @@ import { Footer } from '@/components/footer'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'PsicoToolKit – Terapia clara, herramientas prácticas',
-  description: 'Terapia CBT, recursos descargables y blog de psicoeducación.',
+  title: 'Daniel Reyna – Psicólogo CBT',
+  description: 'Terapia cognitivo-conductual breve, psicoeducación y recursos prácticos.',
   metadataBase: new URL('https://example.com'),
   openGraph: {
-    title: 'PsicoToolKit',
-    description: 'Terapia CBT, recursos descargables y blog.',
+    title: 'Daniel Reyna – Psicólogo',
+    description: 'Terapia CBT, psicoeducación y recursos.',
     type: 'website',
   },
 }
