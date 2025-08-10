@@ -9,7 +9,7 @@ export function Header(){
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur border-b">
       <div className="container flex items-center justify-between h-16">
-        <Link href="/" className="font-semibold">PsicoToolKit</Link>
+        <Link href="/" className="font-semibold">Daniel Reyna — Psicólogo</Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           <Link href="/servicios" className="hover:underline">Servicios</Link>
           <Link href="/tienda" className="hover:underline">Tienda</Link>
