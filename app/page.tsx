@@ -16,8 +16,12 @@ export default function Home() {
       <section className="container py-16 md:py-24">
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div className="space-y-6">
-            <h1 className="text-4xl md:text-5xl font-semibold leading-tight">Terapia clara, herramientas prácticas.</h1>
-            <p className="text-lg text-muted-foreground">CBT breve y recursos que sí se usan: agenda tu sesión o descarga guías listas para aplicar.</p>
+            <h1 className="text-4xl md:text-5xl font-semibold leading-tight">
+  Terapia clara, herramientas prácticas.
+</h1>
+<p className="text-lg text-muted-foreground">
+  Psicología cognitivo-conductual (CBT) con enfoque breve. Contenido y recursos que sí ayudan.
+</p>
             <div className="flex flex-wrap gap-3">
               <Button asChild><Link href="/agenda"><Calendar className="mr-2 h-4 w-4"/> Agenda tu sesión</Link></Button>
               <Button variant="ghost" asChild><Link href="#newsletter"><ArrowRight className="mr-2 h-4 w-4"/> Descarga una guía gratis</Link></Button>
