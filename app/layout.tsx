@@ -22,12 +22,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        {/* Calendly stylesheet */}
         <link
           href="https://assets.calendly.com/assets/external/widget.css"
           rel="stylesheet"
         />
       </head>
       <body className={inter.className}>
-        <div className="min-h-screen flex flex
-
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
+      </body>
+    </html>
+  )
+}
