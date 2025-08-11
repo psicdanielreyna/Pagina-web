@@ -1,45 +1,45 @@
+// app/page.tsx
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Calendar, ShoppingBag, BookOpen } from 'lucide-react'
+import { ArrowRight, ShoppingBag, BookOpen } from 'lucide-react'
 import { ProductCard } from '@/components/product-card'
 import { PostCard } from '@/components/post-card'
 import { NewsletterForm } from '@/components/newsletter-form'
 import { recursos } from '@/data/recursos'
 
-
-const products = [
-  { id: 'overthinking', title: 'Cómo Apagar tu Mente', price: 'MXN —', href: '/tienda/overthinking', description: 'Workbook práctico para calmar el sobrepensamiento.', image: '/placeholder.svg' },
-  { id: 'kit-ansiedad', title: 'Kit Terapeuta: Ansiedad', price: 'MXN —', href: '/tienda/kit-ansiedad', description: 'Hojas de trabajo, scripts y plan de 6 sesiones.', image: '/placeholder.svg' },
-]
-
 export default function Home() {
   return (
-    <div className="">
+    <div>
       <section className="container py-16 md:py-24">
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl font-semibold leading-tight">
-  Terapia clara, herramientas prácticas.
-</h1>
-<p className="text-lg text-muted-foreground">
-  Psicología cognitivo-conductual (CBT) con enfoque breve. Contenido y recursos que sí ayudan.
-</p>
+              Terapia clara, herramientas prácticas.
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Psicología cognitivo-conductual (CBT) con enfoque breve. Contenido y recursos que sí ayudan.
+            </p>
             <div className="flex flex-wrap gap-3">
-              <Button asChild><Link href="/agenda"><Calendar className="mr-2 h-4 w-4"/> Agenda tu sesión</Link></Button>
-              <Button variant="ghost" asChild><Link href="#newsletter"><ArrowRight className="mr-2 h-4 w-4"/> Descarga una guía gratis</Link></Button>
+              <Button asChild>
+                <Link href="#newsletter"><ArrowRight className="mr-2 h-4 w-4" /> Recibe una guía gratuita</Link>
+              </Button>
+              <Button variant="ghost" asChild>
+                <Link href="/tienda"><ShoppingBag className="mr-2 h-4 w-4" /> Explorar recursos</Link>
+              </Button>
             </div>
             <div className="flex gap-6 pt-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2"><BookOpen className="h-4 w-4"/> CBT breve</div>
-              <div className="flex items-center gap-2"><ShoppingBag className="h-4 w-4"/> Recursos descargables</div>
+              <div className="flex items-center gap-2"><BookOpen className="h-4 w-4" /> Enfoque CBT breve</div>
+              <div className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Recursos descargables</div>
             </div>
           </div>
+
           <div className="rounded-2xl bg-card p-8 shadow-sm border">
             <h3 className="text-xl font-medium mb-4">¿Qué te gustaría hacer hoy?</h3>
             <div className="grid sm:grid-cols-2 gap-4">
-              <Button variant="secondary" asChild><Link href="/servicios">Ver servicios</Link></Button>
               <Button variant="secondary" asChild><Link href="/tienda">Explorar tienda</Link></Button>
               <Button variant="secondary" asChild><Link href="/blog">Leer el blog</Link></Button>
               <Button variant="secondary" asChild><Link href="/sobre-mi">Conocer al terapeuta</Link></Button>
+              <Button variant="secondary" asChild><Link href="#newsletter">Suscribirme</Link></Button>
             </div>
           </div>
         </div>
@@ -51,7 +51,17 @@ export default function Home() {
           <Button variant="ghost" asChild><Link href="/tienda">Ver todo</Link></Button>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map(p => <ProductCard key={p.id} {...p} />)}
+          {recursos.map((r) => (
+            <ProductCard
+              key={r.id}
+              title={r.title}
+              description={r.description}
+              href={r.href}
+              image={r.image}
+              price={r.price}
+              currency={r.currency}
+            />
+          ))}
         </div>
       </section>
 
@@ -76,19 +86,4 @@ export default function Home() {
       </section>
     </div>
   )
-export type Recurso = {
-<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  {recursos.map((r) => (
-    <ProductCard
-      key={r.id}
-      title={r.title}
-      description={r.description}
-      href={r.href}
-      image={r.image}
-      price={r.price}
-      currency={r.currency}
-    />
-  ))}
-</div>
-  
 }
