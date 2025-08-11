@@ -4,6 +4,8 @@ import { ArrowRight, Calendar, ShoppingBag, BookOpen } from 'lucide-react'
 import { ProductCard } from '@/components/product-card'
 import { PostCard } from '@/components/post-card'
 import { NewsletterForm } from '@/components/newsletter-form'
+import { recursos } from '@/data/recursos'
+
 
 const products = [
   { id: 'overthinking', title: 'Cómo Apagar tu Mente', price: 'MXN —', href: '/tienda/overthinking', description: 'Workbook práctico para calmar el sobrepensamiento.', image: '/placeholder.svg' },
@@ -75,35 +77,18 @@ export default function Home() {
     </div>
   )
 export type Recurso = {
-  id: string
-  title: string
-  description: string
-  price: number
-  currency: 'MXN'
-  image: string
-  href: string
-}
-
-export const recursos: Recurso[] = [
-  {
-    id: 'apagar-mente',
-    title: 'Cómo Apagar tu Mente',
-    description: 'Workbook práctico para calmar el sobrepensamiento con técnicas simples y efectivas.',
-    price: 249,
-    currency: 'MXN',
-    image: '/manuales/apagar-mente.png',
-    href: '/manuales/como-apagar-tu-mente.pdf'
-  },
-  {
-    id: 'arte-creer-en-ti',
-    title: 'El Arte de Creer en Ti',
-    description: 'Estrategias y ejercicios para fortalecer tu autoestima y confianza personal.',
-    price: 249,
-    currency: 'MXN',
-    image: '/manuales/el-arte-de-creer-en-ti.png',
-    href: '/manuales/el-arte-de-creer-en-ti.pdf'
-  }
-]
-
+<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {recursos.map((r) => (
+    <ProductCard
+      key={r.id}
+      title={r.title}
+      description={r.description}
+      href={r.href}
+      image={r.image}
+      price={r.price}
+      currency={r.currency}
+    />
+  ))}
+</div>
   
 }
