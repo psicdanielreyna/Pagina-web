@@ -1,4 +1,4 @@
-import { ProductCard } from '@/components/product-card'
+import ProductCard from '@/components/product-card'
 
 const items = [
   { id: 'overthinking', title: 'Cómo Apagar tu Mente', price: 'MXN —', href: '/tienda/overthinking', description: 'Workbook práctico para calmar el sobrepensamiento.', image: '/placeholder.svg' },
