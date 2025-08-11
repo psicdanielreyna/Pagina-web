@@ -25,7 +25,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link
           href="https://assets.calendly.com/assets/external/widget.css"
           rel="stylesheet"
-        />
+        /> 
+<script async src="https://js.stripe.com/v3/buy-button.js"></script>
+
       </head>
       <body className={inter.className}>
         <div className="min-h-screen flex flex-col">
