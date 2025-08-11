@@ -1,10 +1,14 @@
 'use client'
-import { useState } from 'react'
+
+import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-export default function DescargarPage() {
+// evita prerender/SSG de esta ruta
+export const dynamic = 'force-dynamic'
+
+function DownloadForm() {
   const sp = useSearchParams()
   const id = sp.get('id') || ''
   const [pin, setPin] = useState('')
@@ -29,14 +33,10 @@ export default function DescargarPage() {
     setLoading(false)
   }
 
-  if (!id) return <div className="container py-16">Falta el parámetro <code>id</code>.</div>
+  if (!id) return <p className="text-sm text-muted-foreground">Falta el parámetro <code>id</code>.</p>
 
   return (
-    <div className="container py-16 max-w-md">
-      <h1 className="text-2xl font-semibold mb-2">Descargar recurso</h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        Ingresa tu PIN para descargar el archivo.
-      </p>
+    <>
       <div className="flex gap-2">
         <Input
           placeholder="PIN"
@@ -48,6 +48,21 @@ export default function DescargarPage() {
         </Button>
       </div>
       {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
+    </>
+  )
+}
+
+export default function DescargarPage() {
+  return (
+    <div className="container py-16 max-w-md">
+      <h1 className="text-2xl font-semibold mb-2">Descargar recurso</h1>
+      <p className="text-sm text-muted-foreground mb-6">
+        Ingresa tu PIN para descargar el archivo.
+      </p>
+      {/* el hook va dentro de Suspense */}
+      <Suspense fallback={<p className="text-sm text-muted-foreground">Cargando…</p>}>
+        <DownloadForm />
+      </Suspense>
     </div>
   )
 }
