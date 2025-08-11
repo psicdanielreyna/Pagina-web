@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from 'next'
 import './globals.css'
 import { Inter } from 'next/font/google'
@@ -21,32 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
+        {/* Calendly stylesheet */}
         <link
           href="https://assets.calendly.com/assets/external/widget.css"
           rel="stylesheet"
         />
       </head>
-      <body>
-        {/* ... */}
-        {children}
-        {/* ... */}
-      </body>
-    </html>
-  )
-}
-
-
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="es" suppressHydrationWarning>
       <body className={inter.className}>
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
-      </body>
-    </html>
-  )
-}
+        <div className="min-h-screen flex flex
+
