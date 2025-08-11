@@ -16,7 +16,7 @@ export const recursos: Recurso[] = [
     price: 249,
     currency: 'MXN',
     image: '/manuales/apagar-mente.png',
-    href: '/manuales/como-apagar-tu-mente.pdf'
+    href: 'descargar?id=como-apagar-tu-mente'
   },
   {
     id: 'arte-creer-en-ti',
@@ -25,6 +25,6 @@ export const recursos: Recurso[] = [
     price: 249,
     currency: 'MXN',
     image: '/manuales/el-arte-de-creer-en-ti.png',
-    href: '/manuales/el-arte-de-creer-en-ti.pdf'
+    href: 'descargar?id=el-arte-de-creer-en-ti'
   }
 ]
