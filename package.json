@@ -18,6 +18,9 @@
     "lucide-react": "0.458.0",
     "tailwind-merge": "2.5.3",
     "tailwindcss-animate": "1.0.7"
+    "stripe": "^16.6.0",
+    "resend": "^3.3.0"
+
   },
   "devDependencies": {
     "@types/node": "20.14.10",
