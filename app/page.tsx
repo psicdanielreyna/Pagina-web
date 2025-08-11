@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, ShoppingBag, BookOpen } from 'lucide-react'
-import { ProductCard } from '@/components/product-card'
+import ProductCard from '@/components/product-card'
 import { PostCard } from '@/components/post-card'
 import { NewsletterForm } from '@/components/newsletter-form'
 import { recursos } from '@/data/recursos'
