@@ -1,16 +1,18 @@
-import Link from 'next/link'
-
-export function ProductCard({ title, description, href, image, price }:{
-  title:string, description:string, href:string, image?:string, price?:string
-}){
-  return (
-    <Link href={href} className="block border rounded-2xl overflow-hidden bg-card hover:shadow-sm transition-shadow">
-      <div className="aspect-video bg-muted" />
-      <div className="p-5">
-        <h3 className="text-lg font-medium">{title}</h3>
-        <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
-        <div className="mt-3 text-sm ">{price || ''}</div>
-      </div>
-    </Link>
-  )
-}
+export const recursosDestacados = [
+  {
+    titulo: "Cómo Apagar tu Mente",
+    descripcion: "Workbook práctico para calmar el sobrepensamiento con técnicas simples y efectivas.",
+    precio: 249,
+    moneda: "MXN",
+    imagen: "/manuales/apagar-mente.png",
+    enlace: "/manuales/como-apagar-tu-mente.pdf"
+  },
+  {
+    titulo: "El Arte de Creer en Ti",
+    descripcion: "Estrategias y ejercicios para fortalecer tu autoestima y confianza personal.",
+    precio: 249,
+    moneda: "MXN",
+    imagen: "/manuales/el-arte-de-creer-en-ti.png",
+    enlace: "/manuales/el-arte-de-creer-en-ti.pdf"
+  }
+];
