@@ -4,6 +4,8 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { verifyToken } from '@/lib/tokens'
 
+export const runtime = 'nodejs' // 👈 importante para usar fs
+
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get('id') || ''
   const pin = req.nextUrl.searchParams.get('pin') || ''
@@ -12,20 +14,23 @@ export async function GET(req: NextRequest) {
 
   if (!id || !DOWNLOADS[id]) return new Response('Not found', { status: 404 })
 
-  // 1) Si trae token, verifícalo (24h)
   if (token) {
     const data = verifyToken(token)
     if (!data || data.id !== id) return new Response('Unauthorized', { status: 401 })
   } else {
-    // 2) Si no hay token, requiere PIN
     if (!required || pin !== required) return new Response('Unauthorized', { status: 401 })
   }
 
   const fileMeta = DOWNLOADS[id]
   const filePath = path.join(process.cwd(), fileMeta.path)
+
   try {
-    const data = await fs.readFile(filePath)
-    return new Response(data, {
+    const buf = await fs.readFile(filePath)          // Buffer
+    const ab = buf.buffer.slice(                     // ArrayBuffer limpio
+      buf.byteOffset,
+      buf.byteOffset + buf.byteLength
+    )
+    return new Response(ab, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${fileMeta.filename}"`,
