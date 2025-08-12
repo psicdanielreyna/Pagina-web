@@ -25,19 +25,17 @@ export async function GET(req: NextRequest) {
   const filePath = path.join(process.cwd(), fileMeta.path)
 
   try {
-    const buf = await fs.readFile(filePath)          // Buffer
-    const ab = buf.buffer.slice(                     // ArrayBuffer limpio
-      buf.byteOffset,
-      buf.byteOffset + buf.byteLength
-    )
-    return new Response(ab, {
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${fileMeta.filename}"`,
-        'Cache-Control': 'no-store',
-      },
-    })
-  } catch {
-    return new Response('File missing', { status: 500 })
-  }
+  const buf = await fs.readFile(filePath)        // Buffer
+  const body = new Uint8Array(buf)               // ✅ BodyInit válido
+
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${fileMeta.filename}"`,
+      'Cache-Control': 'no-store',
+    },
+  })
+} catch {
+  return new Response('File missing', { status: 500 })
 }
+
