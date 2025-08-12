@@ -10,3 +10,11 @@ export const STRIPE_TO_RESOURCE: Record<string, keyof typeof RESOURCE_IDS> = {
   'buy_btn_COMO_APAGAR': 'como-apagar-tu-mente',
   'buy_btn_ARTE_CREER': 'el-arte-de-creer-en-ti',
 }
+export const RESOURCE_PRICES: Record<string, number> = {
+  'como-apagar-tu-mente': 249,
+  'el-arte-de-creer-en-ti': 249,
+}
+export const RESOURCE_TITLES: Record<string, string> = {
+  'como-apagar-tu-mente': 'Cómo Apagar tu Mente',
+  'el-arte-de-creer-en-ti': 'El Arte de Creer en Ti',
+}
