@@ -27,6 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         /> 
 <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+        <link rel="preconnect" href="https://js.stripe.com" />
+<script async src="https://js.stripe.com/v3/buy-button.js"></script>
+
 
       </head>
       <body className={inter.className}>
