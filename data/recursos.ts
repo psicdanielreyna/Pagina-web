@@ -8,23 +8,24 @@ export type Recurso = {
   href: string
 }
 
-export const recursos: Recurso[] = [
+export const recursos = [
   {
-    id: 'apagar-mente',
-    title: 'Cómo Apagar tu Mente',
-    description: 'Workbook práctico para calmar el sobrepensamiento con técnicas simples y efectivas.',
+    slug: "el-arte-de-creer-en-ti",
+    title: "El Arte de Creer en Ti",
     price: 249,
-    currency: 'MXN',
-    image: '/manuales/apagar-mente.png',
-    href: '/producto/como-apagar-tu-mente'
+    image: "/manuales/el-arte-de-creer-en-ti.png",
+    description: "Estrategias y ejercicios para fortalecer tu autoestima.",
+    file: "/manuales/el-arte-de-creer-en-ti.pdf",
+    mercadoPago: "https://mpago.la/xxxxx"   // <— Asegúrate de tener esto
   },
   {
-    id: 'arte-creer-en-ti',
-    title: 'El Arte de Creer en Ti',
-    description: 'Estrategias y ejercicios para fortalecer tu autoestima y confianza personal.',
+    slug: "como-apagar-tu-mente",
+    title: "Cómo Apagar tu Mente",
     price: 249,
-    currency: 'MXN',
-    image: '/manuales/el-arte-de-creer-en-ti.png',
-    href: '/producto/el-arte-de-creer-en-ti'
+    image: "/manuales/apagar-mente.png",
+    description: "Técnicas prácticas para detener el sobrepensamiento.",
+    file: "/manuales/como-apagar-tu-mente.pdf",
+    mercadoPago: "https://mpago.la/yyyyy"   // <— Y esto también
   }
 ]
+
