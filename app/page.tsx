@@ -45,25 +45,23 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="container py-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">Recursos destacados</h2>
-          <Button variant="ghost" asChild><Link href="/tienda">Ver todo</Link></Button>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recursos.map((r) => (
-            <ProductCard
-              key={r.id}
-              title={r.title}
-              description={r.description}
-              href={r.href}
-              image={r.image}
-              price={r.price}
-              currency={r.currency}
-            />
-          ))}
-        </div>
-      </section>
+     import { recursos } from "@/data/recursos"
+// ...
+
+<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {recursos.map((r) => (
+    <ProductCard
+      key={r.slug}                              // ✅ usar slug
+      title={r.title}
+      description={r.description}
+      href={`/tienda/${r.slug}`}                // ✅ construir la url con el slug
+      image={r.image}
+      price={r.price}
+      currency="MXN"
+    />
+  ))}
+</div>
+
 
       <section className="container py-12">
         <div className="flex items-center justify-between mb-6">
