@@ -1,87 +1,23 @@
-// app/page.tsx
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { ArrowRight, ShoppingBag, BookOpen } from 'lucide-react'
-import ProductCard from '@/components/product-card'
-import { PostCard } from '@/components/post-card'
-import { NewsletterForm } from '@/components/newsletter-form'
-import { recursos } from '@/data/recursos'
+import ProductCard from "@/components/product-card"
+import { recursos } from "@/data/recursos"
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div>
-      <section className="container py-16 md:py-24">
-        <div className="grid md:grid-cols-2 gap-10 items-center">
-          <div className="space-y-6">
-            <h1 className="text-4xl md:text-5xl font-semibold leading-tight">
-              Terapia clara, herramientas prácticas.
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Psicología cognitivo-conductual (CBT) con enfoque breve. Contenido y recursos que sí ayudan.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild>
-                <Link href="#newsletter"><ArrowRight className="mr-2 h-4 w-4" /> Recibe una guía gratuita</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/tienda"><ShoppingBag className="mr-2 h-4 w-4" /> Explorar recursos</Link>
-              </Button>
-            </div>
-            <div className="flex gap-6 pt-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2"><BookOpen className="h-4 w-4" /> Enfoque CBT breve</div>
-              <div className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Recursos descargables</div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl bg-card p-8 shadow-sm border">
-            <h3 className="text-xl font-medium mb-4">¿Qué te gustaría hacer hoy?</h3>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Button variant="secondary" asChild><Link href="/tienda">Explorar tienda</Link></Button>
-              <Button variant="secondary" asChild><Link href="/blog">Leer el blog</Link></Button>
-              <Button variant="secondary" asChild><Link href="/sobre-mi">Conocer al terapeuta</Link></Button>
-              <Button variant="secondary" asChild><Link href="#newsletter">Suscribirme</Link></Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-     import { recursos } from "@/data/recursos"
-// ...
-
-<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  {recursos.map((r) => (
-    <ProductCard
-      key={r.slug}                              // ✅ usar slug
-      title={r.title}
-      description={r.description}
-      href={`/tienda/${r.slug}`}                // ✅ construir la url con el slug
-      image={r.image}
-      price={r.price}
-      currency="MXN"
-    />
-  ))}
-</div>
-
-
-      <section className="container py-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">Últimos del blog</h2>
-          <Button variant="ghost" asChild><Link href="/blog">Ver blog</Link></Button>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          <PostCard title="La verdad sobre dejar de procrastinar" href="/blog/procrastinacion" />
-          <PostCard title="¿Los libros de autoayuda realmente funcionan?" href="/blog/autoayuda-funciona" />
-          <PostCard title="Mini-test: ¿tienes burnout académico?" href="/blog/burnout-mini-test" />
-        </div>
-      </section>
-
-      <section id="newsletter" className="container py-16">
-        <div className="container-narrow bg-card border rounded-2xl p-8">
-          <h3 className="text-xl font-semibold mb-2">Recibe herramientas que sí ayudan</h3>
-          <p className="text-muted-foreground mb-6">Un correo a la semana. Sin spam. Incluye recursos descargables.</p>
-          <NewsletterForm />
-        </div>
-      </section>
-    </div>
+    <main className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-semibold mb-6">Bienvenido a PsicoToolKit</h1>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {recursos.map((r) => (
+          <ProductCard
+            key={r.slug}
+            title={r.title}
+            description={r.description}
+            href={r.href}
+            image={r.image}
+            price={r.price}
+            currency="MXN"
+          />
+        ))}
+      </div>
+    </main>
   )
 }
