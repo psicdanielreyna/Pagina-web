@@ -1,37 +1,19 @@
 // app/layout.tsx
-import type { Metadata } from 'next'
-import './globals.css'
-import { Inter } from 'next/font/google'
-import { Header } from '@/components/header'
-import { Footer } from '@/components/footer'
+import "./globals.css"
+import { Inter } from "next/font/google"
+import Header from "@/components/header"
+import Footer from "@/components/footer" // si Footer también es default
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] })
 
-export const metadata: Metadata = {
-  title: 'Daniel Reyna – Psicólogo CBT',
-  description: 'Terapia cognitivo-conductual breve, psicoeducación y recursos prácticos.',
-  metadataBase: new URL('https://example.com'),
-  openGraph: {
-    title: 'Daniel Reyna – Psicólogo',
-    description: 'Terapia CBT, psicoeducación y recursos.',
-    type: 'website',
-  },
+export const metadata = {
+  title: "Daniel Reyna — Psicólogo",
+  description: "Psicoterapia y recursos prácticos para el bienestar emocional.",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <head>
-        <link
-          href="https://assets.calendly.com/assets/external/widget.css"
-          rel="stylesheet"
-        /> 
-<script async src="https://js.stripe.com/v3/buy-button.js"></script>
-        <link rel="preconnect" href="https://js.stripe.com" />
-<script async src="https://js.stripe.com/v3/buy-button.js"></script>
-
-
-      </head>
+    <html lang="es">
       <body className={inter.className}>
         <div className="min-h-screen flex flex-col">
           <Header />
