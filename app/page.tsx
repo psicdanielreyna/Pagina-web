@@ -75,6 +75,90 @@ export default function HomePage() {
           </div> */}
         </div>
       </section>
+      // app/page.tsx (solo la parte del blog)
+async function getBlog() {
+  const res = await fetch("/api/blog?limit=3", { cache: "no-store" });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items as {
+    title: string;
+    link: string;
+    date: string;
+    excerpt: string;
+    image?: string;
+  }[];
+}
+
+export default async function HomePage() {
+  const posts = await getBlog();
+
+  return (
+    <main className="...">
+      {/* ...tu hero / recursos / newsletter... */}
+
+      {/* --- Blog --- */}
+      <section className="mt-16">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold">Últimos artículos</h2>
+          <a
+            href="https://robertomtz.com"
+            target="_blank"
+            rel="noreferrer"
+            className="text-teal-700 hover:underline"
+          >
+            Ver blog
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Principal grande */}
+          <a
+            href={posts[0]?.link ?? "#"}
+            target="_blank"
+            rel="noreferrer"
+            className="lg:col-span-2 rounded-xl border p-4 hover:shadow-md transition"
+          >
+            {posts[0]?.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={posts[0].image}
+                alt={posts[0].title}
+                className="w-full h-64 object-cover rounded-lg mb-4"
+              />
+            ) : null}
+            <h3 className="text-xl font-semibold mb-2">
+              {posts[0]?.title ?? "Pronto habrá artículos"}
+            </h3>
+            <p className="text-slate-600 text-sm">
+              {posts[0]?.excerpt ?? ""}
+            </p>
+            <p className="text-slate-400 text-xs mt-2">{posts[0]?.date}</p>
+          </a>
+
+          {/* Dos secundarias a la derecha */}
+          <div className="flex flex-col gap-6">
+            {posts.slice(1, 3).map((p) => (
+              <a
+                key={p.link}
+                href={p.link}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-xl border p-4 hover:shadow-md transition"
+              >
+                <h4 className="font-medium mb-1">{p.title}</h4>
+                <p className="text-slate-600 text-sm line-clamp-3">
+                  {p.excerpt}
+                </p>
+                <p className="text-slate-400 text-xs mt-2">{p.date}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 
       {/* NEWSLETTER CENTRADO ABAJO */}
       <section className="py-10 bg-muted/30">
