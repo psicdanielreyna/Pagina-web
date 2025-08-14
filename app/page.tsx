@@ -2,6 +2,9 @@
 import Image from "next/image"
 import Link from "next/link"
 import { recursos } from "@/data/recursos"
+import { ProductCard } from "@/components/ProductCard"
+import { NewsletterForm } from "@/components/NewsletterForm"
+
 
 // Llama a nuestro endpoint serverless en Netlify (relativo)
 async function getBlog() {
