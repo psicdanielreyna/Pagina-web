@@ -1,4 +1,4 @@
-import ProductCard from "@/components/product-card"
+import ProductCard from '@/components/product-card' // ← default
 import NewsletterForm from "@/components/newsletter-form"
 import recursos from "@/data/recursos"
 
