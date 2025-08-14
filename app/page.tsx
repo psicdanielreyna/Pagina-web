@@ -1,6 +1,7 @@
-import ProductCard from "@/components/ProductCard"
-import NewsletterForm from "@/components/NewsletterForm"
+import ProductCard from "@/components/product-card"
+import NewsletterForm from "@/components/newsletter-form"
 import recursos from "@/data/recursos.json"
+
 
 export default function HomePage() {
   const destacados = recursos.slice(0, 2)
