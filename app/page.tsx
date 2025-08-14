@@ -161,9 +161,8 @@ export default async function HomePage() {
             </p>
             {/* Sustituye este bloque por tu <NewsletterForm /> si ya existe */}
             <form
-              action="https://formspree.io/f/your-id"
-              method="POST"
-              className="flex gap-2"
+             <NewsletterForm />
+
             >
               <input
                 type="email"
