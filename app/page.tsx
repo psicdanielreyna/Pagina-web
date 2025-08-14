@@ -30,11 +30,11 @@ export default function HomePage() {
           {destacados.map((r) => (
             <ProductCard
               key={r.slug}
-              slug={r.slug}
               title={r.title}
               description={r.description}
               image={r.image}
               price={r.price}
+              href={`/tienda/${r.slug}`}   // ✅ usa href
             />
           ))}
         </div>
