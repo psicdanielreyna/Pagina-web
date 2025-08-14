@@ -46,12 +46,17 @@ export default async function HomePage() {
       <section>
         <div className="container mx-auto px-4 flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Recursos destacados</h2>
-          <Link
-            href="/tienda"
-            className="text-teal-700 hover:underline"
-          >
-            Ver todo
-          </Link>
+         {destacados.map((r) => (
+  <ProductCard
+    key={r.slug}
+    slug={r.slug}
+    title={r.title}
+    description={r.description}
+    image={r.image}
+    price={r.price}
+  />
+))}
+
         </div>
 
         <div className="container mx-auto px-4 grid gap-6 sm:grid-cols-2">
