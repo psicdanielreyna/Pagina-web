@@ -18,4 +18,5 @@ const recursos = [
   }
 ]
 
-export default recursos
+export { recursos }          // ← export nombrado
+export default recursos      // ← export default
