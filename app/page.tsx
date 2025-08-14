@@ -1,6 +1,7 @@
 import ProductCard from "@/components/product-card"
 import NewsletterForm from "@/components/newsletter-form"
-import recursos from "@/data/recursos.json"
+import recursos from "@/data/recursos"
+
 
 
 export default function HomePage() {
