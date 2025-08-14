@@ -1,7 +1,7 @@
 // app/page.tsx
 import Link from "next/link"
 import Image from "next/image"
-import ProductCard from "@/components/product-card"
+import { ProductCard } from "@/components/product-card"
 import { NewsletterForm } from "@/components/newsletter-form"
 import { recursos } from "@/data/recursos"
 
