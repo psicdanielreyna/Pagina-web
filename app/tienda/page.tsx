@@ -17,13 +17,15 @@ export default function TiendaPage() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {recursos.map((r) => (
           <ProductCard
+           <ProductCard
             key={r.slug}
             title={r.title}
             description={r.description}
-            price={r.price}
             image={r.image}
-            href={`/tienda/${r.slug}`}
+            price={r.price}
+            href={`/tienda/${r.slug}`}   // ✅ usa href
           />
+
         ))}
       </div>
     </div>
