@@ -23,7 +23,8 @@
     "resend": "^3.3.0",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
-    "mercadopago": "^2.3.5"
+    "mercadopago": "^2.3.5",
+    "rss-parser": "^3.13.0"
 
   },
   "devDependencies": {
