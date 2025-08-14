@@ -2,22 +2,20 @@
 
 import { useState } from "react"
 
-export function NewsletterForm() {
+export default function NewsletterForm() {
   const [email, setEmail] = useState("")
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setStatus("loading")
-
     try {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         body: JSON.stringify({ email }),
         headers: { "Content-Type": "application/json" },
       })
-
-      if (!res.ok) throw new Error("Error en suscripción")
+      if (!res.ok) throw new Error("fail")
       setStatus("success")
       setEmail("")
     } catch {
@@ -42,16 +40,8 @@ export function NewsletterForm() {
       >
         {status === "loading" ? "Enviando..." : "Quiero recibirlo"}
       </button>
-      {status === "success" && (
-        <p className="text-green-600 text-sm mt-2 sm:mt-0">
-          ¡Gracias por suscribirte!
-        </p>
-      )}
-      {status === "error" && (
-        <p className="text-red-600 text-sm mt-2 sm:mt-0">
-          Ocurrió un error. Intenta de nuevo.
-        </p>
-      )}
+      {status === "success" && <p className="text-green-600 text-sm">¡Gracias por suscribirte!</p>}
+      {status === "error" && <p className="text-red-600 text-sm">Ocurrió un error. Intenta de nuevo.</p>}
     </form>
   )
 }
