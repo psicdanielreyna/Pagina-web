@@ -1,104 +1,89 @@
 // app/page.tsx
-import Link from "next/link"
 import Image from "next/image"
-import { ProductCard } from "@/components/product-card"
-import { NewsletterForm } from "@/components/newsletter-form"
+import Link from "next/link"
 import { recursos } from "@/data/recursos"
 
-export default function HomePage() {
-  // Si quieres destacar sólo algunos recursos, selecciona aquí
+// Llama a nuestro endpoint serverless en Netlify (relativo)
+async function getBlog() {
+  try {
+    const res = await fetch("/api/blog?limit=3", { cache: "no-store" })
+    if (!res.ok) return []
+    const data = await res.json()
+    return (data.items ?? []) as {
+      title: string
+      link: string
+      date: string
+      excerpt: string
+      image?: string
+    }[]
+  } catch {
+    return []
+  }
+}
+
+export default async function HomePage() {
+  const posts = await getBlog()
   const destacados = recursos.slice(0, 2)
 
   return (
-    <div className="space-y-12">
+    <main className="space-y-12">
       {/* HERO */}
       <section className="pt-8 md:pt-12">
-        <div className="container mx-auto">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-            Bienvenido a <span className="whitespace-nowrap">Daniel Reyna — Psicólogo</span>
+        <div className="container mx-auto px-4">
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
+            Bienvenido a PsicoToolKit
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground max-w-3xl">
+          <p className="text-slate-600 mt-3 max-w-2xl">
             Recursos prácticos y herramientas para tu bienestar.
           </p>
         </div>
       </section>
 
       {/* RECURSOS DESTACADOS */}
-      <section className="pb-4">
-        <div className="container mx-auto">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-2xl md:text-3xl font-semibold">Recursos destacados</h2>
-            <Link
-              href="/tienda"
-              className="rounded-full border px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-            >
-              Ver todo
-            </Link>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            {destacados.map((r) => (
-              <ProductCard
-                key={r.slug}
-                title={r.title}
-                description={r.description}
-                href={`/tienda/${r.slug}`}
-                image={r.image}
-                price={r.price}
-                currency="MXN"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ÚLTIMOS ARTÍCULOS (se mantiene igual a como lo tenías) */}
-      {/* Si ya tenías este bloque en tu página anterior y usa otra fuente de datos,
-          puedes dejarlo tal cual. Sólo lo envolvemos en container para consistencia. */}
       <section>
-        <div className="container mx-auto">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-2xl md:text-3xl font-semibold">Últimos artículos</h2>
-            <Link
-              href="/blog"
-              className="rounded-full border px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-            >
-              Ver blog
-            </Link>
-          </div>
+        <div className="container mx-auto px-4 flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold">Recursos destacados</h2>
+          <Link
+            href="/tienda"
+            className="text-teal-700 hover:underline"
+          >
+            Ver todo
+          </Link>
+        </div>
 
-          {/* Deja aquí tu grid de posts existente */}
-          {/* Ejemplo de placeholder (borra si ya tienes tu listado de posts renderizado): */}
-          {/* <div className="grid gap-6 md:grid-cols-2">
-            <ArticleCard ... />
-            <ArticleCard ... />
-          </div> */}
+        <div className="container mx-auto px-4 grid gap-6 sm:grid-cols-2">
+          {destacados.map((r) => (
+            <Link
+              key={r.slug}
+              href={`/tienda/${r.slug}`}
+              className="rounded-xl border bg-white hover:shadow-md transition overflow-hidden"
+            >
+              {/* Imagen */}
+              <div className="relative w-full h-64">
+                <Image
+                  src={r.image}
+                  alt={r.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+              {/* Texto */}
+              <div className="p-4">
+                <h3 className="font-semibold">{r.title}</h3>
+                <p className="text-slate-600 text-sm mt-1 line-clamp-2">
+                  {r.description}
+                </p>
+                <p className="mt-2 font-medium">MXN {r.price}.00</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
-      // app/page.tsx (solo la parte del blog)
-async function getBlog() {
-  const res = await fetch("/api/blog?limit=3", { cache: "no-store" });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.items as {
-    title: string;
-    link: string;
-    date: string;
-    excerpt: string;
-    image?: string;
-  }[];
-}
 
-export default async function HomePage() {
-  const posts = await getBlog();
-
-  return (
-    <main className="...">
-      {/* ...tu hero / recursos / newsletter... */}
-
-      {/* --- Blog --- */}
-      <section className="mt-16">
-        <div className="flex items-center justify-between mb-6">
+      {/* BLOG: 1 grande + 2 a la derecha */}
+      <section className="pb-4">
+        <div className="container mx-auto px-4 flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Últimos artículos</h2>
           <a
             href="https://robertomtz.com"
@@ -110,7 +95,7 @@ export default async function HomePage() {
           </a>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Principal grande */}
           <a
             href={posts[0]?.link ?? "#"}
@@ -155,31 +140,40 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-    </main>
-  );
-}
 
-
-      {/* NEWSLETTER CENTRADO ABAJO */}
-      <section className="py-10 bg-muted/30">
-        <div className="container mx-auto">
-          <div className="flex justify-center">
-            <div className="w-full max-w-2xl text-center">
-              <h2 className="text-2xl md:text-3xl font-semibold">Suscríbete al newsletter</h2>
-              <p className="mt-2 text-muted-foreground">
-                Recibe herramientas y artículos breves para tu salud mental.
-              </p>
-
-              {/* wrapper para centrar el formulario si su contenido es ancho */}
-              <div className="mt-6 flex justify-center">
-                <div className="w-full">
-                  <NewsletterForm />
-                </div>
-              </div>
-            </div>
+      {/* NEWSLETTER centrado abajo (si ya tienes componente, colócalo aquí) */}
+      <section className="pb-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-xl mx-auto text-center">
+            <h3 className="text-xl font-semibold mb-2">
+              Suscríbete al newsletter
+            </h3>
+            <p className="text-slate-600 mb-4">
+              Recibe herramientas y artículos breves para tu salud mental.
+            </p>
+            {/* Sustituye este bloque por tu <NewsletterForm /> si ya existe */}
+            <form
+              action="https://formspree.io/f/your-id"
+              method="POST"
+              className="flex gap-2"
+            >
+              <input
+                type="email"
+                name="email"
+                placeholder="tu@email.com"
+                className="flex-1 rounded-lg border px-3 py-2"
+                required
+              />
+              <button
+                type="submit"
+                className="rounded-lg bg-teal-700 text-white px-4 py-2 hover:bg-teal-800"
+              >
+                Quiero recibirlo
+              </button>
+            </form>
           </div>
         </div>
       </section>
-    </div>
+    </main>
   )
 }
