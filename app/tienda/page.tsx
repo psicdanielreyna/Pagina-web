@@ -1,6 +1,6 @@
 // app/tienda/page.tsx
 import { Metadata } from "next"
-import { ProductCard } from "@/components/product-card"
+import ProductCard from '@/components/product-card' // ← default, sin llaves
 import { recursos } from "@/data/recursos"
 
 export const metadata: Metadata = {
