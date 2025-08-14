@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-interface ProductCardProps {
+type Props = {
   slug: string
   title: string
   description: string
@@ -9,19 +9,12 @@ interface ProductCardProps {
   price: number
 }
 
-export function ProductCard({
-  slug,
-  title,
-  description,
-  image,
-  price,
-}: ProductCardProps) {
+export default function ProductCard({ slug, title, description, image, price }: Props) {
   return (
     <Link
       href={`/tienda/${slug}`}
       className="rounded-xl border bg-white hover:shadow-md transition overflow-hidden"
     >
-      {/* Imagen */}
       <div className="relative w-full h-64">
         <Image
           src={image}
@@ -31,7 +24,6 @@ export function ProductCard({
           sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
-      {/* Texto */}
       <div className="p-4">
         <h3 className="font-semibold">{title}</h3>
         <p className="text-slate-600 text-sm mt-1 line-clamp-2">{description}</p>
