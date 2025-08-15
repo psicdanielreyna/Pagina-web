@@ -10,20 +10,20 @@ type Recurso = {
 
 const recursos: Recurso[] = [
   {
-    slug: "el-arte-de-creer-en-ti",
-    title: "El Arte de Creer en Ti",
-    description:
-      "Estrategias y ejercicios para fortalecer tu autoestima y confianza personal.",
+    sslug: "como-apagar-la-mente",
+    title: "Cómo Apagar tu Mente",
+    description: "Técnicas efectivas para calmar el sobrepensamiento.",
+    image: "/manuales/apagar-mente.png",
     price: 249,
-    image: "/manuales/el-arte-de-creer-en-ti.png", // <- ruta real en /public
+    href: "https://mpago.la/2bYkKse", // <- Mercado Pago
   },
   {
-    slug: "como-apagar-tu-mente",
-    title: "Cómo Apagar tu Mente",
-    description:
-      "Workbook práctico para calmar el sobrepensamiento con técnicas simples y efectivas.",
+    slug: "el-arte-de-creer-en-ti",
+    title: "El Arte de Creer en Ti",
+    description: "Estrategias para fortalecer tu autoestima y confianza.",
+    image: "/manuales/el-arte-de-creer-en-ti.png",
     price: 249,
-    image: "/manuales/apagar-mente.png", // <- ruta real en /public
+    href: "https://mpago.la/1NgbPFE", // <- Mercado Pago
   },
 ]
 
