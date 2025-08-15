@@ -7,6 +7,31 @@ import NewsletterForm from "@/components/newsletter-form"
 
 import recursos from "@/data/recursos"
 import posts from "@/data/posts"
+import Image from "next/image";
+
+export default function Home() {
+  return (
+    <section className="flex flex-col md:flex-row items-center gap-8 p-8">
+      <div className="flex-1">
+        <h1 className="text-4xl font-bold mb-4">Bienvenido a PsicoToolKit</h1>
+        <p className="text-lg text-gray-700">
+          Recursos para potenciar la terapia y el bienestar.
+        </p>
+      </div>
+
+      <div className="flex-1">
+        <Image
+          src="/images/header.png" // usando carpeta public/images
+          alt="Consulta psicológica"
+          width={600}
+          height={400}
+          className="rounded-lg shadow-lg"
+        />
+      </div>
+    </section>
+  );
+}
+
 
 // SEO
 export const metadata = {
