@@ -1,10 +1,10 @@
 // data/posts.ts
 export type PostMeta = {
-  slug: string;          // debe coincidir con la carpeta/archivo en app/blog/[slug]/page.mdx
+  slug: string;
   title: string;
-  date: string;          // ISO string "2025-08-15"
+  date: string;
   excerpt: string;
-  image?: string;        // ruta pública de la portada (opcional)
+  image?: string;
 };
 
 const posts: PostMeta[] = [
@@ -14,7 +14,7 @@ const posts: PostMeta[] = [
     date: "2025-08-10",
     excerpt:
       "Técnicas concretas para bajar el ruido mental cuando sientes que la cabeza no para.",
-    image: "/blog/como-apagar-tu-mente.jpg",
+    image: "/blog/post-1.png",  // <-- coincide con tu archivo real
   },
   {
     slug: "el-arte-de-creer-en-ti",
@@ -22,7 +22,7 @@ const posts: PostMeta[] = [
     date: "2025-08-05",
     excerpt:
       "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
-    image: "/blog/el-arte-de-creer-en-ti.jpg",
+    image: "/blog/post-2.png",
   },
   {
     slug: "ansiedad-3-pasos",
@@ -30,7 +30,7 @@ const posts: PostMeta[] = [
     date: "2025-07-28",
     excerpt:
       "Un mini-protocolo para reconocer, regular y responder mejor ante la ansiedad.",
-    image: "/blog/ansiedad-3-pasos.jpg",
+    image: "/blog/post-3.png",
   },
 ];
 
