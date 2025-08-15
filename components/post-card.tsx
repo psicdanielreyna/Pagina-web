@@ -1,46 +1,52 @@
-// /components/post-card.tsx
+// components/post-card.tsx
 import Image from "next/image"
 import Link from "next/link"
 
 type Props = {
-  href: string
+  slug: string
   title: string
   excerpt: string
-  image?: string
-  featured?: boolean
+  image: string
+  date?: string
 }
 
-export default function PostCard({
-  href,
-  title,
-  excerpt,
-  image = "/blog/placeholder.jpg",
-  featured = false,
-}: Props) {
+export default function PostCard({ slug, title, excerpt, image, date }: Props) {
   return (
-    <Link
-      href={href}
-      className={
-        featured
-          ? "group block rounded-2xl overflow-hidden border hover:shadow-xl transition"
-          : "group block rounded-xl overflow-hidden border hover:shadow-md transition"
-      }
-    >
-      <div className={featured ? "relative aspect-[16/9]" : "relative aspect-[4/3]"}>
+    <article className="border rounded-xl overflow-hidden hover:shadow-md transition h-full flex flex-col">
+      <div className="relative aspect-[16/10] bg-neutral-50">
         <Image
           src={image}
           alt={title}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-          sizes={featured ? "(min-width: 1024px) 900px, 100vw" : "(min-width: 1024px) 450px, 100vw"}
-          priority={featured}
+          className="object-cover"
+          sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw"
+          priority={false}
         />
       </div>
-      <div className={featured ? "p-6 space-y-2 bg-white" : "p-4 space-y-1 bg-white"}>
-        <h3 className={featured ? "text-xl font-semibold" : "text-lg font-semibold"}>{title}</h3>
-        <p className="text-sm text-neutral-600">{excerpt}</p>
-        <span className="inline-block text-sm text-blue-600 mt-1">Leer más →</span>
+
+      <div className="p-4 flex-1 flex flex-col gap-2">
+        {date && (
+          <span className="text-xs text-neutral-500">
+            {new Date(date).toLocaleDateString("es-MX", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
+        )}
+
+        <h3 className="text-lg font-semibold leading-snug">{title}</h3>
+        <p className="text-neutral-600 text-sm flex-1">{excerpt}</p>
+
+        <div className="pt-2">
+          <Link
+            href={`/blog/${slug}`}
+            className="inline-flex items-center text-blue-600 hover:underline"
+          >
+            Leer más →
+          </Link>
+        </div>
       </div>
-    </Link>
+    </article>
   )
 }
