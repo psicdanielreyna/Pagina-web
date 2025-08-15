@@ -1,26 +1,34 @@
-import Link from 'next/link'
+// app/blog/page.tsx
+import posts from "@/data/posts"
+import PostCard from "@/components/post-card"
 
-const posts = [
-  { slug: 'procrastinacion', title: 'La verdad sobre dejar de procrastinar', excerpt: 'Por qué procrastinamos y cómo dejar de hacerlo sin mitos.' },
-  { slug: 'autoayuda-funciona', title: '¿Los libros de autoayuda realmente funcionan?', excerpt: 'Cuándo ayudan, cuándo no, y cómo elegirlos.' },
-  { slug: 'burnout-mini-test', title: 'Mini-test: ¿tienes burnout académico?', excerpt: 'Un screening breve para orientarte.' },
-  { slug: 'mi-primer-post', title: 'Post MDX de ejemplo', excerpt: 'Este post está escrito en MDX.' },
-]
+export const metadata = {
+  title: "Blog — Daniel Reyna",
+  description:
+    "Ideas prácticas y herramientas psicológicas para ansiedad, autoestima y bienestar.",
+}
 
 export default function BlogPage() {
+  const sorted = [...posts].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+
   return (
-    <div className="container py-16">
-      <h1 className="text-3xl font-semibold mb-6">Blog</h1>
-      <ul className="grid md:grid-cols-2 gap-6">
-        {posts.map(p => (
-          <li key={p.slug} className="border rounded-xl p-6 bg-card">
-            <h3 className="text-xl font-medium mb-2">
-              <Link className="hover:underline" href={`/blog/${p.slug}`}>{p.title}</Link>
-            </h3>
-            <p className="text-muted-foreground">{p.excerpt}</p>
-          </li>
+    <div className="container mx-auto px-4 py-10 space-y-8">
+      <h1 className="text-3xl font-semibold">Blog</h1>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sorted.map((p) => (
+          <PostCard
+            key={p.slug}
+            slug={p.slug}
+            title={p.title}
+            excerpt={p.excerpt}
+            image={p.image}
+            date={p.date}
+          />
         ))}
-      </ul>
+      </div>
     </div>
   )
 }
