@@ -10,7 +10,10 @@ export default function ServiciosPage(){
         <li>Pareja</li>
       </ul>
       <h2>Precios</h2>
-      <p>Precios accesibles. <a className="underline" href="/agenda">Conoce tus opciones y agenda</a>.</p>
+      <p>Precios accesibles. <a className="underline" href=<Link href="/agenda?t=individual" className="btn-primary">Agendar</Link>
+<Link href="/agenda?t=paquete" className="btn-primary">Agendar</Link>
+<Link href="/agenda?t=pareja" className="btn-primary">Agendar</Link>
+
       <h2>Preguntas frecuentes</h2>
       <p>Próximamente.</p>
     </div>
