@@ -45,9 +45,15 @@ export default function HomePage() {
               avanzar a tu ritmo.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Link href="/agendar" className="inline-flex items-center rounded-full px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition">
-+ <Link href="/agenda" className="inline-flex items-center rounded-full px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition">
-    Agendar cita
+             import Link from "next/link"
+              // ...
+<Link
+  href="/servicios"
+  className="inline-flex items-center rounded-full px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition"
+>
+  Agendar cita
+</Link>
+
   </Link>
 
               </Link>
