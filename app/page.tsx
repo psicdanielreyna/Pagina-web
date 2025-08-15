@@ -1,4 +1,4 @@
-// /app/page.tsx
+// app/page.tsx
 import Image from "next/image"
 import Link from "next/link"
 
@@ -7,33 +7,8 @@ import NewsletterForm from "@/components/newsletter-form"
 
 import recursos from "@/data/recursos"
 import posts from "@/data/posts"
-import Image from "next/image";
 
-export default function Home() {
-  return (
-    <section className="flex flex-col md:flex-row items-center gap-8 p-8">
-      <div className="flex-1">
-        <h1 className="text-4xl font-bold mb-4">Bienvenido a PsicoToolKit</h1>
-        <p className="text-lg text-gray-700">
-          Recursos para potenciar la terapia y el bienestar.
-        </p>
-      </div>
-
-      <div className="flex-1">
-        <Image
-          src="/images/header.png" // usando carpeta public/images
-          alt="Consulta psicológica"
-          width={600}
-          height={400}
-          className="rounded-lg shadow-lg"
-        />
-      </div>
-    </section>
-  );
-}
-
-
-// SEO
+// (Opcional) SEO
 export const metadata = {
   title: "Daniel Reyna — Psicoterapia & Recursos",
   description:
@@ -41,10 +16,10 @@ export const metadata = {
 }
 
 export default function HomePage() {
-  // toma 2 recursos para portada
+  // Recursos destacados para portada
   const destacados = recursos.slice(0, 2)
 
-  // ordena posts por fecha DESC y toma 3
+  // Últimas 3 entradas (1 grande + 2 a la derecha)
   const sorted = [...posts].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
@@ -83,9 +58,10 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Imagen del hero (usa /public/images/header.png) */}
           <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border">
             <Image
-              src="/hero.jpg"
+              src="/images/header.png"
               alt="Consulta y recursos de psicoterapia"
               fill
               className="object-cover"
@@ -133,7 +109,7 @@ export default function HomePage() {
 
           {featured ? (
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Post grande a la izquierda (ocupa 2 columnas en desktop) */}
+              {/* Post grande a la izquierda (2 columnas en desktop) */}
               <div className="lg:col-span-2">
                 <FeaturedBlock
                   slug={featured.slug}
@@ -162,7 +138,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* NEWSLETTER CENTRADO */}
+      {/* NEWSLETTER al centro */}
       <section>
         <div className="container mx-auto px-4">
           <div className="max-w-xl mx-auto">
@@ -180,38 +156,30 @@ export default function HomePage() {
   )
 }
 
-/* ====== Subcomponentes locales para la sección blog ====== */
+/* ====== Subcomponentes locales para la sección de blog ====== */
 
 function FeaturedBlock({
   slug,
   title,
   excerpt,
-  image = "/blog/placeholder.jpg",
+  image,
 }: {
   slug: string
   title: string
   excerpt: string
-  image?: string
+  image: string
 }) {
   return (
     <Link
       href={`/blog/${slug}`}
-      className="group block rounded-2xl overflow-hidden border hover:shadow-xl transition"
+      className="group block rounded-2xl overflow-hidden border hover:shadow-md transition"
     >
       <div className="relative aspect-[16/9]">
-        <Image
-          src={image}
-          alt={title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-          sizes="(min-width: 1024px) 900px, 100vw"
-          priority
-        />
+        <Image src={image} alt={title} fill className="object-cover" />
       </div>
-      <div className="p-6 space-y-2 bg-white">
-        <h3 className="text-xl md:text-2xl font-semibold">{title}</h3>
-        <p className="text-neutral-700">{excerpt}</p>
-        <span className="inline-block text-sm text-blue-600 mt-1">Leer más →</span>
+      <div className="p-4 space-y-2">
+        <h3 className="text-xl font-semibold group-hover:underline">{title}</h3>
+        <p className="text-neutral-700 line-clamp-3">{excerpt}</p>
       </div>
     </Link>
   )
@@ -221,31 +189,24 @@ function MiniBlock({
   slug,
   title,
   excerpt,
-  image = "/blog/placeholder.jpg",
+  image,
 }: {
   slug: string
   title: string
   excerpt: string
-  image?: string
+  image: string
 }) {
   return (
     <Link
       href={`/blog/${slug}`}
-      className="group grid grid-cols-5 gap-3 rounded-xl overflow-hidden border hover:shadow-md transition"
+      className="group grid grid-cols-[120px_1fr] gap-3 rounded-xl overflow-hidden border hover:shadow-sm transition"
     >
-      <div className="relative col-span-2 aspect-[4/3]">
-        <Image
-          src={image}
-          alt={title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-          sizes="(min-width: 1024px) 280px, 50vw"
-        />
+      <div className="relative h-full min-h-[90px]">
+        <Image src={image} alt={title} fill className="object-cover" />
       </div>
-      <div className="col-span-3 p-4 space-y-1 bg-white">
-        <h4 className="text-base font-semibold">{title}</h4>
-        <p className="text-sm text-neutral-600 line-clamp-3">{excerpt}</p>
-        <span className="inline-block text-sm text-blue-600 mt-1">Leer más →</span>
+      <div className="p-3">
+        <h4 className="font-medium group-hover:underline">{title}</h4>
+        <p className="text-sm text-neutral-600 line-clamp-2">{excerpt}</p>
       </div>
     </Link>
   )
