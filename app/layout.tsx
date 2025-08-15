@@ -1,24 +1,30 @@
+// app/layout.tsx
 import "./globals.css"
-import { Inter } from "next/font/google"
+import type { Metadata } from "next"
+
+// ⬇️ Si tienes Header y Footer como componentes,
+// déjalos así (ambos export default). Ajusta si en tu repo son named exports.
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 
-const inter = Inter({ subsets: ["latin"] })
-
-export const metadata = {
-  title: "Daniel Reyna — Psicólogo",
-  description: "Psicoterapia y recursos prácticos para el bienestar emocional.",
+export const metadata: Metadata = {
+  title: "Daniel Reyna — Psicoterapia & Recursos",
+  description:
+    "Psicoterapia individual y de pareja. Recursos prácticos para ansiedad, autoestima y bienestar.",
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="es">
-      <body className={inter.className}>
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+      {/* Usamos tipografía del sistema para evitar llamadas a Google Fonts */}
+      <body className="min-h-screen bg-white text-neutral-900 antialiased font-sans">
+        <Header />
+        <main className="min-h-[70vh]">{children}</main>
+        <Footer />
       </body>
     </html>
   )
