@@ -8,18 +8,20 @@ import NewsletterForm from "@/components/newsletter-form"
 import recursos from "@/data/recursos"
 import posts from "@/data/posts"
 
-// (Opcional) SEO
+// SEO
 export const metadata = {
   title: "Daniel Reyna — Psicoterapia & Recursos",
   description:
     "Psicoterapia individual y de pareja. Recursos prácticos para ansiedad, autoestima y bienestar.",
 }
 
+const PLACEHOLDER = "/images/blog-placeholder.jpg" // crea este archivo o cambia la ruta
+
 export default function HomePage() {
-  // Recursos destacados para portada
+  // Recursos destacados
   const destacados = recursos.slice(0, 2)
 
-  // Últimas 3 entradas (1 grande + 2 a la derecha)
+  // Últimas 3 entradas (1 grande + 2)
   const sorted = [...posts].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
@@ -58,7 +60,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Imagen del hero (usa /public/images/header.png) */}
           <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border">
             <Image
               src="/images/header.png"
@@ -109,13 +110,13 @@ export default function HomePage() {
 
           {featured ? (
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Post grande a la izquierda (2 columnas en desktop) */}
+              {/* Post grande */}
               <div className="lg:col-span-2">
                 <FeaturedBlock
                   slug={featured.slug}
                   title={featured.title}
                   excerpt={featured.excerpt}
-                  image={featured.image}
+                  image={featured.image ?? PLACEHOLDER}
                 />
               </div>
 
@@ -127,7 +128,7 @@ export default function HomePage() {
                     slug={p.slug}
                     title={p.title}
                     excerpt={p.excerpt}
-                    image={p.image}
+                    image={p.image ?? PLACEHOLDER}
                   />
                 ))}
               </div>
@@ -156,7 +157,7 @@ export default function HomePage() {
   )
 }
 
-/* ====== Subcomponentes locales para la sección de blog ====== */
+/* ===== Subcomponentes blog ===== */
 
 function FeaturedBlock({
   slug,
@@ -167,15 +168,16 @@ function FeaturedBlock({
   slug: string
   title: string
   excerpt: string
-  image: string
+  image?: string
 }) {
+  const src = image ?? PLACEHOLDER
   return (
     <Link
       href={`/blog/${slug}`}
       className="group block rounded-2xl overflow-hidden border hover:shadow-md transition"
     >
       <div className="relative aspect-[16/9]">
-        <Image src={image} alt={title} fill className="object-cover" />
+        <Image src={src} alt={title} fill className="object-cover" />
       </div>
       <div className="p-4 space-y-2">
         <h3 className="text-xl font-semibold group-hover:underline">{title}</h3>
@@ -194,15 +196,16 @@ function MiniBlock({
   slug: string
   title: string
   excerpt: string
-  image: string
+  image?: string
 }) {
+  const src = image ?? PLACEHOLDER
   return (
     <Link
       href={`/blog/${slug}`}
       className="group grid grid-cols-[120px_1fr] gap-3 rounded-xl overflow-hidden border hover:shadow-sm transition"
     >
       <div className="relative h-full min-h-[90px]">
-        <Image src={image} alt={title} fill className="object-cover" />
+        <Image src={src} alt={title} fill className="object-cover" />
       </div>
       <div className="p-3">
         <h4 className="font-medium group-hover:underline">{title}</h4>
