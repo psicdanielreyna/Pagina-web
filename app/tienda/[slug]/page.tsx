@@ -14,11 +14,7 @@ export default function TiendaItemPage({ params }: Props) {
   // 1) usa la ruta declarada en el recurso
   // 2) si no hay, intenta /manuales/<slug>.png
   // 3) si tampoco existe, usa una genérica
-  const imgSrc =
-    item.image ??
-    `/manuales/${item.slug}.png` ??
-    "/manuales/fallback.png"
-
+    const imgSrc = item.image ?? `/manuales/${item.slug}.png`;
   return (
     <div className="container mx-auto px-4 py-10">
       <div className="grid lg:grid-cols-2 gap-10">
