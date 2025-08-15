@@ -20,21 +20,21 @@ const servicios: Servicio[] = [
     key: "individual",
     title: "Terapia individual",
     description: "Sesión de 50 minutos.",
-    price: 700, // <-- cambia aquí
+    price: 499, // <-- cambia aquí
     href: "/agenda?t=individual",
   },
   {
     key: "paquete",
     title: "Paquete mensual",
     description: "4 sesiones al mes a precio preferente.",
-    price: 2400, // <-- cambia aquí
+    price: 1900, // <-- cambia aquí
     href: "/agenda?t=paquete",
   },
   {
     key: "pareja",
     title: "Terapia de pareja",
     description: "Sesión de 80 minutos enfocada en comunicación y acuerdos.",
-    price: 900, // <-- cambia aquí
+    price: 749, // <-- cambia aquí
     href: "/agenda?t=pareja",
   },
 ]
