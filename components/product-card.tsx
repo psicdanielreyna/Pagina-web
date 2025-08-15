@@ -45,10 +45,10 @@ export default function ProductCard({
         ) : <span />}
 
         <Link
-          href={href}
-          className="inline-flex items-center gap-2 text-primary hover:underline"
-        >
-          Ver más
+        <a href={href} target="_blank" rel="noopener noreferrer">
+  Comprar
+</a>
+
         </Link>
       </div>
     </div>
