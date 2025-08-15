@@ -1,37 +1,37 @@
 // data/posts.ts
-export type Post = {
-  slug: string
-  title: string
-  excerpt: string
-  image: string // ruta en /public
-  date: string  // ISO yyyy-mm-dd
-}
+export type PostMeta = {
+  slug: string;          // debe coincidir con la carpeta/archivo en app/blog/[slug]/page.mdx
+  title: string;
+  date: string;          // ISO string "2025-08-15"
+  excerpt: string;
+  image?: string;        // ruta pública de la portada (opcional)
+};
 
-const posts: Post[] = [
+const posts: PostMeta[] = [
   {
-    slug: "terapia-individual-que-es",
-    title: "¿Qué puedes esperar de la terapia individual?",
+    slug: "como-apagar-tu-mente",
+    title: "Cómo apagar tu mente",
+    date: "2025-08-10",
     excerpt:
-      "Cómo es una primera sesión, enfoques que uso y qué objetivos trabajamos para que te sientas acompañado desde el inicio.",
-    image: "/blog/post-1.png",
-    date: "2025-08-15",
+      "Técnicas concretas para bajar el ruido mental cuando sientes que la cabeza no para.",
+    image: "/blog/como-apagar-tu-mente.jpg",
   },
   {
-    slug: "ansiedad-que-hacer-ahora",
-    title: "Ansiedad: qué hacer cuando aparece ‘de la nada’",
+    slug: "el-arte-de-creer-en-ti",
+    title: "El arte de creer en ti",
+    date: "2025-08-05",
     excerpt:
-      "Tres pasos prácticos para regularte en minutos y cortar el ciclo de preocupación–síntoma–preocupación.",
-    image: "/blog/post-2.png",
-    date: "2025-08-14",
+      "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
+    image: "/blog/el-arte-de-creer-en-ti.jpg",
   },
   {
-    slug: "tecnica-para-parar-pensamientos",
-    title: "Una técnica breve para frenar pensamientos intrusivos",
+    slug: "ansiedad-3-pasos",
+    title: "Ansiedad en 3 pasos prácticos",
+    date: "2025-07-28",
     excerpt:
-      "STOP: una herramienta sencilla para interrumpir rumiación y recuperar claridad en el día a día.",
-    image: "/blog/post-3.png",
-    date: "2025-08-13",
+      "Un mini-protocolo para reconocer, regular y responder mejor ante la ansiedad.",
+    image: "/blog/ansiedad-3-pasos.jpg",
   },
-]
+];
 
-export default posts
+export default posts;
