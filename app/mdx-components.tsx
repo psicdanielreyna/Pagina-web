@@ -1,8 +1,8 @@
 // app/mdx-components.tsx
 import Image from "next/image";
 import Link from "next/link";
-import type { MDXComponents } from "mdx/types";
 
+/** Héroe de post con imagen full-width, responsive y caption opcional */
 function PostHero({
   src,
   alt,
@@ -31,6 +31,7 @@ function PostHero({
   );
 }
 
+/** Caja de aviso (note/tip/warn) */
 function Callout({
   type = "note",
   children,
@@ -52,12 +53,12 @@ function Callout({
 }
 
 /**
- * Mapea etiquetas MDX a componentes de React (Next.js)
- * Para que Next optimice imágenes y use <Link/> en lugar de <a/>
+ * Mapear etiquetas MDX a componentes Next.js sin depender de `mdx/types`.
+ * Next detecta automáticamente `useMDXComponents` en App Router.
  */
-export function useMDXComponents(components: MDXComponents): MDXComponents {
+export function useMDXComponents(components: any): any {
   return {
-    // sustituimos <img> por Next <Image> con estilos seguros
+    // <img> -> Next <Image> con estilos seguros
     img: (props: any) => (
       <span className="not-prose block my-6">
         <Image
@@ -69,9 +70,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         />
       </span>
     ),
-    // sustituimos <a> por <Link />
+
+    // <a> -> Next <Link> para rutas internas; externas se abren en pestaña nueva
     a: ({ href = "", children, ...rest }: any) => {
-      // enlaces absolutos -> <a target="_blank">
       const isExternal = /^https?:\/\//.test(href);
       if (isExternal) {
         return (
@@ -87,11 +88,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       );
     },
 
-    // componentes “extra” disponibles dentro del MDX:
+    // Componentes extra disponibles en los .mdx
     PostHero,
     Callout,
 
-    // permite sobrescribir/añadir más desde el propio mdx si quisieras
     ...components,
   };
 }
