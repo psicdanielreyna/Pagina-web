@@ -1,32 +1,38 @@
 // app/page.tsx
-import Image from "next/image"
-import Link from "next/link"
+import Link from "next/link";
+import Image from "next/image";
 
-import ProductCard from "@/components/product-card"
-import NewsletterForm from "@/components/newsletter-form"
+import ProductCard from "@/components/product-card";
+import NewsletterForm from "@/components/newsletter-form";
 
-import recursos from "@/data/recursos"
-import posts from "@/data/posts"
+import recursos from "@/data/recursos";
+import posts from "@/data/posts";
 
 // SEO
 export const metadata = {
   title: "Daniel Reyna — Psicoterapia & Recursos",
   description:
     "Psicoterapia individual y de pareja. Recursos prácticos para ansiedad, autoestima y bienestar.",
-}
+};
 
-const PLACEHOLDER = "/images/blog-placeholder.jpg" // crea este archivo o cambia la ruta
+type Post = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  image?: string;
+};
 
 export default function HomePage() {
-  // Recursos destacados
-  const destacados = recursos.slice(0, 2)
+  // Recursos destacados (toma 2)
+  const destacados = recursos.slice(0, 2);
 
-  // Últimas 3 entradas (1 grande + 2)
-  const sorted = [...posts].sort(
+  // Blog: ordena por fecha DESC y toma 3
+  const sorted = [...(posts as Post[])].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
-  const [featured, ...rest] = sorted
-  const secundarios = rest.slice(0, 2)
+  );
+  const [featured, ...rest] = sorted;
+  const secundarios = rest.slice(0, 2);
 
   return (
     <div className="space-y-16">
@@ -45,17 +51,11 @@ export default function HomePage() {
               avanzar a tu ritmo.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
-             import Link from "next/link"
-              // ...
-<Link
-  href="/servicios"
-  className="inline-flex items-center rounded-full px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition"
->
-  Agendar cita
-</Link>
-
-  </Link>
-
+              <Link
+                href="/servicios"
+                className="inline-flex items-center rounded-full px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition"
+              >
+                Agendar cita
               </Link>
               <Link
                 href="/tienda"
@@ -116,13 +116,13 @@ export default function HomePage() {
 
           {featured ? (
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Post grande */}
+              {/* Post grande a la izquierda (2 columnas) */}
               <div className="lg:col-span-2">
                 <FeaturedBlock
                   slug={featured.slug}
                   title={featured.title}
                   excerpt={featured.excerpt}
-                  image={featured.image ?? PLACEHOLDER}
+                  image={featured.image}
                 />
               </div>
 
@@ -134,7 +134,7 @@ export default function HomePage() {
                     slug={p.slug}
                     title={p.title}
                     excerpt={p.excerpt}
-                    image={p.image ?? PLACEHOLDER}
+                    image={p.image}
                   />
                 ))}
               </div>
@@ -145,7 +145,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* NEWSLETTER al centro */}
+      {/* NEWSLETTER CENTRADO */}
       <section>
         <div className="container mx-auto px-4">
           <div className="max-w-xl mx-auto">
@@ -160,10 +160,10 @@ export default function HomePage() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
-/* ===== Subcomponentes blog ===== */
+/* ====== Subcomponentes locales para la sección blog ====== */
 
 function FeaturedBlock({
   slug,
@@ -171,26 +171,32 @@ function FeaturedBlock({
   excerpt,
   image,
 }: {
-  slug: string
-  title: string
-  excerpt: string
-  image?: string
+  slug: string;
+  title: string;
+  excerpt: string;
+  image?: string;
 }) {
-  const src = image ?? PLACEHOLDER
+  const img = image ?? "/blog/fallback.jpg";
   return (
     <Link
       href={`/blog/${slug}`}
-      className="group block rounded-2xl overflow-hidden border hover:shadow-md transition"
+      className="group block rounded-2xl border overflow-hidden"
     >
       <div className="relative aspect-[16/9]">
-        <Image src={src} alt={title} fill className="object-cover" />
+        <Image
+          src={img}
+          alt={title}
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          sizes="(min-width: 1024px) 800px, 100vw"
+        />
       </div>
-      <div className="p-4 space-y-2">
-        <h3 className="text-xl font-semibold group-hover:underline">{title}</h3>
-        <p className="text-neutral-700 line-clamp-3">{excerpt}</p>
+      <div className="p-5 space-y-2">
+        <h3 className="text-xl font-semibold">{title}</h3>
+        <p className="text-neutral-600">{excerpt}</p>
       </div>
     </Link>
-  )
+  );
 }
 
 function MiniBlock({
@@ -199,24 +205,30 @@ function MiniBlock({
   excerpt,
   image,
 }: {
-  slug: string
-  title: string
-  excerpt: string
-  image?: string
+  slug: string;
+  title: string;
+  excerpt: string;
+  image?: string;
 }) {
-  const src = image ?? PLACEHOLDER
+  const img = image ?? "/blog/fallback.jpg";
   return (
     <Link
       href={`/blog/${slug}`}
-      className="group grid grid-cols-[120px_1fr] gap-3 rounded-xl overflow-hidden border hover:shadow-sm transition"
+      className="group grid grid-cols-[120px_1fr] gap-4 rounded-xl border overflow-hidden"
     >
-      <div className="relative h-full min-h-[90px]">
-        <Image src={src} alt={title} fill className="object-cover" />
+      <div className="relative h-24">
+        <Image
+          src={img}
+          alt={title}
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          sizes="120px"
+        />
       </div>
-      <div className="p-3">
-        <h4 className="font-medium group-hover:underline">{title}</h4>
+      <div className="py-3 pr-3">
+        <h4 className="font-medium leading-tight">{title}</h4>
         <p className="text-sm text-neutral-600 line-clamp-2">{excerpt}</p>
       </div>
     </Link>
-  )
+  );
 }
