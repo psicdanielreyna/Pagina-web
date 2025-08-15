@@ -1,33 +1,36 @@
-// /data/posts.ts
-export type BlogPost = {
+// data/posts.ts
+export type Post = {
   slug: string
   title: string
   excerpt: string
-  image?: string
-  date: string
+  image: string // ruta en /public
+  date: string  // ISO yyyy-mm-dd
 }
 
-const posts: BlogPost[] = [
+const posts: Post[] = [
   {
-    slug: "mi-primer-post",
-    title: "Mi primer post",
-    excerpt: "Un vistazo a cómo iniciar tu camino en terapia y bienestar.",
-    image: "/blog/placeholder.jpg",
-    date: "2025-08-10",
+    slug: "terapia-individual-que-es",
+    title: "¿Qué puedes esperar de la terapia individual?",
+    excerpt:
+      "Cómo es una primera sesión, enfoques que uso y qué objetivos trabajamos para que te sientas acompañado desde el inicio.",
+    image: "/blog/post-1.png",
+    date: "2025-08-15",
   },
   {
-    slug: "como-manejar-la-ansiedad",
-    title: "Cómo manejar la ansiedad",
-    excerpt: "Herramientas simples para días complicados.",
-    image: "/blog/placeholder.jpg",
-    date: "2025-08-08",
+    slug: "ansiedad-que-hacer-ahora",
+    title: "Ansiedad: qué hacer cuando aparece ‘de la nada’",
+    excerpt:
+      "Tres pasos prácticos para regularte en minutos y cortar el ciclo de preocupación–síntoma–preocupación.",
+    image: "/blog/post-2.png",
+    date: "2025-08-14",
   },
   {
-    slug: "creencias-que-te-frenan",
-    title: "Creencias que te frenan",
-    excerpt: "Pequeños ajustes de pensamiento con gran impacto.",
-    image: "/blog/placeholder.jpg",
-    date: "2025-08-05",
+    slug: "tecnica-para-parar-pensamientos",
+    title: "Una técnica breve para frenar pensamientos intrusivos",
+    excerpt:
+      "STOP: una herramienta sencilla para interrumpir rumiación y recuperar claridad en el día a día.",
+    image: "/blog/post-3.png",
+    date: "2025-08-13",
   },
 ]
 
