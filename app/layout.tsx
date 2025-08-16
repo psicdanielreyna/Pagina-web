@@ -2,13 +2,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 
-// URL base del sitio (cámbiala cuando tengas dominio propio)
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+// Cambia esta URL cuando conectes tu dominio
 const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://danielreyna.netlify.app";
 
-// SEO / Metadata principal
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
@@ -27,12 +28,7 @@ export const metadata: Metadata = {
     description:
       "Terapia psicológica profesional en Monterrey y en línea. Especialista en ansiedad, depresión, duelo, estrés y autoestima.",
     images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Daniel Reyna Psicólogo",
-      },
+      { url: "/og-image.jpg", width: 1200, height: 630, alt: "Daniel Reyna Psicólogo" },
     ],
   },
   twitter: {
@@ -51,15 +47,15 @@ export const metadata: Metadata = {
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
       <body className={inter.className}>
-        {/* Schema.org JSON-LD */}
+        <Navbar />
+        <main className="min-h-screen">{children}</main>
+        <Footer />
+
+        {/* JSON-LD Schema.org (opcional) */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -77,17 +73,9 @@ export default function RootLayout({
                 addressRegion: "Nuevo León",
                 addressCountry: "MX",
               },
-              sameAs: [
-                // agrega tus redes si quieres:
-                // "https://www.instagram.com/tu_usuario",
-                // "https://www.facebook.com/tu_usuario"
-              ],
             }),
           }}
         />
-
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
       </body>
     </html>
   );
