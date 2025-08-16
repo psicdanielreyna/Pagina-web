@@ -38,6 +38,34 @@ export const metadata: Metadata = {
   },
 };
 
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Daniel Reyna — Psicólogo",
+  description: "Acompañamiento psicológico con herramientas claras y efectivas.",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="es">
+      <body className={inter.className}>
+        <Navbar />
+        <main className="min-h-screen">{children}</main>
+      </body>
+    </html>
+  );
+}
+
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
@@ -63,7 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
               sameAs: [
                 // pon aquí tus redes si quieres
-                // "https://www.instagram.com/tuusuario",
+                // "https://www.instagram.com/psic.danielreyna",
                 // "https://www.facebook.com/tuusuario"
               ],
             }),
