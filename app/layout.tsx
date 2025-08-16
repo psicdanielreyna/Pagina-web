@@ -6,21 +6,11 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-// Cambia esta URL cuando conectes tu dominio
+// URL base del sitio (ajústala cuando compres el dominio)
 const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://danielreyna.netlify.app";
-
-// app/layout.tsx
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
-
-const baseUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://danielreyna.netlify.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -39,7 +29,9 @@ export const metadata: Metadata = {
     title: "Daniel Reyna — Psicólogo",
     description:
       "Terapia psicológica profesional en Monterrey y en línea. Especialista en ansiedad, depresión, duelo, estrés y autoestima.",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Daniel Reyna Psicólogo" }],
+    images: [
+      { url: "/og-image.jpg", width: 1200, height: 630, alt: "Daniel Reyna Psicólogo" },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -59,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body className={inter.className}>
+        {/* Header */}
         <Navbar />
 
         {/* JSON-LD Schema.org */}
@@ -83,10 +76,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
+        {/* Contenido */}
         <main className="min-h-screen">{children}</main>
+
+        {/* Footer */}
         <Footer />
       </body>
     </html>
   );
 }
-
