@@ -34,13 +34,14 @@ export default function SobreMiPage() {
 
         {/* Imagen */}
         <div className="rounded-2xl overflow-hidden shadow-lg flex justify-center">
-          <Image
-            src="/daniel-reyna-hero.webp" // tu archivo correcto
-            alt="Daniel Reyna Psicólogo"
-            width={500}
-            height={600}
-            className="w-full max-w-sm h-auto object-contain"
-            priority
+         <Image
+          src="/images/daniel-reyna-hero.webp"
+          alt="Daniel Reyna Psicólogo"
+          width={560}
+          height={700}
+          className="w-full max-w-sm h-auto object-contain"
+          priority
+           
           />
         </div>
       </div>
