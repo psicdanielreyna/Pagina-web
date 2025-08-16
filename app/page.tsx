@@ -1,55 +1,57 @@
 // app/page.tsx
-import Link from "next/link";
-import Image from "next/image";
+import Image from "next/image"
+import Link from "next/link"
 
-import ProductCard from "@/components/product-card";
-import NewsletterForm from "@/components/newsletter-form";
+import ProductCard from "@/components/product-card"
+import NewsletterForm from "@/components/newsletter-form"
 
-import recursos from "@/data/recursos";
-import posts from "@/data/posts";
+import recursos from "@/data/recursos"
+import posts from "@/data/posts"
 
 // SEO
 export const metadata = {
   title: "Daniel Reyna — Psicoterapia & Recursos",
   description:
     "Psicoterapia individual y de pareja. Recursos prácticos para ansiedad, autoestima y bienestar.",
-};
-
-type Post = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  image?: string;
-};
+}
 
 export default function HomePage() {
-  // Recursos destacados (toma 2)
-  const destacados = recursos.slice(0, 2);
+  // Toma 2 recursos para portada
+  const destacados = recursos.slice(0, 2)
 
-  // Blog: ordena por fecha DESC y toma 3
-  const sorted = [...(posts as Post[])].sort(
+  // Ordena posts por fecha DESC y toma 3
+  const sorted = [...posts].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
-  const [featured, ...rest] = sorted;
-  const secundarios = rest.slice(0, 2);
+  )
+  const [featured, ...rest] = sorted
+  const secundarios = rest.slice(0, 2)
 
   return (
     <div className="space-y-16">
       {/* HERO */}
       <section className="pt-8 md:pt-12">
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+          {/* Columna izquierda */}
           <div className="space-y-4">
-            <span className="inline-block text-sm tracking-wide text-blue-700/80">
-              Psicoterapia | Recursos prácticos
-            </span>
+            <nav className="text-sm tracking-wide text-blue-700/80 flex items-center gap-2">
+              <Link href="/servicios" className="hover:underline">
+                Psicoterapia
+              </Link>
+              <span aria-hidden="true">|</span>
+              <Link href="/tienda" className="hover:underline">
+                Recursos prácticos
+              </Link>
+            </nav>
+
             <h1 className="text-3xl md:text-4xl font-bold">
               Daniel Reyna — Acompañamiento con herramientas claras y humanas
             </h1>
+
             <p className="text-neutral-700">
               Sesiones individuales y de pareja, y materiales descargables para
               avanzar a tu ritmo.
             </p>
+
             <div className="flex flex-wrap gap-3 pt-2">
               <Link
                 href="/servicios"
@@ -66,6 +68,7 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Columna derecha: imagen */}
           <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border">
             <Image
               src="/images/header.png"
@@ -97,7 +100,8 @@ export default function HomePage() {
                 description={r.description}
                 image={r.image}
                 price={r.price}
-                href={`/tienda/${r.slug}`}
+                // Si existe link de Mercado Pago, lo usamos; si no, caemos a la página interna
+                href={r.href ?? `/tienda/${r.slug}`}
               />
             ))}
           </div>
@@ -116,7 +120,7 @@ export default function HomePage() {
 
           {featured ? (
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Post grande a la izquierda (2 columnas) */}
+              {/* Post grande a la izquierda (ocupa 2 columnas en desktop) */}
               <div className="lg:col-span-2">
                 <FeaturedBlock
                   slug={featured.slug}
@@ -160,7 +164,7 @@ export default function HomePage() {
         </div>
       </section>
     </div>
-  );
+  )
 }
 
 /* ====== Subcomponentes locales para la sección blog ====== */
@@ -171,32 +175,32 @@ function FeaturedBlock({
   excerpt,
   image,
 }: {
-  slug: string;
-  title: string;
-  excerpt: string;
-  image?: string;
+  slug: string
+  title: string
+  excerpt: string
+  image?: string
 }) {
-  const img = image ?? "/blog/fallback.jpg";
+  const imgSrc = image ?? `/blog/${slug}.jpg`
   return (
     <Link
       href={`/blog/${slug}`}
-      className="group block rounded-2xl border overflow-hidden"
+      className="group block rounded-2xl overflow-hidden border hover:shadow-sm transition"
     >
       <div className="relative aspect-[16/9]">
         <Image
-          src={img}
+          src={imgSrc}
           alt={title}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          className="object-cover"
           sizes="(min-width: 1024px) 800px, 100vw"
         />
       </div>
-      <div className="p-5 space-y-2">
-        <h3 className="text-xl font-semibold">{title}</h3>
+      <div className="p-4 space-y-1">
+        <h3 className="text-xl font-semibold group-hover:underline">{title}</h3>
         <p className="text-neutral-600">{excerpt}</p>
       </div>
     </Link>
-  );
+  )
 }
 
 function MiniBlock({
@@ -205,30 +209,32 @@ function MiniBlock({
   excerpt,
   image,
 }: {
-  slug: string;
-  title: string;
-  excerpt: string;
-  image?: string;
+  slug: string
+  title: string
+  excerpt: string
+  image?: string
 }) {
-  const img = image ?? "/blog/fallback.jpg";
+  const imgSrc = image ?? `/blog/${slug}.jpg`
   return (
     <Link
       href={`/blog/${slug}`}
-      className="group grid grid-cols-[120px_1fr] gap-4 rounded-xl border overflow-hidden"
+      className="group grid grid-cols-[96px,1fr] gap-3 items-center rounded-xl overflow-hidden border p-2 hover:bg-neutral-50 transition"
     >
-      <div className="relative h-24">
+      <div className="relative w-[96px] h-[72px] rounded-md overflow-hidden bg-gray-50">
         <Image
-          src={img}
+          src={imgSrc}
           alt={title}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          className="object-cover"
           sizes="120px"
         />
       </div>
-      <div className="py-3 pr-3">
-        <h4 className="font-medium leading-tight">{title}</h4>
+      <div className="space-y-1">
+        <h4 className="font-medium leading-snug group-hover:underline">
+          {title}
+        </h4>
         <p className="text-sm text-neutral-600 line-clamp-2">{excerpt}</p>
       </div>
     </Link>
-  );
+  )
 }
