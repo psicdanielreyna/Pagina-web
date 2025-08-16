@@ -35,7 +35,7 @@ export default function SobreMiPage() {
         {/* Imagen */}
         <div className="rounded-2xl overflow-hidden shadow-lg flex justify-center">
           <Image
-            src="/hero-expandido.png" // tu archivo correcto
+            src="/daniel-reyna-hero.webp" // tu archivo correcto
             alt="Daniel Reyna Psicólogo"
             width={500}
             height={600}
