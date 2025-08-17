@@ -103,9 +103,9 @@ export default function HomePage() {
 
     <div className="grid md:grid-cols-3 gap-6">
       {destacados.map((p) => {
-        // 👇 imagen: usa la del dato si existe; si no, convención por slug; y por último un fallback
+        // Usa p.img si existe, si no intenta por convención con el slug, y como último un fallback.
         const imgSrc =
-          p.image ??
+          (("img" in p ? (p as any).img : undefined) as string | undefined) ??
           `/images/blog/${p.slug}.jpg` ??
           `/images/blog/${p.slug}.webp` ??
           "/images/blog/fallback-post.jpg";
@@ -117,13 +117,7 @@ export default function HomePage() {
             className="rounded-2xl border border-slate-100 bg-white overflow-hidden hover:shadow-md transition"
           >
             <div className="relative aspect-[4/3]">
-              {/* Si tu hosting no encuentra la ruta, coloca las imágenes aquí:
-                  /public/images/blog/{slug}.jpg  (o .webp)
-                  Ejemplos:
-                  /public/images/blog/como-apagar-tu-mente.jpg
-                  /public/images/blog/el-arte-de-creer-en-ti.jpg
-                  /public/images/blog/ansiedad-en-3-pasos-practicos.jpg
-              */}
+              {/* Coloca tus imágenes en /public/images/blog/{slug}.jpg o .webp */}
               <Image src={imgSrc} alt={p.title} fill className="object-cover" />
             </div>
 
