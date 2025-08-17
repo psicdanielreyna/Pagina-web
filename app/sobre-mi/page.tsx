@@ -1,60 +1,83 @@
 // app/sobre-mi/page.tsx
 import Image from "next/image";
+import Link from "next/link";
+
+export const metadata = {
+  title: "Sobre mí",
+  description:
+    "Psicólogo clínico TCC breve. Experiencia con adolescentes y adultos, en línea y presencial.",
+};
 
 export default function SobreMiPage() {
   return (
-    <section id="sobre-mi" className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Título principal */}
-        <h2 className="text-4xl font-extrabold text-center text-gray-900 mb-16">
-          Sobre mí
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <section className="py-16 md:py-20">
+      <div className="container">
+        <div className="mx-auto max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
           {/* Texto */}
-          <div className="bg-white rounded-2xl shadow p-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">
-              Hola, soy Daniel Reyna
-            </h3>
-
-            <p className="text-lg text-gray-700 leading-relaxed mb-4">
-              Soy <strong>psicólogo clínico cognitivo-conductual</strong>,
-              especializado en <strong>terapia breve</strong>. Cuento con
-              experiencia trabajando con <strong>adolescentes y adultos</strong>{" "}
-              en México, tanto en sesiones <strong>en línea</strong> como{" "}
-              <strong>presenciales</strong>.
+          <div className="space-y-5">
+            <h1 className="text-4xl md:text-hero font-extrabold text-ink">
+              Sobre mí
+            </h1>
+            <p className="text-lg md:text-xl text-ink-soft leading-relaxed">
+              Soy <span className="font-semibold">psicólogo clínico cognitivo conductual</span>,
+              especializado en <span className="font-semibold">terapia breve TCC</span>. Tengo
+              experiencia trabajando con adolescentes y adultos en México, tanto
+              en línea como de manera presencial.
+            </p>
+            <p className="text-lg text-ink-soft leading-relaxed">
+              Mi enfoque está en ayudarte a manejar la ansiedad, el estrés, la
+              depresión y los procesos de duelo, brindándote herramientas
+              prácticas y efectivas para mejorar tu bienestar emocional.
             </p>
 
-            <p className="text-lg text-gray-700 leading-relaxed mb-4">
-              Mi enfoque está en ayudarte a manejar la{" "}
-              <strong>ansiedad, el estrés, la depresión y los procesos de duelo</strong>, brindándote herramientas
-              prácticas y efectivas que puedas aplicar desde la primera sesión.
-            </p>
-
-            <p className="text-lg text-gray-700">
-              Sígueme en Instagram:{" "}
-              <a
+            <div className="pt-2">
+              <Link
                 href="https://instagram.com/psic.danielreyna"
                 target="_blank"
-                rel="noopener noreferrer"
-                className="text-indigo-600 hover:underline"
+                className="inline-flex items-center gap-2 text-brand hover:text-brand-hover font-medium"
+                aria-label="Ir a Instagram de Daniel Reyna"
               >
-                @psic.danielreyna
-              </a>
-            </p>
+                <svg
+                  aria-hidden
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M7 2C4.239 2 2 4.239 2 7v10c0 2.761 2.239 5 5 5h10c2.761 0 5-2.239 5-5V7c0-2.761-2.239-5-5-5H7zm0 2h10c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3zm11 1a1 1 0 100 2 1 1 0 000-2zM12 7a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6z" />
+                </svg>
+                Sígueme en Instagram: @psic.danielreyna
+              </Link>
+            </div>
           </div>
 
           {/* Imagen */}
-          <div className="flex justify-center">
+          <div className="order-first lg:order-none">
             <Image
-              src="/images/daniel-reyna-hero.webp" // asegúrate de que existe en /public/images/
+              src="/hero-expandido.jpg"
               alt="Daniel Reyna Psicólogo"
-              width={640}
-              height={800}
-              className="rounded-2xl shadow-lg w-full max-w-sm md:max-w-md h-auto object-cover"
+              width={960}
+              height={960}
+              className="hero-img"
               priority
-              sizes="(max-width: 768px) 90vw, (max-width: 1024px) 45vw, 500px"
             />
+          </div>
+        </div>
+
+        {/* Bloque breve de llamada a la acción */}
+        <div className="mx-auto max-w-6xl mt-16 card p-8 md:p-10 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-ink mb-3">
+            ¿Listo para comenzar?
+          </h2>
+          <p className="text-ink-soft mb-6">
+            Agenda tu primera sesión o conoce más sobre los servicios.
+          </p>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link href="/servicios" className="btn-primary">
+              Ver servicios
+            </Link>
+            <Link href="/agenda" className="btn-ghost">
+              Ir a la agenda
+            </Link>
           </div>
         </div>
       </div>
