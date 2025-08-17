@@ -14,6 +14,7 @@ module.exports = {
     },
     extend: {
       colors: {
+        // Tus variables existentes
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -25,6 +26,14 @@ module.exports = {
         accent: { DEFAULT: 'hsl(var(--accent))', foreground: 'hsl(var(--accent-foreground))' },
         destructive: { DEFAULT: 'hsl(var(--destructive))', foreground: 'hsl(var(--destructive-foreground))' },
         card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
+
+        // 👉 Añadidos para tus utilidades en globals.css
+        brand: '#2563eb',            // azul primario (bg-brand, ring-brand)
+        'brand-hover': '#1d4ed8',    // hover:bg-brand-hover
+      },
+      boxShadow: {
+        // 👉 Para shadow-soft
+        soft: '0 8px 24px rgba(0, 0, 0, 0.06)',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -43,4 +52,3 @@ module.exports = {
   },
   plugins: [require('tailwindcss-animate')],
 }
-
