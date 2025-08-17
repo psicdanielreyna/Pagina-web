@@ -3,45 +3,54 @@ import Link from "next/link";
 import Image from "next/image";
 import Newsletter from "@/components/Newsletter";
 
-type PostCard = {
-  slug: string;
+type Card = {
   title: string;
   excerpt: string;
   href: string;
-  img?: string; // si no la pones, usamos /images/blog/{slug}.jpg
+  img: string;
   alt: string;
 };
 
-const destacados: PostCard[] = [
+// ---------- DATA ----------
+const destacados: Card[] = [
   {
-    slug: "como-apagar-tu-mente",
     title: "Cómo apagar tu mente",
     excerpt:
       "Técnicas concretas para bajar el ruido mental cuando sientes que la cabeza no para.",
     href: "/blog/como-apagar-tu-mente",
+    img: "/images/post-1.png",
     alt: "Cómo apagar tu mente",
   },
   {
-    slug: "el-arte-de-creer-en-ti",
     title: "El arte de creer en ti",
     excerpt:
       "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
     href: "/blog/el-arte-de-creer-en-ti",
+    img: "/images/post-2.png",
+    alt: "El arte de creer en ti",
+  },
+];
+
+const postsBlog: Card[] = [
+  {
+    title: "El arte de creer en ti",
+    excerpt:
+      "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
+    href: "/blog/el-arte-de-creer-en-ti",
+    img: "/images/post-2.png",
     alt: "El arte de creer en ti",
   },
   {
-    slug: "ansiedad-en-3-pasos",
     title: "Ansiedad en 3 pasos prácticos",
     excerpt:
       "Un mini-protocolo para reconocer, regular y responder mejor ante la ansiedad.",
     href: "/blog/ansiedad-en-3-pasos",
+    img: "/images/post-3.png",
     alt: "Ansiedad en 3 pasos",
   },
 ];
 
-// Para el teaser “Último del blog” reutilizamos 2 de arriba
-const teaserPosts: PostCard[] = destacados.slice(1, 3);
-
+// ---------- PAGE ----------
 export default function HomePage() {
   return (
     <div className="space-y-16">
@@ -100,7 +109,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* RECURSOS DESTACADOS */}
+      {/* RECURSOS DESTACADOS (2) */}
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
@@ -108,98 +117,86 @@ export default function HomePage() {
               Recursos destacados
             </h2>
             <Link
-              href="/blog"
+              href="/tienda"
               className="text-emerald-700 hover:text-emerald-800 font-medium"
             >
               Ver todos
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {destacados.map((p) => {
-              const imgSrc = p.img ?? `/images/blog/${p.slug}.jpg`;
-              return (
-                <Link
-                  key={p.slug}
-                  href={p.href}
-                  className="rounded-2xl border border-slate-100 bg-white overflow-hidden hover:shadow-md transition"
-                >
-                  <div className="relative aspect-[4/3]">
-                    <Image
-                      src={imgSrc}
-                      alt={p.alt}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {destacados.map((p) => (
+              <Link
+                key={p.href}
+                href={p.href}
+                className="rounded-2xl border border-slate-100 bg-white overflow-hidden hover:shadow-md transition"
+              >
+                <div className="relative aspect-[4/3] bg-slate-100">
+                  <Image src={p.img} alt={p.alt} fill className="object-cover" />
+                </div>
 
-                  <div className="p-4">
-                    <h3 className="font-semibold text-slate-900">{p.title}</h3>
-                    <p className="mt-1 text-slate-600 text-sm line-clamp-2">
-                      {p.excerpt}
-                    </p>
+                <div className="p-4">
+                  <h3 className="font-semibold text-slate-900">{p.title}</h3>
+                  <p className="mt-1 text-slate-600 text-sm line-clamp-2">
+                    {p.excerpt}
+                  </p>
 
-                    <div className="mt-4">
-                      <span className="inline-flex items-center rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-700">
-                        Leer más
-                      </span>
-                    </div>
+                  <div className="mt-4">
+                    <span className="inline-flex items-center rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-700">
+                      Leer más
+                    </span>
                   </div>
-                </Link>
-              );
-            })}
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* BLOG + NEWSLETTER */}
+      {/* BLOG (grande) */}
       <section className="py-12 md:py-16">
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 items-start">
-          {/* Teaser Blog */}
-          <div className="rounded-2xl border border-slate-100 bg-white p-6">
-            <h2 className="text-xl md:text-2xl font-bold text-slate-900">
-              Último del blog
-            </h2>
-            <p className="mt-1 text-slate-600">
-              Lecturas breves y útiles para tu día a día.
-            </p>
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">
+            Último del blog
+          </h2>
+          <p className="text-slate-600 mb-6">
+            Lecturas breves y útiles para tu día a día.
+          </p>
 
-            <div className="mt-6 space-y-4">
-              {teaserPosts.map((p) => (
-                <Link
-                  key={p.slug}
-                  href={p.href}
-                  className="flex gap-4 rounded-xl border border-slate-100 p-3 hover:bg-slate-50"
-                >
-                  <div className="relative h-16 w-24 rounded-lg overflow-hidden bg-slate-100">
-                    <Image
-                      src={p.img ?? `/images/blog/${p.slug}.jpg`}
-                      alt={p.alt}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900">{p.title}</h3>
-                    <p className="text-sm text-slate-600 line-clamp-2">
-                      {p.excerpt}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            <div className="mt-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            {postsBlog.map((p) => (
               <Link
-                href="/blog"
-                className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-slate-700 hover:bg-slate-50"
+                key={p.href}
+                href={p.href}
+                className="rounded-2xl border border-slate-100 bg-white overflow-hidden hover:shadow-md transition"
               >
-                Ver blog
+                <div className="relative aspect-[16/9] bg-slate-100">
+                  <Image src={p.img} alt={p.alt} fill className="object-cover" />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    {p.title}
+                  </h3>
+                  <p className="mt-2 text-slate-600">{p.excerpt}</p>
+                </div>
               </Link>
-            </div>
+            ))}
           </div>
 
-          {/* Newsletter (client component) */}
+          <div className="mt-6">
+            <Link
+              href="/blog"
+              className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-slate-700 hover:bg-slate-50"
+            >
+              Ver blog
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* NEWSLETTER (debajo del blog) */}
+      <section className="py-6 md:py-8">
+        <div className="container mx-auto px-4">
           <div className="rounded-2xl border border-slate-100 bg-white p-6">
             <Newsletter />
           </div>
