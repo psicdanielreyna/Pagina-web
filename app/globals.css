@@ -2,37 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ========== Reset/opciones globales ========== */
-:root {
-  color-scheme: light;
+/* =========================
+   Estilos globales
+========================= */
+body {
+  @apply bg-background text-foreground;
+  font-family: 'Inter', sans-serif;
 }
 
-html, body {
-  @apply bg-white text-gray-900;
+/* =========================
+   Componentes personalizados
+========================= */
+
+/* 👉 Tarjetas reutilizables */
+.card {
+  @apply bg-card text-card-foreground rounded-lg shadow-soft p-6;
 }
 
-/* ========== Utilities personalizadas ========== */
-@layer utilities {
-  /* Sombra suave reusable */
-  .shadow-soft {
-    box-shadow:
-      0 10px 20px rgba(0, 0, 0, 0.06),
-      0 2px 6px rgba(0, 0, 0, 0.04);
-  }
+/* 👉 Botón primario */
+.btn-primary {
+  @apply px-4 py-2 rounded-lg bg-brand text-white 
+         hover:bg-brand-hover focus:outline-none 
+         focus:ring-2 focus:ring-brand shadow-soft 
+         transition-all;
 }
 
-/* ========== Components (clases que usan @apply) ========== */
-@layer components {
-  /* Botón primario unificado */
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full
-      bg-brand text-white px-6 py-3 font-medium shadow-soft transition
-      hover:bg-brand-hover focus:outline-none focus-visible:ring-2
-      focus-visible:ring-brand/60 active:scale-[0.98];
-  }
-
-  /* Tarjeta genérica */
-  .card {
-    @apply rounded-2xl bg-white shadow-soft border border-slate-100;
-  }
+/* 👉 Botón secundario */
+.btn-secondary {
+  @apply px-4 py-2 rounded-lg bg-secondary text-secondary-foreground 
+         hover:opacity-90 focus:outline-none 
+         focus:ring-2 focus:ring-secondary shadow-soft 
+         transition-all;
 }
