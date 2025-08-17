@@ -1,107 +1,76 @@
 // app/servicios/page.tsx
-import Link from "next/link"
+import Link from "next/link";
 
 export const metadata = {
-  title: "Servicios | Daniel Reyna — Psicólogo",
+  title: "Servicios",
   description:
-    "Terapia individual, paquete mensual y terapia de pareja. Enfoque CBT breve para ansiedad, depresión, duelo y autoestima.",
-}
-
-type Servicio = {
-  key: "individual" | "paquete" | "pareja"
-  title: string
-  description: string
-  price: number // en MXN
-  href: string
-}
-
-const servicios: Servicio[] = [
-  {
-    key: "individual",
-    title: "Terapia individual",
-    description: "Sesión de 50 minutos.",
-    price: 499, // <-- cambia aquí
-    href: "/agenda?t=individual",
-  },
-  {
-    key: "paquete",
-    title: "Paquete mensual",
-    description: "4 sesiones al mes a precio preferente.",
-    price: 1900, // <-- cambia aquí
-    href: "/agenda?t=paquete",
-  },
-  {
-    key: "pareja",
-    title: "Terapia de pareja",
-    description: "Sesión de 80 minutos enfocada en comunicación y acuerdos.",
-    price: 749, // <-- cambia aquí
-    href: "/agenda?t=pareja",
-  },
-]
-
-function formatMXN(v: number) {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    maximumFractionDigits: 0,
-  }).format(v)
-}
+    "Terapia individual, paquete mensual y terapia de pareja. Elige la modalidad que mejor se ajuste a ti.",
+};
 
 export default function ServiciosPage() {
+  const servicios = [
+    {
+      slug: "individual",
+      titulo: "Terapia individual",
+      desc:
+        "Sesión de 50 minutos. Enfoque TCC breve: ansiedad, depresión, duelo y autoestima.",
+      precio: "MXN $700",
+    },
+    {
+      slug: "paquete",
+      titulo: "Paquete mensual (4 sesiones)",
+      desc:
+        "Acompañamiento continuo durante el mes. Ideal para trabajar objetivos concretos.",
+      precio: "MXN $2,500",
+    },
+    {
+      slug: "pareja",
+      titulo: "Terapia de pareja",
+      desc:
+        "Sesión de 60 minutos. Comunicación, resolución de conflictos y acuerdos realistas.",
+      precio: "MXN $1,100",
+    },
+  ];
+
   return (
-    <section className="container mx-auto px-4 py-16 space-y-8">
-      <h1 className="text-3xl md:text-4xl font-bold">Servicios</h1>
-      <p className="text-neutral-700">
-        Enfoque CBT breve: ansiedad, depresión, duelo y autoestima.
-      </p>
+    <section className="py-16 md:py-20">
+      <div className="container">
+        <div className="mx-auto max-w-6xl space-y-10">
+          <header className="text-center space-y-4">
+            <h1 className="text-4xl md:text-hero font-extrabold text-ink">
+              Servicios
+            </h1>
+            <p className="text-lg md:text-xl text-ink-soft max-w-3xl mx-auto">
+              Enfoque TCC breve para ansiedad, depresión, duelo y autoestima.
+              Atención en línea y presencial (Monterrey).
+            </p>
+          </header>
 
-      <h2 className="text-xl font-semibold">Modalidades</h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {servicios.map((s) => (
+              <article key={s.slug} className="card p-6 flex flex-col">
+                <h3 className="text-xl font-semibold text-ink">{s.titulo}</h3>
+                <p className="text-ink-soft mt-2">{s.desc}</p>
+                <div className="mt-4 text-ink font-semibold">{s.precio}</div>
+                <div className="mt-auto pt-6 flex gap-3">
+                  <Link href={`/agenda?t=${s.slug}`} className="btn-primary">
+                    Agendar
+                  </Link>
+                  <Link href="/agenda" className="btn-ghost">
+                    Ver disponibilidad
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {servicios.map((s) => (
-          <ServiceCard
-            key={s.key}
-            title={s.title}
-            description={s.description}
-            price={s.price}
-            href={s.href}
-          />
-        ))}
+          <div className="text-center">
+            <Link href="/agenda" className="btn-primary">
+              Ir a la agenda
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
-  )
-}
-
-function ServiceCard({
-  title,
-  description,
-  price,
-  href,
-}: {
-  title: string
-  description: string
-  price: number
-  href: string
-}) {
-  return (
-    <div className="rounded-2xl border bg-white p-6 shadow-sm">
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-sm text-neutral-600">{description}</p>
-
-      <div className="mt-4">
-        <span className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-800">
-          {formatMXN(price)} <span className="text-neutral-500">MXN</span>
-        </span>
-      </div>
-
-      <div className="mt-5">
-        <Link
-          href={href}
-          className="inline-flex items-center rounded-full bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
-        >
-          Agendar
-        </Link>
-      </div>
-    </div>
-  )
+  );
 }
