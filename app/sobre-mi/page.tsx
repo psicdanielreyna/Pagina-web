@@ -1,89 +1,73 @@
 // app/sobre-mi/page.tsx
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata = {
-  title: "Sobre mí",
+  title: "Sobre mí | Daniel Reyna Psicólogo",
   description:
-    "Psicólogo clínico cognitivo-conductual especializado en terapia breve TCC. Atención a adolescentes y adultos en línea y presencial.",
+    "Psicólogo clínico TCC. Acompaño a adolescentes y adultos en México, en línea y presencial.",
 };
 
 export default function SobreMiPage() {
   return (
     <section className="py-16 md:py-20">
-      <div className="container mx-auto px-4">
-        {/* Título */}
-        <div className="mb-10">
-          <span className="inline-block text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-600 mb-4">
-            Sobre mí
-          </span>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">
-            Hola, soy Daniel Reyna
-          </h1>
-        </div>
-
-        {/* Hero expandido: texto + foto recortada */}
+      <div className="container">
         <div className="mx-auto max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
           {/* Texto */}
           <div>
-            <p className="text-lg text-slate-800 leading-relaxed mb-4">
-              Soy <strong>psicólogo clínico cognitivo-conductual</strong>,
-              especializado en <strong>terapia breve TCC</strong>. Acompaño a{" "}
-              <strong>adolescentes y adultos</strong> en México para trabajar
-              temas de ansiedad, depresión, duelo, estrés y autoestima, con
-              sesiones <strong>en línea</strong> y <strong>presenciales</strong>.
-            </p>
-            <p className="text-lg text-slate-800 leading-relaxed mb-8">
-              Mi enfoque es claro y práctico: herramientas que puedes aplicar
-              desde la primera sesión, a tu ritmo y con seguimiento.
-            </p>
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-6">
+              Hola, soy Daniel Reyna
+            </h1>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="space-y-4 text-lg leading-relaxed text-slate-700">
+              <p>
+                Soy <span className="font-semibold">psicólogo clínico cognitivo-conductual</span>, especializado en{" "}
+                <span className="font-semibold">terapia breve TCC</span>. Acompaño a{" "}
+                <span className="font-semibold">adolescentes y adultos</span> en México para trabajar temas de
+                ansiedad, depresión, duelo, estrés y autoestima, con sesiones{" "}
+                <span className="font-semibold">en línea</span> y{" "}
+                <span className="font-semibold">presenciales</span>.
+              </p>
+
+              <p>
+                Mi enfoque es claro y práctico: herramientas que puedes aplicar desde la primera sesión, a tu ritmo y
+                con seguimiento.
+              </p>
+            </div>
+
+            <div className="mt-8 flex gap-3">
               <Link
-                href="/agenda"
-                className="inline-flex items-center justify-center rounded-full px-6 py-3
-                           text-white font-medium bg-teal-700 shadow-md transition
-                           hover:bg-teal-800 focus-visible:outline-none
-                           focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-700/60
-                           active:scale-[0.98]"
-              >
-                Agendar una sesión
-              </Link>
-
-              <a
                 href="https://instagram.com/psic.danielreyna"
                 target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5
-                           border border-slate-300 text-slate-700 transition
-                           hover:bg-slate-50 focus-visible:outline-none
-                           focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-300"
-                aria-label="Instagram @psic.danielreyna"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-slate-700 hover:bg-slate-50"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm5.5-.75a1 1 0 100 2 1 1 0 000-2z" />
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+                  <path
+                    fill="currentColor"
+                    d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.9.2 2.4.4.6.2 1 .4 1.5.9.5.4.7.9.9 1.5.2.5.3 1.2.4 2.4.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.9-.4 2.4-.2.6-.4 1-.9 1.5-.4.5-.9.7-1.5.9-.5.2-1.2.3-2.4.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.9-.2-2.4-.4-.6-.2-1-.4-1.5-.9-.5-.4-.7-.9-.9-1.5-.2-.5-.3-1.2-.4-2.4C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.2-1.9.4-2.4.2-.6.4-1 .9-1.5.4-.5.9-.7 1.5-.9.5-.2 1.2-.3 2.4-.4C8.4 2.2 8.8 2.2 12 2.2m0 1.8c-3.1 0-3.5 0-4.7.1-1 .1-1.5.2-1.9.3-.5.2-.8.3-1.1.6-.3.3-.5.6-.6 1.1-.1.4-.3.9-.3 1.9-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 1 .2 1.5.3 1.9.2.5.3.8.6 1.1.3.3.6.5 1.1.6.4.1.9.3 1.9.3 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1-.1 1.5-.2 1.9-.3.5-.2.8-.3 1.1-.6.3-.3.5-.6.6-1.1.1-.4.3-.9.3-1.9.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1-.2-1.5-.3-1.9-.2-.5-.3-.8-.6-1.1-.3-.3-.6-.5-1.1-.6-.4-.1-.9-.3-1.9-.3-1.2-.1-1.6-.1-4.7-.1Zm0 3.7a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2Zm0 10.9a4.3 4.3 0 1 0 0-8.6 4.3 4.3 0 0 0 0 8.6Zm6.9-10.9a1.5 1.5 0 1 1-3.1 0 1.5 1.5 0 0 1 3.1 0Z"
+                  />
                 </svg>
-                <span className="font-medium">@psic.danielreyna</span>
-              </a>
+                @psic.danielreyna
+              </Link>
+
+              <Link
+                href="/agenda"
+                className="inline-flex items-center rounded-full bg-emerald-700 text-white px-5 py-2.5 font-medium hover:bg-emerald-800"
+              >
+                Agendar sesión
+              </Link>
             </div>
           </div>
 
-          {/* Imagen recortada (con fondo blanco) */}
-          <div className="relative rounded-2xl border border-slate-200 bg-white overflow-hidden">
-            <div className="relative aspect-[4/5]">
-              <Image
-                src="/images/daniel-reyna-hero.webp"
-                alt="Daniel Reyna Psicólogo"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
+          {/* Imagen */}
+          <div className="relative w-full h-[520px] rounded-3xl border border-slate-100 overflow-hidden shadow-lg">
+            <Image
+              src="/images/daniel-reyna-hero.webp"
+              alt="Daniel Reyna Psicólogo"
+              fill
+              className="object-cover object-center"
+              priority
+            />
           </div>
         </div>
       </div>
