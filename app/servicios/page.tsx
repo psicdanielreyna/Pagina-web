@@ -14,21 +14,21 @@ export default function ServiciosPage() {
       titulo: "Terapia individual",
       desc:
         "Sesión de 50 minutos. Enfoque TCC breve: ansiedad, depresión, duelo y autoestima.",
-      precio: "MXN $700",
+      precio: "MXN $499",
     },
     {
       slug: "paquete",
       titulo: "Paquete mensual (4 sesiones)",
       desc:
         "Acompañamiento continuo durante el mes. Ideal para trabajar objetivos concretos.",
-      precio: "MXN $2,500",
+      precio: "MXN $1,900",
     },
     {
       slug: "pareja",
       titulo: "Terapia de pareja",
       desc:
         "Sesión de 60 minutos. Comunicación, resolución de conflictos y acuerdos realistas.",
-      precio: "MXN $1,100",
+      precio: "MXN $749",
     },
   ];
 
