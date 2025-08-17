@@ -1,8 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ========== Reset/opciones globales ========== */
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  @apply bg-white text-gray-900;
+}
+
+/* ========== Utilities personalizadas ========== */
 @layer utilities {
-  /* Sombra suave consistente para tarjetas y modales */
+  /* Sombra suave reusable */
   .shadow-soft {
     box-shadow:
       0 10px 20px rgba(0, 0, 0, 0.06),
@@ -10,84 +21,18 @@
   }
 }
 
-:root {
-  --background: 210 40% 98%;
-  --foreground: 222.2 47.4% 11.2%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 47.4% 11.2%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 47.4% 11.2%;
-  --primary: 173 58% 39%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 151 55% 41%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 222.2 84% 4.9%;
-  --radius: 1rem;
-}
+/* ========== Components (clases que usan @apply) ========== */
+@layer components {
+  /* Botón primario unificado */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+      bg-brand text-white px-6 py-3 font-medium shadow-soft transition
+      hover:bg-brand-hover focus:outline-none focus-visible:ring-2
+      focus-visible:ring-brand/60 active:scale-[0.98];
+  }
 
-html, body { height: 100%; }
-body { @apply bg-background text-foreground; }
-.container-narrow { @apply max-w-3xl mx-auto; }
-
-/* prose tweaks */
-.prose :where(h1,h2,h3,h4):not(:where(.not-prose *)) { @apply scroll-mt-20; }
-
-/* Suaviza títulos y tipografía general */
-h1, h2, h3 {
-  text-wrap: balance;
-}
-p { text-wrap: pretty; }
-
-/* Prosa más legible para el blog y textos largos */
-.prose {
-  --tw-prose-body: #334155;   /* ink.soft */
-  --tw-prose-headings: #0b1220;
-  --tw-prose-links: #0c766a;
-  --tw-prose-bold: #0b1220;
-  --tw-prose-quotes: #0b1220;
-  --tw-prose-counters: #64748b;
-  --tw-prose-bullets: #cbd5e1;
-  --tw-prose-hr: #e2e8f0;
-  --tw-prose-code: #0b1220;
-  --tw-prose-th-borders: #e2e8f0;
-  --tw-prose-td-borders: #e2e8f0;
-}
-
-/* Tarjetas consistentes */
-.card {
-  @apply rounded-2xl bg-white shadow-soft border border-slate-100;
-}
-
-/* Botón primario unificado */
-.btn-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand text-white px-6 py-3 font-medium shadow-soft transition
-         hover:bg-brand-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/60 active:scale-[0.98];
-}
-
-/* Botón fantasma */
-.btn-ghost {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-medium text-ink-soft hover:bg-surface-soft;
-}
-
-/* Links con subrayado amable */
-.link {
-  @apply underline underline-offset-4 decoration-ink-mute hover:decoration-brand hover:text-brand;
-}
-
-/* Imágenes de héroe / tarjetas */
-.hero-img {
-  @apply w-full h-auto rounded-2xl shadow-soft;
-}
-
-/* Sección gris suave reutilizable */
-.section-soft {
-  @apply bg-surface-soft;
+  /* Tarjeta genérica */
+  .card {
+    @apply rounded-2xl bg-white shadow-soft border border-slate-100;
+  }
 }
