@@ -1,12 +1,13 @@
 // app/page.tsx
 import Link from "next/link";
 import Image from "next/image";
+import Newsletter from "@/components/Newsletter";
 
 type Card = {
   title: string;
   excerpt: string;
-  href: string; // /blog/slug
-  img: string;  // ruta en /public
+  href: string;
+  img: string;
   alt: string;
 };
 
@@ -37,10 +38,27 @@ const destacados: Card[] = [
   },
 ];
 
-export default function HomePage() {
-  // si aún no hay posts dinámicos, usamos los destacados como teaser
-  const teaserPosts = destacados.slice(0, 2);
+// Pequeño teaser para la sección “Último del blog”
+const teaserPosts: Card[] = [
+  {
+    title: "El arte de creer en ti",
+    excerpt:
+      "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
+    href: "/blog/el-arte-de-creer-en-ti",
+    img: "/images/post-2.png",
+    alt: "El arte de creer en ti",
+  },
+  {
+    title: "Ansiedad en 3 pasos prácticos",
+    excerpt:
+      "Un mini-protocolo para reconocer, regular y responder mejor ante la ansiedad.",
+    href: "/blog/ansiedad-en-3-pasos",
+    img: "/images/post-3.png",
+    alt: "Ansiedad en 3 pasos",
+  },
+];
 
+export default function HomePage() {
   return (
     <div className="space-y-16">
       {/* HERO */}
@@ -51,9 +69,11 @@ export default function HomePage() {
             <p className="text-sm text-slate-500 mb-3">
               Psicoterapia <span className="mx-2">|</span> Recursos prácticos
             </p>
+
             <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-6">
               Daniel Reyna — Acompañamiento con herramientas claras y humanas
             </h1>
+
             <p className="text-lg text-slate-700 mb-8">
               Sesiones individuales y de pareja, y materiales descargables para
               avanzar a tu ritmo.
@@ -73,9 +93,9 @@ export default function HomePage() {
               <Link
                 href="/agenda"
                 className="inline-flex items-center justify-center rounded-full px-6 py-3
-                           text-white font-medium bg-teal-700 shadow-md transition
-                           hover:bg-teal-800 focus-visible:outline-none
-                           focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-700/60
+                           text-white font-medium bg-emerald-700 shadow-md transition
+                           hover:bg-emerald-800 focus-visible:outline-none
+                           focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-700/60
                            active:scale-[0.98]"
               >
                 Agendar cita
@@ -119,12 +139,7 @@ export default function HomePage() {
                 className="rounded-2xl border border-slate-100 bg-white overflow-hidden hover:shadow-md transition"
               >
                 <div className="relative aspect-[4/3]">
-                  <Image
-                    src={p.img || "/images/blog/fallback-post.jpg"}
-                    alt={p.alt || p.title}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={p.img} alt={p.alt} fill className="object-cover" />
                 </div>
 
                 <div className="p-4">
@@ -166,8 +181,8 @@ export default function HomePage() {
                 >
                   <div className="relative h-16 w-24 rounded-lg overflow-hidden bg-slate-100">
                     <Image
-                      src={p.img || "/images/blog/fallback-post.jpg"}
-                      alt={p.alt || p.title}
+                      src={p.img}
+                      alt={p.alt}
                       fill
                       className="object-cover"
                     />
@@ -192,48 +207,9 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Newsletter simple (sin backend) */}
+          {/* Newsletter (Client Component) */}
           <div className="rounded-2xl border border-slate-100 bg-white p-6">
-            <h2 className="text-xl md:text-2xl font-bold text-slate-900">
-              Newsletter
-            </h2>
-            <p className="mt-1 text-slate-600">
-              Consejos breves y herramientas que sí puedes aplicar.
-            </p>
-
-            <form
-              className="mt-6 flex gap-3"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const email = (e.currentTarget.elements.namedItem(
-                  "email"
-                ) as HTMLInputElement)?.value;
-                if (email) {
-                  window.location.href = `mailto:daniel@tu-dominio.com?subject=Suscripción%20newsletter&body=Quiero%20suscribirme.%20Mi%20correo:%20${encodeURIComponent(
-                    email
-                  )}`;
-                }
-              }}
-            >
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="tu@email.com"
-                className="flex-1 rounded-full border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-600/40"
-              />
-              <button
-                type="submit"
-                className="rounded-full bg-emerald-700 text-white px-5 py-3 font-medium hover:bg-emerald-800"
-              >
-                Quiero recibirlo
-              </button>
-            </form>
-
-            <p className="mt-2 text-xs text-slate-500">
-              *Cuando tengas tu backend listo, conectamos este formulario a tu
-              endpoint real.
-            </p>
+            <Newsletter />
           </div>
         </div>
       </section>
