@@ -50,18 +50,19 @@ export default function SobreMiPage() {
             </div>
           </div>
 
-          {/* Imagen */}
-          <div className="order-first lg:order-none">
-            <Image
-              src="/hero-expandido.jpg"
-              alt="Daniel Reyna Psicólogo"
-              width={960}
-              height={960}
-              className="hero-img"
-              priority
-            />
-          </div>
-        </div>
+         {/* Foto (Sobre mí) */}
+<div className="relative rounded-2xl border bg-white overflow-hidden shadow-sm">
+  <div className="relative w-full min-h-[380px] md:min-h-[520px]">
+    <Image
+      src="/images/daniel-reyna-hero.webp"
+      alt="Daniel Reyna Psicólogo"
+      fill
+      className="object-contain"
+      sizes="(max-width: 1024px) 100vw, 600px"
+      priority
+    />
+  </div>
+</div>
 
         {/* Bloque breve de llamada a la acción */}
         <div className="mx-auto max-w-6xl mt-16 card p-8 md:p-10 text-center">
