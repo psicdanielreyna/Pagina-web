@@ -51,18 +51,20 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border bg-white">
-              <Image
-                src="/images/daniel-reyna-hero.webp"
-                alt="Consulta y recursos de psicoterapia"
-                fill
-                className="object-cover"
-                sizes="(min-width: 768px) 600px, 100vw"
-                priority
-              />
-            </div>
-          </div>
-        </div>
+            {/* Foto (Sobre mí) */}
+<div className="relative rounded-2xl border bg-white overflow-hidden shadow-sm">
+  <div className="relative w-full min-h-[380px] md:min-h-[520px]">
+    <Image
+      src="/images/daniel-reyna-hero.webp"
+      alt="Daniel Reyna Psicólogo"
+      fill
+      className="object-contain"
+      sizes="(max-width: 1024px) 100vw, 600px"
+      priority
+    />
+  </div>
+</div>
+      
       </section>
 
       {/* RECURSOS DESTACADOS */}
