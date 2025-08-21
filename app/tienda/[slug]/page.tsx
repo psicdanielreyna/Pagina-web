@@ -9,7 +9,7 @@ const DB = {
     price: "$249 MXN",
     img: "/images/tienda/apagar-mente.png",
     alt: "Portada Cómo Apagar tu Mente",
-    mpLink: "https://mpago.la/XXXXXXXX", // 🔁 reemplaza
+    mpLink: "https://mpago.la/26HoVyh", // 🔁 reemplaza
     bullets: [
       "Guía PDF (32 páginas)",
       "Plantilla de registro",
@@ -23,7 +23,7 @@ const DB = {
     price: "$249 MXN",
     img: "/images/tienda/el-arte-de-creer-en-ti.png",
     alt: "Portada El Arte de Creer en Ti",
-    mpLink: "https://mpago.la/YYYYYYYY", // 🔁 reemplaza
+    mpLink: "https://mpago.la/1LrHK3P", // 🔁 reemplaza
     bullets: [
       "Guía PDF (28 páginas)",
       "Ejercicios de autoobservación",
