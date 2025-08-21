@@ -2,36 +2,34 @@
 import Image from "next/image";
 import Link from "next/link";
 
-type Producto = {
+type Item = {
   slug: string;
-  titulo: string;
-  subtitulo: string;
-  precio: string;
+  title: string;
+  price: string;
   img: string;
   alt: string;
-  descripcionLarga: string;
+  blurb: string;
+  mpLink: string; // Mercado Pago
 };
 
-const productos: Producto[] = [
+const items: Item[] = [
   {
     slug: "apagar-mente",
-    titulo: "Cómo Apagar tu Mente",
-    subtitulo: "Técnicas efectivas para calmar el sobrepensamiento.",
-    precio: "$249 MXN",
+    title: "Cómo Apagar tu Mente",
+    price: "$249 MXN",
     img: "/images/tienda/apagar-mente.png",
     alt: "Portada Cómo Apagar tu Mente",
-    descripcionLarga:
-      "Incluye ejercicios guiados, plantilla de registro y un método paso a paso para desactivar el bucle de pensamientos.",
+    blurb: "Técnicas efectivas para calmar el sobrepensamiento.",
+    mpLink: "https://mpago.la/XXXXXXXX", // 🔁 reemplaza por tu link real
   },
   {
     slug: "el-arte-de-creer-en-ti",
-    titulo: "El Arte de Creer en Ti",
-    subtitulo: "Estrategias para fortalecer tu autoestima y confianza.",
-    precio: "$249 MXN",
+    title: "El Arte de Creer en Ti",
+    price: "$249 MXN",
     img: "/images/tienda/el-arte-de-creer-en-ti.png",
     alt: "Portada El Arte de Creer en Ti",
-    descripcionLarga:
-      "Herramientas prácticas para re-entrenar tu diálogo interno, cultivar límites sanos y sostener el cambio.",
+    blurb: "Estrategias para fortalecer tu autoestima y confianza.",
+    mpLink: "https://mpago.la/YYYYYYYY", // 🔁 reemplaza por tu link real
   },
 ];
 
@@ -46,45 +44,41 @@ export default function TiendaPage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-          {productos.map((p) => (
-            <article
-              key={p.slug}
-              className="flex flex-col rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition"
+        <div className="grid md:grid-cols-2 gap-6">
+          {items.map((it) => (
+            <div
+              key={it.slug}
+              className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
             >
-              <div className="relative h-48 md:h-56 bg-slate-100">
-                <Image
-                  src={p.img}
-                  alt={p.alt}
-                  fill
-                  className="object-cover"
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                  priority
-                />
+              {/* Imagen con misma altura que “Recursos” y portada completa */}
+              <div className="relative h-[260px] md:h-[300px] bg-slate-50">
+                <Image src={it.img} alt={it.alt} fill className="object-contain" />
               </div>
 
-              <div className="flex-1 p-5">
-                <h3 className="text-lg font-semibold text-slate-900">{p.titulo}</h3>
-                <p className="mt-1 text-slate-600">{p.subtitulo}</p>
-                <p className="mt-3 text-sm text-slate-600">{p.descripcionLarga}</p>
-                <p className="mt-4 font-semibold text-slate-900">{p.precio}</p>
-              </div>
+              <div className="p-5 space-y-2">
+                <h3 className="font-semibold text-slate-900">{it.title}</h3>
+                <p className="text-slate-600 text-sm">{it.blurb}</p>
+                <p className="font-semibold">{it.price}</p>
 
-              <div className="p-5 pt-0 flex flex-col sm:flex-row gap-3">
-                <Link
-                  href={`/tienda/${p.slug}`}
-                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-full border border-slate-300 px-5 py-3 text-slate-700 hover:bg-slate-50"
-                >
-                  Ver más
-                </Link>
-                <Link
-                  href={`/checkout/${p.slug}`} // ajusta cuando tengas checkout real
-                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-full bg-blue-600 text-white px-5 py-3 font-medium hover:bg-blue-700"
-                >
-                  Comprar
-                </Link>
+                <div className="flex gap-3 pt-2">
+                  <a
+                    href={it.mpLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center rounded-full px-5 py-2 bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    Comprar
+                  </a>
+
+                  <Link
+                    href={`/tienda/${it.slug}`}
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2 text-slate-700 hover:bg-slate-50"
+                  >
+                    Ver más
+                  </Link>
+                </div>
               </div>
-            </article>
+            </div>
           ))}
         </div>
       </div>
