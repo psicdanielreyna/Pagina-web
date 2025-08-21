@@ -1,4 +1,14 @@
 // app/blog/page.tsx
+// app/blog/layout.tsx
+export default function BlogLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // sin encabezado aquí; solo envoltura opcional
+  return <>{children}</>;
+}
+
 import Image from "next/image";
 import Link from "next/link";
 
