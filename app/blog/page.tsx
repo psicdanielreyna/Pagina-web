@@ -1,14 +1,13 @@
-// app/blog/page.tsx
 // app/blog/layout.tsx
 export default function BlogLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // sin encabezado aquí; solo envoltura opcional
   return <>{children}</>;
 }
 
+// app/blog/page.tsx
 import Image from "next/image";
 import Link from "next/link";
 
@@ -50,7 +49,7 @@ const posts: Post[] = [
     excerpt:
       "Un mini-protocolo para reconocer, regular y responder mejor ante la ansiedad.",
     href: "/blog/ansiedad-en-3-pasos",
-    img: "/images/blog/ansiedad-3-pasos.png", // súbela cuando la tengas o cambia el path
+    img: "/images/blog/ansiedad-3-pasos.png",
     alt: "Post 3",
   },
 ];
@@ -59,7 +58,6 @@ export default function BlogPage() {
   return (
     <section className="py-10 md:py-14">
       <div className="container mx-auto px-4">
-        {/* ÚNICO encabezado */}
         <header className="mb-8">
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Blog</h1>
           <p className="mt-2 text-slate-600">
@@ -67,7 +65,6 @@ export default function BlogPage() {
           </p>
         </header>
 
-        {/* Listado simple */}
         <div className="space-y-4">
           {posts.map((p) => (
             <Link
@@ -89,9 +86,7 @@ export default function BlogPage() {
               <div className="min-w-0">
                 <h2 className="font-semibold text-slate-900">{p.title}</h2>
                 <p className="text-xs text-slate-500">{p.date}</p>
-                <p className="mt-1 text-sm text-slate-600 line-clamp-2">
-                  {p.excerpt}
-                </p>
+                <p className="mt-1 text-sm text-slate-600 line-clamp-2">{p.excerpt}</p>
               </div>
             </Link>
           ))}
