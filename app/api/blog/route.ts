@@ -9,6 +9,10 @@ type Item = {
   contentSnippet?: string;
   enclosure?: { url?: string };
 };
+// app/api/blog/route.ts
+export const dynamic = "force-dynamic";
+
+// ...tu handler GET aquí (puede usar request.url sin romper el build)
 
 export async function GET(req: Request) {
   try {
