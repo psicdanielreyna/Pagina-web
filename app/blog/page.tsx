@@ -1,103 +1,75 @@
 // app/blog/page.tsx
-import Image from "next/image";
 import Link from "next/link";
-import posts from "@/data/posts";
+import Image from "next/image";
 
-export const dynamic = "force-static";
+// Listado simple; títulos renombrados a Post 1, Post 2, Post 3
+const posts = [
+  {
+    title: "Post 1",
+    href: "/blog/como-apagar-tu-mente",
+    img: "/images/blog/como-apagar-tu-mente.webp",
+    alt: "Post 1",
+    excerpt:
+      "Técnicas concretas para bajar el ruido mental cuando sientes que la cabeza no para.",
+    date: "08/10/2025",
+  },
+  {
+    title: "Post 2",
+    href: "/blog/el-arte-de-creer-en-ti",
+    img: "/images/blog/el-arte-de-creer-en-ti.webp",
+    alt: "Post 2",
+    excerpt:
+      "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
+    date: "08/05/2025",
+  },
+  {
+    title: "Post 3",
+    href: "/blog/ansiedad-en-3-pasos",
+    img: "/images/blog/ansiedad-en-3-pasos.webp",
+    alt: "Post 3",
+    excerpt:
+      "Un mini-protocolo para reconocer, regular y responder mejor ante la ansiedad.",
+    date: "07/28/2025",
+  },
+];
 
-export default function BlogIndexPage() {
-  // ordena por fecha DESC
-  const sorted = [...posts].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
-
-  const [featured, ...rest] = sorted;
-  const secundarios = rest.slice(0, 2);
-
+export default function BlogPage() {
   return (
-    <div className="space-y-10">
-      {/* 1 grande + 2 a la derecha */}
-      {featured && (
-        <section className="grid lg:grid-cols-3 gap-6">
-          {/* grande */}
-          <Link
-            href={`/blog/${featured.slug}`}
-            className="block group rounded-2xl border overflow-hidden"
-          >
-            <div className="relative aspect-[16/10] bg-white">
-              <Image
-                src={featured.image ?? "/blog/fallback.jpg"}
-                alt={featured.title}
-                fill
-                className="object-contain bg-white group-hover:scale-[1.02] transition-transform"
-                sizes="(min-width: 1024px) 66vw, 100vw"
-                priority
-              />
-            </div>
-            <div className="p-5">
-              <h2 className="text-xl md:text-2xl font-semibold group-hover:underline">
-                {featured.title}
-              </h2>
-              <p className="text-sm text-neutral-500 mt-1">
-                {new Date(featured.date).toLocaleDateString()}
-              </p>
-              <p className="text-neutral-700 mt-2">{featured.excerpt}</p>
-            </div>
-          </Link>
+    <section className="py-12 md:py-16">
+      <div className="container mx-auto px-4">
+        <h1 className="text-4xl font-extrabold tracking-tight mb-2">Blog</h1>
+        <p className="text-slate-600 mb-8">
+          Lecturas breves y aplicables para sentirte mejor.
+        </p>
 
-          {/* dos a la derecha */}
-          <div className="space-y-6">
-            {secundarios.map((p) => (
-              <Link
-                key={p.slug}
-                href={`/blog/${p.slug}`}
-                className="block group rounded-2xl border overflow-hidden"
-              >
-                <div className="grid grid-cols-5">
-                  <div className="col-span-2 relative aspect-[4/3] bg-white">
-                    <Image
-                      src={p.image ?? "/blog/fallback.jpg"}
-                      alt={p.title}
-                      fill
-                      className="object-contain bg-white"
-                      sizes="200px"
-                    />
-                  </div>
-                  <div className="col-span-3 p-4">
-                    <h3 className="font-semibold group-hover:underline">
-                      {p.title}
-                    </h3>
-                    <p className="text-xs text-neutral-500 mt-1">
-                      {new Date(p.date).toLocaleDateString()}
-                    </p>
-                    <p className="text-sm text-neutral-700 mt-2 line-clamp-3">
-                      {p.excerpt}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* resto en grilla (opcional) */}
-      {/* <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sorted.slice(3).map((p) => (
-          <Link key={p.slug} href={`/blog/${p.slug}`} className="group rounded-2xl border overflow-hidden">
-            <div className="relative aspect-[16/10] bg-white">
-              <Image src={p.image ?? "/blog/fallback.jpg"} alt={p.title} fill className="object-contain bg-white" />
-            </div>
-            <div className="p-4">
-              <h3 className="font-semibold group-hover:underline">{p.title}</h3>
-              <p className="text-xs text-neutral-500 mt-1">
-                {new Date(p.date).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-neutral-700 mt-2 line-clamp-3">{p.excerpt}</p>
-            </div>
-          </Link>
-        ))}
-      </section> */}
-    </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {posts.map((p) => (
+            <Link
+              key={p.href}
+              href={p.href}
+              className="rounded-2xl border border-slate-100 bg-white overflow-hidden hover:shadow-md transition"
+            >
+              <div className="relative h-56 w-full bg-slate-100">
+                <Image
+                  src={p.img}
+                  alt={p.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 33vw, 100vw"
+                  priority={p.title === "Post 1"}
+                />
+              </div>
+              <div className="p-4">
+                <p className="text-xs text-slate-500">{p.date}</p>
+                <h3 className="mt-1 font-semibold text-slate-900">{p.title}</h3>
+                <p className="mt-1 text-slate-600 text-sm line-clamp-3">
+                  {p.excerpt}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
