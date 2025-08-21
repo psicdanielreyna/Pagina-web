@@ -20,7 +20,7 @@ const items: Item[] = [
     img: "/images/tienda/apagar-mente.png",
     alt: "Portada Cómo Apagar tu Mente",
     blurb: "Técnicas efectivas para calmar el sobrepensamiento.",
-    mpLink: "https://mpago.la/XXXXXXXX", // 🔁 reemplaza por tu link real
+    mpLink: "https://mpago.la/1UDDJxC", // 🔁 reemplaza por tu link real
   },
   {
     slug: "el-arte-de-creer-en-ti",
@@ -29,7 +29,7 @@ const items: Item[] = [
     img: "/images/tienda/el-arte-de-creer-en-ti.png",
     alt: "Portada El Arte de Creer en Ti",
     blurb: "Estrategias para fortalecer tu autoestima y confianza.",
-    mpLink: "https://mpago.la/YYYYYYYY", // 🔁 reemplaza por tu link real
+    mpLink: "https://mpago.la/1LrHK3P", // 🔁 reemplaza por tu link real
   },
 ];
 
