@@ -1,32 +1,22 @@
-// data/recursos.ts
-export type Recurso = {
-  slug: string
-  title: string
-  description?: string
-  image?: string          // ruta pública, p.ej. /manuales/apagar-mente.png
-  price?: number | string
-  href?: string           // <-- NUEVO: link externo (Mercado Pago)
-}
+import type { Recurso } from "@/types/content";
 
-const recursos: Recurso[] = [
+export const recursosDestacados: Recurso[] = [
   {
-    slug: "como-apagar-la-mente",
-    title: "Cómo Apagar tu Mente",
-    description: "Técnicas efectivas para calmar el sobrepensamiento.",
-    image: "/manuales/apagar-mente.png",
-    price: 249,
-    href: "https://mpago.la/2bYkKse", // <-- MP
+    slug: "apagar-mente",
+    title: "Cómo apagar tu mente",
+    excerpt:
+      "Técnicas concretas para bajar el ruido mental cuando sientes que la cabeza no para.",
+    img: "/images/tienda/apagar-mente.png",
+    alt: "Portada del manual Cómo apagar tu mente",
+    href: "/tienda/apagar-mente",
   },
   {
     slug: "el-arte-de-creer-en-ti",
-    title: "El Arte de Creer en Ti",
-    description: "Estrategias para fortalecer tu autoestima y confianza.",
-    image: "/manuales/el-arte-de-creer-en-ti.png",
-    price: 249,
-    href: "https://mpago.la/1NgbPFE", // <-- MP
+    title: "El arte de creer en ti",
+    excerpt:
+      "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
+    img: "/images/tienda/el-arte-de-creer-en-ti.png",
+    alt: "Portada del manual El arte de creer en ti",
+    href: "/tienda/el-arte-de-creer-en-ti",
   },
-  // Si algún recurso no tiene link externo, simplemente no pongas href
-  // y la tarjeta usará la página interna /tienda/[slug]
-]
-
-export default recursos
+];
