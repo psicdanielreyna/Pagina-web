@@ -181,89 +181,83 @@ export default function HomePage() {
       </section>
 
       {/* ===== BLOG + NEWSLETTER ===== */}
-      <section className="py-12 md:py-16">
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 items-start">
-          {/* Columna izquierda: Blog (post grande + dos chicos a la derecha) */}
-          <div className="rounded-2xl border border-slate-100 bg-white p-6">
-            <h2 className="text-xl md:text-2xl font-bold text-slate-900">
-              Último del blog
-            </h2>
-            <p className="mt-1 text-slate-600">
-              Lecturas breves y útiles para tu día a día.
-            </p>
+<section className="py-12 md:py-16">
+  <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 items-start">
+    {/* Columna izquierda: Blog (pequeños a la izquierda, grande a la derecha) */}
+    <div className="rounded-2xl border border-slate-100 bg-white p-6">
+      <h2 className="text-xl md:text-2xl font-bold text-slate-900">
+        Último del blog
+      </h2>
+      <p className="mt-1 text-slate-600">
+        Lecturas breves y útiles para tu día a día.
+      </p>
 
-            <div className="mt-6 grid md:grid-cols-3 gap-4">
-              {/* Grande a la izquierda (ocupa 2 cols en md) */}
-              <Link
-                href={destacado.href}
-                className="md:col-span-2 rounded-xl border border-slate-100 overflow-hidden hover:bg-slate-50"
-              >
-                <div className="relative aspect-[4/3] bg-slate-50">
-                  <Image
-                    src={destacado.img}
-                    alt={destacado.alt}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 768px) 100vw, 512px"
-                    priority
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-slate-900">
-                    {destacado.title}
-                  </h3>
-                  <p className="text-sm text-slate-600 line-clamp-2">
-                    {destacado.excerpt}
-                  </p>
-                </div>
-              </Link>
-
-              {/* Dos chicos apilados a la derecha */}
-              <div className="space-y-4">
-                {resto.slice(0, 2).map((p) => (
-                  <Link
-                    key={p.slug}
-                    href={p.href}
-                    className="flex gap-3 rounded-xl border border-slate-100 p-3 hover:bg-slate-50"
-                  >
-                    <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-50">
-                      <Image
-                        src={p.img}
-                        alt={p.alt}
-                        fill
-                        className="object-contain"
-                        sizes="64px"
-                      />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-900">
-                        {p.title}
-                      </h4>
-                      <p className="text-sm text-slate-600 line-clamp-2">
-                        {p.excerpt}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+      {/* GRID: 3 cols en md; izquierda = 1 col (chicos), derecha = 2 cols (grande) */}
+      <div className="mt-6 grid md:grid-cols-3 gap-4">
+        {/* Izquierda: dos chicos apilados */}
+        <div className="space-y-4">
+          {resto.slice(0, 2).map((p) => (
+            <Link
+              key={p.slug}
+              href={p.href}
+              className="flex gap-3 rounded-xl border border-slate-100 p-3 hover:bg-slate-50"
+            >
+              <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-50">
+                <Image
+                  src={p.img}
+                  alt={p.alt}
+                  fill
+                  className="object-contain"
+                  sizes="64px"
+                />
               </div>
-            </div>
-
-            <div className="mt-6">
-              <Link
-                href="/blog"
-                className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-slate-700 hover:bg-slate-50"
-              >
-                Ver blog
-              </Link>
-            </div>
-          </div>
-
-          {/* Derecha: Newsletter */}
-          <div className="rounded-2xl border border-slate-100 bg-white p-6">
-            <Newsletter />
-          </div>
+              <div>
+                <h4 className="font-semibold text-slate-900">{p.title}</h4>
+                <p className="text-sm text-slate-600 line-clamp-2">
+                  {p.excerpt}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
-      </section>
+
+        {/* Derecha: grande (ocupa 2 columnas) */}
+        <Link
+          href={destacado.href}
+          className="md:col-span-2 rounded-xl border border-slate-100 overflow-hidden hover:bg-slate-50"
+        >
+          <div className="relative aspect-[4/3] bg-slate-50">
+            <Image
+              src={destacado.img}
+              alt={destacado.alt}
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, 512px"
+              priority
+            />
+          </div>
+          <div className="p-4">
+            <h3 className="font-semibold text-slate-900">{destacado.title}</h3>
+            <p className="text-sm text-slate-600 line-clamp-2">
+              {destacado.excerpt}
+            </p>
+          </div>
+        </Link>
+      </div>
+
+      <div className="mt-6">
+        <Link
+          href="/blog"
+          className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-slate-700 hover:bg-slate-50"
+        >
+          Ver blog
+        </Link>
+      </div>
     </div>
-  );
-}
+
+    {/* Derecha: Newsletter */}
+    <div className="rounded-2xl border border-slate-100 bg-white p-6">
+      <Newsletter />
+    </div>
+  </div>
+</section>
