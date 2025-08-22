@@ -1,15 +1,13 @@
-// sanity.config.ts
-import { defineConfig } from 'sanity';
-import { deskTool } from 'sanity/desk';
-import { visionTool } from '@sanity/vision';
-import schema from './sanity/schema';
+import { defineConfig } from "sanity";
+import { deskTool } from "sanity/desk";
+import { visionTool } from "@sanity/vision";
+import { schemaTypes } from "./schemas";
 
 export default defineConfig({
-  name: 'default',
-  title: 'Studio Daniel',
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!, // en Netlify env
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,      // en Netlify env
-  basePath: '/studio',
+  name: "default",
+  title: "Mi Blog",
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
   plugins: [deskTool(), visionTool()],
-  schema,
+  schema: { types: schemaTypes },
 });
