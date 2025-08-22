@@ -1,15 +1,15 @@
 // sanity.config.ts
 import { defineConfig } from 'sanity';
-import { structureTool } from 'sanity/structure';
+import { deskTool } from 'sanity/desk';
 import { visionTool } from '@sanity/vision';
-import { schema } from './sanity/schema'; // tu schema combinado
+import schema from './sanity/schema';
 
 export default defineConfig({
   name: 'default',
   title: 'Studio Daniel',
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!, // en Netlify env
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,      // en Netlify env
   basePath: '/studio',
-  plugins: [structureTool(), visionTool()],
+  plugins: [deskTool(), visionTool()],
   schema,
 });
