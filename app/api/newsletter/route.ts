@@ -1,75 +1,65 @@
 // app/api/newsletter/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 
-export async function POST(req: Request) {
+// Si estuvieras en edge runtimes, cámbialo a "edge". En Netlify/Node, así está bien.
+export const runtime = "nodejs";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export async function POST(req: NextRequest) {
   try {
     const { email } = await req.json();
 
-    // Validaciones
-    if (!email || typeof email !== "string") {
-      return NextResponse.json({ ok: false, message: "Email inválido." }, { status: 400 });
-    }
-    const trimmed = email.trim().toLowerCase();
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!re.test(trimmed)) {
-      return NextResponse.json({ ok: false, message: "Escribe un email válido." }, { status: 400 });
+    if (!email || !isValidEmail(String(email))) {
+      return NextResponse.json(
+        { message: "Correo inválido." },
+        { status: 400 }
+      );
     }
 
     const audienceId = process.env.RESEND_AUDIENCE_ID;
-    const apiKey = process.env.RESEND_API_KEY;
-
-    if (!audienceId || !apiKey) {
-      console.error("ENV MISSING", { hasAudience: !!audienceId, hasKey: !!apiKey });
+    if (!audienceId) {
       return NextResponse.json(
-        { ok: false, message: "Faltan variables de entorno en el servidor." },
+        {
+          message:
+            "Falta configurar RESEND_AUDIENCE_ID en variables de entorno.",
+        },
         { status: 500 }
       );
     }
 
-    const url = `https://api.resend.com/audiences/${audienceId}/contacts`;
-    const body = { email: trimmed, unsubscribed: false };
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(body),
+    const { data, error } = await resend.contacts.create({
+      audienceId,
+      email,
+      unsubscribed: false,
     });
 
-    // Intenta parsear json; si no hay, crea uno básico
-    let data: any = null;
-    try {
-      data = await res.json();
-    } catch {
-      data = { raw: await res.text() };
+    // Si Resend regresa conflicto (ya estaba suscrito), lo tratamos como OK
+    if (error) {
+      const msg = (error as any)?.message ?? "Error al suscribir.";
+      if (/already exists|already subscribed|conflict/i.test(msg)) {
+        return NextResponse.json({
+          ok: true,
+          already: true,
+          message: "Ya estabas suscrito ✨",
+        });
+      }
+      return NextResponse.json({ message: msg }, { status: 400 });
     }
 
-    // Log detallado al server log de Netlify
-    if (!res.ok) {
-      console.error("RESEND ERROR", {
-        status: res.status,
-        statusText: res.statusText,
-        data,
-      });
-
-      const msg =
-        data?.error?.message ||
-        data?.message ||
-        data?.raw ||
-        "No se pudo suscribir (error desconocido).";
-
-      return NextResponse.json({ ok: false, message: msg }, { status: res.status });
-    }
-
-    return NextResponse.json({ ok: true, message: "¡Te suscribiste con éxito!" });
-  } catch (err: any) {
-    console.error("ROUTE CATCH", err);
     return NextResponse.json(
-      { ok: false, message: "Ocurrió un error. Intenta más tarde." },
-      { status: 500 }
+      { ok: true, id: data?.id, message: "¡Listo! Te llegará el próximo correo 😊" },
+      { status: 200 }
+    );
+  } catch {
+    return NextResponse.json(
+      { message: "Solicitud inválida." },
+      { status: 400 }
     );
   }
 }
