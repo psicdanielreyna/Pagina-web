@@ -48,41 +48,36 @@ export default function Recursos() {
           </Link>
         </div>
 
-        {/* Cards más pequeñas con espacio sobrante a los lados */}
-        <div className="flex flex-wrap gap-6">
-          {recursos.map((r) => (
-            <Link
-              key={r.slug}
-              href={r.href}
-              className="group block rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition w-full sm:w-[480px] md:w-[520px] max-w-[520px]"
-            >
-              {/* imagen con portada completa, altura contenida */}
-              <div className="relative w-full h-56 bg-slate-100 rounded-t-2xl overflow-hidden">
-                <Image
-                  src={r.img}
-                  alt={r.alt}
-                  fill
-                  sizes="(min-width: 768px) 520px, 100vw"
-                  className="object-contain"
-                  priority
-                />
-              </div>
-
-              <div className="p-5">
-                <h3 className="font-semibold text-lg">{r.title}</h3>
-                <p className="mt-1 text-slate-600">{r.excerpt}</p>
-
-                <button
-                  type="button"
-                  className="mt-3 inline-flex items-center rounded-full border px-3 py-1 text-sm bg-white hover:bg-slate-100"
-                >
-                  Leer más
-                </button>
-              </div>
-            </Link>
-          ))}
-        </div>
+       // components/Recursos.tsx (solo lo relevante)
+<div className="flex flex-wrap gap-6">
+  {recursos.map((r) => (
+    <Link
+      key={r.slug}
+      href={r.href}
+      className="group block rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition
+                 w-full sm:w-[340px] md:w-[360px] lg:w-[380px] max-w-[380px]"
+    >
+      <div className="relative w-full h-48 bg-slate-100 rounded-t-2xl overflow-hidden">
+        <Image
+          src={r.img}
+          alt={r.alt}
+          fill
+          className="object-contain"
+          sizes="(min-width:1024px) 380px, (min-width:768px) 360px, 100vw"
+          priority
+        />
       </div>
-    </section>
-  );
-}
+
+      <div className="p-5">
+        <h3 className="font-semibold text-base">{r.title}</h3>
+        <p className="mt-1 text-slate-600 text-sm">{r.excerpt}</p>
+        <button
+          type="button"
+          className="mt-3 inline-flex items-center rounded-full border px-3 py-1 text-sm bg-white hover:bg-slate-100"
+        >
+          Leer más
+        </button>
+      </div>
+    </Link>
+  ))}
+</div>
