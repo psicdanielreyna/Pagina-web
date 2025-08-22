@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   try {
     const { email } = await req.json();
 
-    // Validaciones básicas
+    // Validaciones
     if (!email || typeof email !== "string") {
       return NextResponse.json({ ok: false, message: "Email inválido." }, { status: 400 });
     }
@@ -19,38 +19,54 @@ export async function POST(req: Request) {
     const apiKey = process.env.RESEND_API_KEY;
 
     if (!audienceId || !apiKey) {
+      console.error("ENV MISSING", { hasAudience: !!audienceId, hasKey: !!apiKey });
       return NextResponse.json(
         { ok: false, message: "Faltan variables de entorno en el servidor." },
         { status: 500 }
       );
     }
 
-    // Alta en Audience de Resend
-    const url = `https://api.resend.com/audiences/a69a0508-2aa1-4455-8057-b5b797bd82f/contacts`;
+    const url = `https://api.resend.com/audiences/${audienceId}/contacts`;
+    const body = { email: trimmed, unsubscribed: false };
+
     const res = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
-      body: JSON.stringify({
-        email: trimmed,
-        unsubscribed: false,
-      }),
+      body: JSON.stringify(body),
     });
 
-    const data = await res.json();
+    // Intenta parsear json; si no hay, crea uno básico
+    let data: any = null;
+    try {
+      data = await res.json();
+    } catch {
+      data = { raw: await res.text() };
+    }
 
+    // Log detallado al server log de Netlify
     if (!res.ok) {
-      // Resend devuelve {error: {...}} cuando hay duplicado u otros errores
+      console.error("RESEND ERROR", {
+        status: res.status,
+        statusText: res.statusText,
+        data,
+      });
+
       const msg =
-        (data?.error && (data.error.message || data.error.name)) ||
-        "No se pudo suscribir.";
+        data?.error?.message ||
+        data?.message ||
+        data?.raw ||
+        "No se pudo suscribir (error desconocido).";
+
       return NextResponse.json({ ok: false, message: msg }, { status: res.status });
     }
 
     return NextResponse.json({ ok: true, message: "¡Te suscribiste con éxito!" });
-  } catch (err) {
+  } catch (err: any) {
+    console.error("ROUTE CATCH", err);
     return NextResponse.json(
       { ok: false, message: "Ocurrió un error. Intenta más tarde." },
       { status: 500 }
