@@ -1,26 +1,34 @@
 "use client";
-
 import { useState } from "react";
 
 export default function Newsletter() {
-  return (
-    <form
-      name="newsletter"
-      method="POST"
-      action="/gracias"
-      data-netlify="true"
-      data-netlify-honeypot="bot-field"
-      className="space-y-4"
-    >
-      {/* Requisito de Netlify Forms */}
-      <input type="hidden" name="form-name" value="newsletter" />
-      {/* Honeypot (anti-bots) */}
-      <p className="hidden">
-        <label>
-          No llenar: <input name="bot-field" />
-        </label>
-      </p>
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle"|"loading"|"ok"|"error">("idle");
+  const [msg, setMsg] = useState("");
 
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus("loading");
+    setMsg("");
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setStatus("ok");
+      setMsg("¡Gracias! Te escribiré pronto.");
+      setEmail("");
+    } catch (err: any) {
+      setStatus("error");
+      setMsg("Hubo un problema. Intenta de nuevo.");
+      console.error(err);
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <label htmlFor="email" className="sr-only">Correo</label>
         <input
@@ -28,6 +36,8 @@ export default function Newsletter() {
           name="email"
           type="email"
           required
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
           placeholder="tu@email.com"
           className="w-full rounded-full border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-600/40"
         />
@@ -35,13 +45,20 @@ export default function Newsletter() {
 
       <button
         type="submit"
-        className="rounded-full bg-emerald-700 text-white px-5 py-3 font-medium hover:bg-emerald-800"
+        disabled={status==="loading"}
+        className="rounded-full bg-emerald-700 text-white px-5 py-3 font-medium hover:bg-emerald-800 disabled:opacity-60"
       >
-        Quiero recibirlo
+        {status==="loading" ? "Enviando..." : "Quiero recibirlo"}
       </button>
 
+      {msg && (
+        <p className={`text-sm ${status==="ok" ? "text-emerald-700" : "text-red-600"}`}>
+          {msg}
+        </p>
+      )}
+
       <p className="text-xs text-slate-500">
-        Tus datos se guardan en Netlify Forms. Podrás darte de baja cuando quieras.
+        Enviaré contenido útil y podrás darte de baja cuando quieras.
       </p>
     </form>
   );
