@@ -1,6 +1,6 @@
-import { defineType } from "sanity";
+import post from "./post";
 
-export const post = defineType({
+export default [post];
   name: "post",
   title: "Post",
   type: "document",
