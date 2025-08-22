@@ -1,65 +1,75 @@
 "use client";
+
 import { useState } from "react";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle"|"loading"|"ok"|"error">("idle");
-  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [ok, setOk] = useState<boolean | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("loading");
-    setMsg("");
+    if (loading) return;
+
+    setMsg(null);
+    setOk(null);
+    setLoading(true);
+
     try {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      if (!res.ok) throw new Error(await res.text());
-      setStatus("ok");
-      setMsg("¡Gracias! Te escribiré pronto.");
-      setEmail("");
-    } catch (err: any) {
-      setStatus("error");
-      setMsg("Hubo un problema. Intenta de nuevo.");
-      console.error(err);
+
+      const data = await res.json();
+      setOk(!!data.ok);
+      setMsg(data.message || (data.ok ? "Listo" : "Algo salió mal"));
+
+      if (data.ok) setEmail("");
+    } catch {
+      setOk(false);
+      setMsg("No se pudo enviar. Intenta más tarde.");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="email" className="sr-only">Correo</label>
+    <div className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8">
+      <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight">Newsletter</h3>
+      <p className="mt-2 text-slate-600">
+        Consejos breves y herramientas que sí puedes aplicar.
+      </p>
+
+      <form onSubmit={onSubmit} className="mt-5 flex gap-3">
         <input
-          id="email"
-          name="email"
           type="email"
           required
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
           placeholder="tu@email.com"
-          className="w-full rounded-full border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-600/40"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-emerald-400"
         />
-      </div>
-
-      <button
-        type="submit"
-        disabled={status==="loading"}
-        className="rounded-full bg-emerald-700 text-white px-5 py-3 font-medium hover:bg-emerald-800 disabled:opacity-60"
-      >
-        {status==="loading" ? "Enviando..." : "Quiero recibirlo"}
-      </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+        >
+          {loading ? "Enviando..." : "Quiero recibirlo"}
+        </button>
+      </form>
 
       {msg && (
-        <p className={`text-sm ${status==="ok" ? "text-emerald-700" : "text-red-600"}`}>
+        <p className={`mt-3 text-sm ${ok ? "text-emerald-700" : "text-rose-600"}`}>
           {msg}
         </p>
       )}
 
-      <p className="text-xs text-slate-500">
-        Enviaré contenido útil y podrás darte de baja cuando quieras.
+      <p className="mt-2 text-xs text-slate-500">
+        *Cuando tengas tu backend listo, conectamos este formulario a tu endpoint real.
       </p>
-    </form>
+    </div>
   );
 }
