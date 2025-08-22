@@ -1,11 +1,13 @@
+// app/gracias/page.tsx
 export default function GraciasPage() {
   return (
-    <div className="container py-16 max-w-2xl">
-      <h1 className="text-3xl font-semibold mb-2">¡Gracias por tu compra!</h1>
-      <p className="text-muted-foreground">
-        Te enviamos un correo con el enlace de descarga (válido por 24 horas). Si no lo ves,
-        revisa tu bandeja de spam o promociones.
-      </p>
-    </div>
-  )
+    <section className="py-20">
+      <div className="container mx-auto px-4 text-center max-w-xl">
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">¡Gracias por suscribirte!</h1>
+        <p className="mt-3 text-slate-600">
+          Te escribiré pronto con herramientas prácticas y contenido útil.
+        </p>
+      </div>
+    </section>
+  );
 }
