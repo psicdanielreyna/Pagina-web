@@ -1,15 +1,16 @@
+// app/page.tsx
 import Hero from "@/components/Hero";
 import Recursos from "@/components/Recursos";
-import BlogHome from "@/components/BlogHome";
-import Newsletter from "@/components/Newsletter";
+import UltimoBlog from "@/components/UltimoBlog";
 
-export default function Page() {
+export default function HomePage() {
   return (
-    <main className="space-y-12 md:space-y-16">
+    <div className="space-y-16">
       <Hero />
+
       <Recursos />
-      <BlogHome />
-      <Newsletter />
-    </main>
+
+      <UltimoBlog />
+    </div>
   );
 }
