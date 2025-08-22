@@ -1,36 +1,72 @@
 "use client";
 
+import { useState } from "react";
+
 export default function Newsletter() {
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle"|"sending"|"ok"|"error">("idle");
+  const [msg, setMsg] = useState<string>("");
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!email) return;
+
+    try {
+      setState("sending");
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.ok) {
+        setState("ok");
+        setMsg("Listo. Revisa tu correo 🙂");
+        setEmail("");
+      } else {
+        setState("error");
+        setMsg(json?.error || "Ocurrió un error");
+      }
+    } catch {
+      setState("error");
+      setMsg("No se pudo enviar. Intenta de nuevo.");
+    }
   }
 
   return (
-    <section className="py-10 md:py-14">
-      <div className="container mx-auto px-4">
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 md:p-8">
-          <h2 className="text-2xl font-extrabold tracking-tight">Newsletter</h2>
-          <p className="mt-1 text-slate-600">
-            Consejos breves y herramientas que sí puedes aplicar.
-          </p>
+    <div>
+      <h2 className="text-xl md:text-2xl font-bold text-slate-900">Newsletter</h2>
+      <p className="mt-1 text-slate-600">Consejos breves y herramientas que sí puedes aplicar.</p>
 
-          <form onSubmit={onSubmit} className="mt-4 flex gap-3">
-            <input
-              type="email"
-              placeholder="tu@email.com"
-              className="w-full rounded-xl border px-4 py-3"
-            />
-            <button className="rounded-xl bg-green-700 px-5 py-3 text-white">
-              Quiero recibirlo
-            </button>
-          </form>
+      <form onSubmit={onSubmit} className="mt-6 flex gap-3">
+        <input
+          name="email"
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="tu@email.com"
+          className="flex-1 rounded-full border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-600/40"
+        />
+        <button
+          type="submit"
+          disabled={state === "sending"}
+          className="rounded-full bg-emerald-700 text-white px-5 py-3 font-medium hover:bg-emerald-800 disabled:opacity-60"
+        >
+          {state === "sending" ? "Enviando..." : "Quiero recibirlo"}
+        </button>
+      </form>
 
-          <p className="mt-2 text-xs text-slate-500">
-            *Cuando tengas tu backend listo, conectamos este formulario a tu
-            endpoint real.
-          </p>
-        </div>
-      </div>
-    </section>
+      {state !== "idle" && (
+        <p className={`mt-2 text-sm ${state === "ok" ? "text-emerald-700" : "text-rose-600"}`}>
+          {msg}
+        </p>
+      )}
+
+      <p className="mt-2 text-xs text-slate-500">
+        *Puedes darte de baja cuando quieras.
+      </p>
+    </div>
   );
 }
