@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { postsHome } from "@/data/blog";
+import postsHome from "@/data/blog";
 
 export default function BlogHome() {
   const [destacado, ...resto] = postsHome;
