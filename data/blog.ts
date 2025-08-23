@@ -1,27 +1,49 @@
-import { client } from "@/lib/sanity.client";
-import { allPostsQuery } from "@/lib/sanity.queries";
+// data/blog.ts
+export type PostHome = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  img: string;
+  alt: string;
+  date: string;
+  href: string;
+};
 
-export default async function BlogPage() {
-  const posts = await client.fetch(allPostsQuery);
+// 👇 datos estáticos (puedes cambiar imágenes/rutas a las tuyas)
+export const postsHome: PostHome[] = [
+  {
+    slug: "como-apagar-tu-mente",
+    title: "Cómo apagar tu mente",
+    excerpt:
+      "Técnicas concretas para bajar el ruido mental cuando sientes que la cabeza no para.",
+    img: "/images/post-1.png",
+    alt: "Cómo apagar tu mente",
+    date: "2025-08-10",
+    href: "/blog/como-apagar-tu-mente",
+  },
+  {
+    slug: "el-arte-de-creer-en-ti",
+    title: "El arte de creer en ti",
+    excerpt:
+      "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
+    img: "/images/post-2.png",
+    alt: "El arte de creer en ti",
+    date: "2025-08-05",
+    href: "/blog/el-arte-de-creer-en-ti",
+  },
+  {
+    slug: "ansiedad-en-3-pasos",
+    title: "Ansiedad en 3 pasos prácticos",
+    excerpt:
+      "Un mini-protocolo para reconocer, regular y responder mejor ante la ansiedad.",
+    img: "/images/post-3.png",
+    alt: "Ansiedad en 3 pasos",
+    date: "2025-07-28",
+    href: "/blog/ansiedad-en-3-pasos",
+  },
+];
 
-  return (
-    <main className="container mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-6">Blog</h1>
-      <div className="space-y-6">
-        {posts.map((post: any) => (
-          <a
-            key={post._id}
-            href={`/blog/${post.slug}`}
-            className="block border p-4 rounded-lg hover:bg-gray-50"
-          >
-            <h2 className="text-xl font-semibold">{post.title}</h2>
-            <p className="text-gray-600">{post.excerpt}</p>
-            <p className="text-sm text-gray-400">
-              {new Date(post.publishedAt).toLocaleDateString()}
-            </p>
-          </a>
-        ))}
-      </div>
-    </main>
-  );
+// (opcional) función async para cuando migremos a Sanity:
+export async function fetchPostsHome(): Promise<PostHome[]> {
+  return postsHome;
 }
