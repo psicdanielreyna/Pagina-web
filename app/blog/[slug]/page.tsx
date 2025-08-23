@@ -5,11 +5,19 @@ import groq from "groq";
 import { client } from "@/lib/sanity.client";
 
 const query = groq`*[_type == "post" && slug.current == $slug][0]{
+  _id,
   title,
+  slug,
   excerpt,
   publishedAt,
-  crop,
-  content
+  // trae portada con asset resuelto y URL por si la necesitas directa
+  "cover": cover{
+    ...,
+    asset->,
+    "url": asset->url
+  },
+  // si existe 'content' úsalo; si no, usa 'body'
+  "content": coalesce(content, body)
 }`;
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
