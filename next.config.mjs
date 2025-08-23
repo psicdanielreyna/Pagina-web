@@ -3,12 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.cdn.sanity.io', // permite imágenes que vienen de Sanity
-      },
+      { protocol: "https", hostname: "cdn.sanity.io" },
     ],
   },
-}
-
-export default nextConfig
+};
+export default nextConfig;
