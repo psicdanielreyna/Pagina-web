@@ -1,25 +1,39 @@
-// schemas/post.ts
-const post = {
+import { defineType, defineField } from "sanity";
+
+export default defineType({
   name: "post",
   title: "Post",
   type: "document",
   fields: [
-    { name: "title", title: "Título", type: "string", validation: (r:any)=>r.required() },
-    { name: "slug",  title: "Slug",   type: "slug", options: { source: "title" }, validation:(r:any)=>r.required() },
-    { name: "excerpt", title: "Resumen", type: "text" },
-    { name: "cover", title: "Portada", type: "image", options: { hotspot: true } },
-    { name: "date", title: "Fecha", type: "datetime", initialValue: () => new Date().toISOString() },
-    {
+    defineField({ name: "title", title: "Título", type: "string", validation: r => r.required() }),
+    defineField({
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      options: { source: "title", maxLength: 96 },
+      validation: r => r.required(),
+    }),
+    defineField({ name: "publishedAt", title: "Fecha", type: "datetime" }),
+    defineField({ name: "excerpt", title: "Resumen", type: "text" }),
+    defineField({
+      name: "cover",
+      title: "Portada",
+      type: "image",
+      options: { hotspot: true },
+      fields: [{ name: "alt", title: "Alt", type: "string" }],
+    }),
+    defineField({
       name: "content",
       title: "Contenido",
       type: "array",
-      of: [{ type: "block" }, { type: "image", options: { hotspot: true } }],
-      validation:(r:any)=>r.required()
-    },
+      of: [
+        { type: "block" }, // párrafos, encabezados, listas, etc.
+        {
+          type: "image",
+          fields: [{ name: "alt", title: "Alt", type: "string" }],
+          options: { hotspot: true },
+        },
+      ],
+    }),
   ],
-  preview: {
-    select: { title: "title", media: "cover", subtitle: "slug.current" },
-  },
-};
-
-export default post;
+});
