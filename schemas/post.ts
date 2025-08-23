@@ -23,17 +23,19 @@ export default defineType({
       fields: [{ name: "alt", title: "Alt", type: "string" }],
     }),
     defineField({
+      {
       name: "content",
       title: "Contenido",
       type: "array",
       of: [
-        { type: "block" }, // párrafos, encabezados, listas, etc.
+        { type: "block" },
         {
           type: "image",
-          fields: [{ name: "alt", title: "Alt", type: "string" }],
           options: { hotspot: true },
+          fields: [{ name: "alt", type: "string", title: "Texto alternativo" }],
         },
       ],
+},
     }),
   ],
 });
