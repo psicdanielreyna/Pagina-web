@@ -1,3 +1,4 @@
+// schemas/post.ts
 import { defineType, defineField } from "sanity";
 
 export default defineType({
@@ -5,16 +6,29 @@ export default defineType({
   title: "Post",
   type: "document",
   fields: [
-    defineField({ name: "title", title: "Título", type: "string", validation: r => r.required() }),
+    defineField({
+      name: "title",
+      title: "Título",
+      type: "string",
+      validation: (Rule) => Rule.required(),
+    }),
     defineField({
       name: "slug",
       title: "Slug",
       type: "slug",
       options: { source: "title", maxLength: 96 },
-      validation: r => r.required(),
+      validation: (Rule) => Rule.required(),
     }),
-    defineField({ name: "publishedAt", title: "Fecha", type: "datetime" }),
-    defineField({ name: "excerpt", title: "Resumen", type: "text" }),
+    defineField({
+      name: "excerpt",
+      title: "Resumen",
+      type: "text",
+    }),
+    defineField({
+      name: "publishedAt",
+      title: "Publicado",
+      type: "datetime",
+    }),
     defineField({
       name: "cover",
       title: "Portada",
@@ -23,7 +37,6 @@ export default defineType({
       fields: [{ name: "alt", title: "Alt", type: "string" }],
     }),
     defineField({
-      {
       name: "content",
       title: "Contenido",
       type: "array",
@@ -32,10 +45,16 @@ export default defineType({
         {
           type: "image",
           options: { hotspot: true },
-          fields: [{ name: "alt", type: "string", title: "Texto alternativo" }],
+          fields: [{ name: "alt", title: "Alt", type: "string" }],
         },
       ],
-},
     }),
+  ],
+  orderings: [
+    {
+      title: "Fecha descendente",
+      name: "publishedAtDesc",
+      by: [{ field: "publishedAt", direction: "desc" }],
+    },
   ],
 });
