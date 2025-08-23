@@ -8,7 +8,7 @@ const query = groq`*[_type == "post" && slug.current == $slug][0]{
   title,
   excerpt,
   publishedAt,
-  cover,
+  crop,
   content
 }`;
 
@@ -60,11 +60,11 @@ export default async function PostPage({ params }: { params: { slug: string } })
       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{post.title}</h1>
 
       {/* Portada opcional */}
-      {post.cover && (
+      {post.crop && (
         <div className="my-8">
           <Image
-            src={urlFor(post.cover).width(1600).height(900).fit("cover").url()}
-            alt={post.cover?.alt || "Portada"}
+            src={urlFor(post.crop).width(1600).height(900).fit("crop").url()}
+            alt={post.crop?.alt || "Portada"}
             width={1600}
             height={900}
             className="rounded-2xl"
