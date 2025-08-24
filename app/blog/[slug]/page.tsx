@@ -1,83 +1,131 @@
 // app/blog/[slug]/page.tsx
-import groq from "groq";
+import { Metadata } from "next";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import groq from "groq";
+import { PortableText } from "@portabletext/react";
+
 import { client } from "@/lib/sanity.client";
 import { urlFor } from "@/lib/sanity.image";
-import Portable from "@/components/Portable";
-
-export const revalidate = 60;
-export const dynamicParams = true;
 
 type Post = {
   _id: string;
   title: string;
-  excerpt?: string;
-  publishedAt: string;
-  cover?: any;
-  content?: any; // campo array del Portable Text
-  slug: { current: string };
+  slug: string;
+  publishedAt?: string;
+  _createdAt: string;
+  cover?: {
+    alt?: string;
+    asset?: { _ref: string; _id: string };
+  };
+  content?: any[];
 };
 
-const POST_QUERY = groq`*[_type == "post" && slug.current == $slug][0]{
+const query = groq`*[_type == "post" && slug.current == $slug][0]{
   _id,
   title,
-  excerpt,
+  "slug": slug.current,
   publishedAt,
-  cover,
-  content,
-  slug
+  _createdAt,
+  cover{
+    alt,
+    asset
+  },
+  content
 }`;
 
-const SLUGS_QUERY = groq`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**"))]{ "slug": slug.current }`;
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const post: Post | null = await client.fetch(query, { slug: params.slug });
 
-export async function generateStaticParams() {
-  const slugs = await client.fetch<{ slug: string }[]>(SLUGS_QUERY);
-  return slugs.map((s) => ({ slug: s.slug }));
+  if (!post) {
+    return { title: "Artículo no encontrado" };
+  }
+
+  const ogImage =
+    post.cover?.asset
+      ? urlFor(post.cover).width(1200).height(630).url()
+      : "/og-default.jpg";
+
+  return {
+    title: post.title,
+    description: "Lectura breve del blog de Daniel Reyna — Psicólogo.",
+    openGraph: {
+      title: post.title,
+      images: [{ url: ogImage }],
+      type: "article",
+    },
+  };
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const post = await client.fetch<Post>(POST_QUERY, { slug: params.slug });
+function formatDate(input?: string) {
+  // Elegimos publishedAt si existe; si no, _createdAt.
+  const d = input ? new Date(input) : undefined;
+  // Utilidad: solo mostramos si es válida.
+  if (!d || isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("es-MX", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
-  if (!post?._id) return notFound();
+export default async function BlogPostPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const post: Post | null = await client.fetch(query, { slug: params.slug });
 
-  const coverUrl = post.cover
-    ? urlFor(post.cover).width(1600).height(900).fit("crop").url()
-    : null;
+  if (!post) {
+    return (
+      <div className="max-w-3xl mx-auto py-10">
+        <h1 className="text-2xl font-semibold">Artículo no encontrado</h1>
+        <p className="mt-2 text-muted-foreground">
+          El post solicitado no existe o fue eliminado.
+        </p>
+      </div>
+    );
+  }
+
+  const dateToShow = formatDate(post.publishedAt ?? post._createdAt);
+  const blocks = Array.isArray(post.content) ? post.content : [];
 
   return (
-    <article className="py-10 md:py-14">
-      <div className="container mx-auto px-4 max-w-3xl">
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{post.title}</h1>
-          {post.excerpt && <p className="mt-2 text-slate-600">{post.excerpt}</p>}
-          <p className="mt-2 text-xs text-slate-500">
-            {new Date(post.publishedAt).toLocaleDateString()}
-          </p>
-        </header>
-
-        {coverUrl && (
-          <div className="my-8 overflow-hidden rounded-2xl">
-            <Image
-              src={coverUrl}
-              alt={post.cover?.alt || post.title}
-              width={1600}
-              height={900}
-              className="h-auto w-full object-cover"
-              priority
-            />
-          </div>
+    <article className="max-w-3xl mx-auto py-10">
+      <header className="mb-6">
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+          {post.title}
+        </h1>
+        {dateToShow && (
+          <p className="mt-2 text-sm text-muted-foreground">{dateToShow}</p>
         )}
+      </header>
 
-        {/* Contenido rico */}
-        {post.content?.length ? (
-          <div className="prose prose-slate max-w-none">
-            <Portable value={post.content} />
-          </div>
+      {post.cover?.asset && (
+        <div className="my-8">
+          <Image
+            src={urlFor(post.cover).width(1600).height(900).fit("crop").url()}
+            alt={post.cover?.alt || "Portada"}
+            width={1600}
+            height={900}
+            className="w-full h-auto rounded-xl"
+            priority
+          />
+        </div>
+      )}
+
+      <section className="prose prose-neutral max-w-none">
+        {blocks.length > 0 ? (
+          <PortableText value={blocks} />
         ) : (
-          <p className="text-slate-500">Este post aún no tiene contenido.</p>
+          <p className="text-muted-foreground">
+            Este artículo aún no tiene contenido publicado.
+          </p>
         )}
-      </div>
+      </section>
     </article>
   );
 }
