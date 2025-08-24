@@ -37,5 +37,8 @@ body {
    @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-}
+
+     /* Solo mostrar la marca central; ocultar cualquier otro link a "/" dentro del header */
+      header a[href="/"] { display: none; }
+      header a#brand { display: inline; }
 }
