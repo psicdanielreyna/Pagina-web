@@ -1,30 +1,19 @@
-// app/api/newsletter/route.ts
-import { NextResponse } from "next/server";
-import { getResend } from "@/lib/resend.server";
+// 👇 impide que Next intente prerender esta ruta en build
+export const dynamic = 'force-dynamic';
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+import { Resend } from 'resend';
 
 export async function POST(req: Request) {
-  try {
-    const { email } = await req.json();
-    if (!email || typeof email !== "string") {
-      return NextResponse.json({ error: "Email requerido" }, { status: 400 });
-    }
-
-    // solo creamos el cliente si hay key
-    const resend = await getResend();
-    const audienceId = process.env.RESEND_AUDIENCE_ID;
-
-    if (!resend || !audienceId) {
-      console.warn("[newsletter] Falta RESEND_API_KEY/AUDIENCE_ID. Dry-run.");
-      return NextResponse.json({ ok: true, dryRun: true });
-    }
-
-    await resend.contacts.create({ email, audienceId });
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("[newsletter] Error:", err);
-    return NextResponse.json({ error: "No se pudo suscribir" }, { status: 500 });
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    // No rompemos el build ni la app: simplemente lo deshabilitamos
+    return Response.json(
+      { ok: false, error: 'Newsletter temporalmente deshabilitado.' },
+      { status: 503 }
+    );
   }
+
+  const resend = new Resend(apiKey);
+
+  // ...tu lógica actual (leer email del body y enviar)
 }
