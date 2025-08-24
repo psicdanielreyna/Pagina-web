@@ -1,64 +1,29 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "@/components/Header"; // o "@/components/Navbar"
+import Footer from "@/components/Footer"; // si tienes footer
+import { Inter } from "next/font/google";
 
-const SITE_NAME = "Daniel Reyna — Psicólogo";
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://danielreyna.netlify.app";
-const DEFAULT_OG = "/og-default.jpg";
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: SITE_NAME,
-    template: "%s | " + SITE_NAME,
-  },
-  description:
-    "Terapia psicológica profesional. Lecturas breves y aplicables para sentirte mejor.",
-  keywords: [
-    "psicólogo",
-    "terapia",
-    "salud mental",
-    "autoayuda",
-    "psicoterapia",
-    "Monterrey",
-  ],
-  authors: [{ name: "Daniel Reyna" }],
+  title: "Daniel Reyna — Psicólogo",
+  description: "Terapia clara y práctica para sentirte mejor.",
   openGraph: {
+    title: "Daniel Reyna — Psicólogo",
+    description: "Terapia clara y práctica para sentirte mejor.",
+    url: "https://danielreyna.netlify.app",
+    siteName: "Daniel Reyna — Psicólogo",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
     type: "website",
-    url: "/",
-    title: SITE_NAME,
-    siteName: SITE_NAME,
-    description:
-      "Terapia psicológica profesional con enfoque práctico. Artículos y recursos útiles.",
     locale: "es_MX",
-    images: [
-      {
-        url: DEFAULT_OG, // en /public/og-default.jpg
-        width: 1200,
-        height: 630,
-        alt: "Daniel Reyna — Psicólogo",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_NAME,
-    description:
-      "Terapia psicológica profesional. Lecturas breves y aplicables para sentirte mejor.",
-    images: [DEFAULT_OG],
-  },
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
-  alternates: {
-    canonical: "/",
-  },
-  themeColor: "#0EA5A3",
-  robots: {
-    index: true,
-    follow: true,
+    title: "Daniel Reyna — Psicólogo",
+    description: "Terapia clara y práctica para sentirte mejor.",
+    images: ["/og-default.jpg"],
   },
 };
 
@@ -68,9 +33,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es-MX">
-      <body className="min-h-screen antialiased bg-white text-gray-900">
-        {children}
+    <html lang="es">
+      <body className={inter.className}>
+        <Header /> 
+        <main className="pt-6 md:pt-10">{children}</main>
+        <Footer />
       </body>
     </html>
   );
