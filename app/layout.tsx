@@ -1,86 +1,76 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-
-// URL base del sitio (ajústala cuando compres el dominio)
-const baseUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://danielreyna.netlify.app";
-
-const inter = Inter({ subsets: ["latin"] });
+const SITE_NAME = "Daniel Reyna — Psicólogo";
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://danielreyna.netlify.app";
+const DEFAULT_OG = "/og-default.jpg";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(baseUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Daniel Reyna — Psicólogo | Terapia Online y Presencial",
-    template: "%s | Daniel Reyna Psicólogo",
+    default: SITE_NAME,
+    template: "%s | " + SITE_NAME,
   },
   description:
-    "Psicólogo clínico especializado en ansiedad, depresión, duelo, estrés y autoestima. Sesiones online y presenciales.",
-  alternates: { canonical: "/" },
+    "Terapia psicológica profesional. Lecturas breves y aplicables para sentirte mejor.",
+  keywords: [
+    "psicólogo",
+    "terapia",
+    "salud mental",
+    "autoayuda",
+    "psicoterapia",
+    "Monterrey",
+  ],
+  authors: [{ name: "Daniel Reyna" }],
   openGraph: {
     type: "website",
-    locale: "es_MX",
-    url: baseUrl,
-    siteName: "Daniel Reyna Psicólogo",
-    title: "Daniel Reyna — Psicólogo",
+    url: "/",
+    title: SITE_NAME,
+    siteName: SITE_NAME,
     description:
-      "Terapia psicológica profesional en Monterrey y en línea. Especialista en ansiedad, depresión, duelo, estrés y autoestima.",
+      "Terapia psicológica profesional con enfoque práctico. Artículos y recursos útiles.",
+    locale: "es_MX",
     images: [
-      { url: "/og-image.jpg", width: 1200, height: 630, alt: "Daniel Reyna Psicólogo" },
+      {
+        url: DEFAULT_OG, // en /public/og-default.jpg
+        width: 1200,
+        height: 630,
+        alt: "Daniel Reyna — Psicólogo",
+      },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Daniel Reyna — Psicólogo",
+    title: SITE_NAME,
     description:
-      "Psicólogo clínico especializado en ansiedad, depresión, duelo, estrés y autoestima.",
-    images: ["/og-image.jpg"],
+      "Terapia psicológica profesional. Lecturas breves y aplicables para sentirte mejor.",
+    images: [DEFAULT_OG],
   },
   icons: {
     icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
+  },
+  alternates: {
+    canonical: "/",
+  },
+  themeColor: "#0EA5A3",
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="es">
-      <body className={inter.className}>
-        {/* Header */}
-        <Navbar />
-
-        {/* JSON-LD Schema.org */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Psychologist",
-              name: "Daniel Reyna",
-              url: baseUrl,
-              image: `${baseUrl}/og-image.jpg`,
-              description:
-                "Psicólogo clínico especializado en ansiedad, depresión, duelo, estrés y autoestima. Sesiones online y presenciales.",
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Monterrey",
-                addressRegion: "Nuevo León",
-                addressCountry: "MX",
-              },
-            }),
-          }}
-        />
-
-        {/* Contenido */}
-        <main className="min-h-screen">{children}</main>
-
-        {/* Footer */}
-        <Footer />
+    <html lang="es-MX">
+      <body className="min-h-screen antialiased bg-white text-gray-900">
+        {children}
       </body>
     </html>
   );
