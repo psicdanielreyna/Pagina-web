@@ -25,7 +25,7 @@ const catalogo: Record<string, Producto> = {
     ],
     img: "/images/tienda/apagar-mente.png",
     alt: "Portada Cómo Apagar tu Mente",
-    mpUrl: "https://mpago.la/REEMPLAZA_CON_TU_LINK_1",
+    mpUrl: "https://mpago.la/2AhKTob",
   },
   "el-arte-de-creer-en-ti": {
     slug: "el-arte-de-creer-en-ti",
