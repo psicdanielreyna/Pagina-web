@@ -33,12 +33,16 @@ body {
          hover:opacity-90 focus:outline-none 
          focus:ring-2 focus:ring-secondary shadow-soft 
          transition-all;
+}
 
-   @layer utilities {
+/* =========================
+   Utilities personalizadas
+========================= */
+@layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-     /* Solo mostrar la marca central; ocultar cualquier otro link a "/" dentro del header */
-      header a[href="/"] { display: none; }
-      header a#brand { display: inline; }
 }
+
+/* Ocultar cualquier <a href="/"> dentro del header y mostrar solo la marca centrada */
+header a[href="/"] { display: none; }
+header a#brand { display: inline; }
