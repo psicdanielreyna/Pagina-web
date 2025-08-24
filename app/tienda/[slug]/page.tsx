@@ -38,7 +38,7 @@ const catalogo: Record<string, Producto> = {
     ],
     img: "/images/tienda/el-arte-de-creer-en-ti.png",
     alt: "Portada El Arte de Creer en Ti",
-    mpUrl: "https://mpago.la/REEMPLAZA_CON_TU_LINK_2",
+    mpUrl: "https://mpago.la/1f528P7",
   },
 };
 
