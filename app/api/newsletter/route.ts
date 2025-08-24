@@ -1,10 +1,12 @@
 // app/api/newsletter/route.ts
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 
-// Opcional: evita que Next intente prerender nada aquí
+// evita cualquier caché/prerender
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
+// 👇 NO importamos "resend" arriba.
+// Lo haremos dinámico y solo si hay API key.
 export async function POST(req: Request) {
   try {
     const { email } = await req.json();
@@ -16,15 +18,14 @@ export async function POST(req: Request) {
     const key = process.env.RESEND_API_KEY;
     const audienceId = process.env.RESEND_AUDIENCE_ID;
 
-    // Si no hay credenciales, no revientes el build; simula éxito (dry-run)
+    // Sin credenciales => no romper build. Modo dry-run.
     if (!key || !audienceId) {
-      console.warn(
-        "[newsletter] Falta RESEND_API_KEY o RESEND_AUDIENCE_ID. Dry-run activado."
-      );
+      console.warn("[newsletter] Falta RESEND_API_KEY/AUDIENCE_ID. Dry-run.");
       return NextResponse.json({ ok: true, dryRun: true });
     }
 
-    // 👇 Inicializa Resend SOLO dentro del handler (no en el tope del módulo)
+    // 👇 Import dinámico SOLO cuando hay credenciales
+    const { Resend } = await import("resend");
     const resend = new Resend(key);
 
     await resend.contacts.create({ email, audienceId });
