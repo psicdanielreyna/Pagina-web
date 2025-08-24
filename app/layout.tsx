@@ -1,9 +1,10 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import "./globals.css";
-import Header from "@/components/Header"; // o "@/components/Navbar"
-import Footer from "@/components/Footer"; // si tienes footer
 import { Inter } from "next/font/google";
+import "./globals.css";
+
+import { SiteHeader } from "@/components/site-header"; // 👈 tu header con el menú lateral
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,16 +15,17 @@ export const metadata: Metadata = {
     title: "Daniel Reyna — Psicólogo",
     description: "Terapia clara y práctica para sentirte mejor.",
     url: "https://danielreyna.netlify.app",
-    siteName: "Daniel Reyna — Psicólogo",
-    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
-    type: "website",
+    siteName: "Daniel Reyna Psicólogo",
+    images: [
+      {
+        url: "/og-default.jpg", // 👈 aquí la que agregaste
+        width: 1200,
+        height: 630,
+        alt: "Daniel Reyna Psicólogo",
+      },
+    ],
     locale: "es_MX",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Daniel Reyna — Psicólogo",
-    description: "Terapia clara y práctica para sentirte mejor.",
-    images: ["/og-default.jpg"],
+    type: "website",
   },
 };
 
@@ -34,10 +36,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={inter.className}>
-        <Header /> 
-        <main className="pt-6 md:pt-10">{children}</main>
-        <Footer />
+      <body className={cn("min-h-screen bg-white text-gray-900", inter.className)}>
+        
+        {/* HEADER ARRIBA */}
+        <SiteHeader />
+
+        {/* CONTENIDO PRINCIPAL */}
+        <main className="flex-1">{children}</main>
+        
       </body>
     </html>
   );
