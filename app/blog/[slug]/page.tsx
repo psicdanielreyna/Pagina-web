@@ -1,78 +1,83 @@
-import Image from "next/image";
-import { client } from "@/lib/sanity.client";
+// app/blog/[slug]/page.tsx
 import groq from "groq";
-import { PortableText } from "@portabletext/react";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { client } from "@/lib/sanity.client";
+import { urlFor } from "@/lib/sanity.image";
+import Portable from "@/components/Portable";
+
+export const revalidate = 60;
+export const dynamicParams = true;
 
 type Post = {
+  _id: string;
   title: string;
+  excerpt?: string;
+  publishedAt: string;
+  cover?: any;
+  content?: any; // campo array del Portable Text
   slug: { current: string };
-  date?: string;
-  cover?: {
-    asset?: { _ref?: string; url?: string };
-    alt?: string;
-  };
-  content?: any[];
-  body?: any[]; // por compatibilidad si el campo se llama body
 };
 
-export const dynamic = "force-dynamic";
-
-const POST_QUERY = groq`*[_type=="post" && slug.current==$slug][0]{
+const POST_QUERY = groq`*[_type == "post" && slug.current == $slug][0]{
+  _id,
   title,
-  slug,
-  date,
-  cover{
-    asset->{url},
-    alt
-  },
-  // acepta ambas variantes
-  content[]{
-    ...,
-    _type == "image" => { asset->{url}, alt }
-  },
-  body[]{
-    ...,
-    _type == "image" => { asset->{url}, alt }
-  }
+  excerpt,
+  publishedAt,
+  cover,
+  content,
+  slug
 }`;
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = (await client.fetch<Post>(POST_QUERY, { slug: params.slug })) || null;
+const SLUGS_QUERY = groq`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**"))]{ "slug": slug.current }`;
 
-  if (!post) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <h1 className="text-2xl font-semibold">Artículo no encontrado</h1>
-      </div>
-    );
-  }
+export async function generateStaticParams() {
+  const slugs = await client.fetch<{ slug: string }[]>(SLUGS_QUERY);
+  return slugs.map((s) => ({ slug: s.slug }));
+}
 
-  const blocks = (post.content && post.content.length > 0 ? post.content : post.body) || [];
+export default async function PostPage({ params }: { params: { slug: string } }) {
+  const post = await client.fetch<Post>(POST_QUERY, { slug: params.slug });
+
+  if (!post?._id) return notFound();
+
+  const coverUrl = post.cover
+    ? urlFor(post.cover).width(1600).height(900).fit("crop").url()
+    : null;
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">{post.title}</h1>
+    <article className="py-10 md:py-14">
+      <div className="container mx-auto px-4 max-w-3xl">
+        <header className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{post.title}</h1>
+          {post.excerpt && <p className="mt-2 text-slate-600">{post.excerpt}</p>}
+          <p className="mt-2 text-xs text-slate-500">
+            {new Date(post.publishedAt).toLocaleDateString()}
+          </p>
+        </header>
 
-      {post.cover?.asset?.url && (
-        <div className="my-8">
-          <Image
-            src={post.cover.asset.url}
-            alt={post.cover.alt || "Portada"}
-            width={1600}
-            height={900}
-            className="h-auto w-full rounded-xl object-cover"
-            priority
-          />
-        </div>
-      )}
+        {coverUrl && (
+          <div className="my-8 overflow-hidden rounded-2xl">
+            <Image
+              src={coverUrl}
+              alt={post.cover?.alt || post.title}
+              width={1600}
+              height={900}
+              className="h-auto w-full object-cover"
+              priority
+            />
+          </div>
+        )}
 
-      {blocks.length > 0 ? (
-        <div className="prose prose-neutral max-w-none dark:prose-invert">
-          <PortableText value={blocks} />
-        </div>
-      ) : (
-        <p className="text-muted-foreground mt-6">Próximamente…</p>
-      )}
+        {/* Contenido rico */}
+        {post.content?.length ? (
+          <div className="prose prose-slate max-w-none">
+            <Portable value={post.content} />
+          </div>
+        ) : (
+          <p className="text-slate-500">Este post aún no tiene contenido.</p>
+        )}
+      </div>
     </article>
   );
 }
