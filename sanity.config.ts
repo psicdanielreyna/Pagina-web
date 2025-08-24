@@ -1,15 +1,15 @@
-// sanity.config.ts
-import {defineConfig} from "sanity";
-import {deskTool} from "sanity/desk";
-import schemas from "./schemas"; // 👈 importa el índice
+import { defineConfig } from "sanity";
+import { visionTool } from "@sanity/vision"; // 👈 Importar plugin
+import { structureTool } from "sanity/structure";
 
 export default defineConfig({
   name: "default",
-  title: "Mi Blog Daniel Reyna",
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-  plugins: [deskTool()],
-  schema: {
-    types: schemas, // 👈 usa el arreglo que exporta ./schemas/index.ts
-  },
+  title: "Mi Blog",
+  projectId: "xxxx",
+  dataset: "production",
+
+  plugins: [
+    structureTool(),
+    visionTool(), // 👈 Activar la pestaña Vision
+  ],
 });
