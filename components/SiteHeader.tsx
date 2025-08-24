@@ -5,68 +5,119 @@ import Link from "next/link";
 import { Menu, Instagram, Facebook, Youtube, Twitter } from "lucide-react";
 import {
   Sheet,
+  SheetTrigger,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
 
 export default function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-white/70 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        {/* Botón menú (izquierda) */}
+    <header className="border-b bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <div className="container mx-auto flex h-14 items-center justify-between px-4">
+        {/* Izquierda: botón del menú */}
         <Sheet>
-          <SheetTrigger asChild>
-            <button
-              aria-label="Abrir menú"
-              className="inline-flex items-center justify-center rounded-md p-2 outline-none ring-0 hover:bg-gray-100"
-            >
-              <Menu className="size-6" />
-            </button>
+          <SheetTrigger
+            aria-label="Abrir menú"
+            className="inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100"
+          >
+            <Menu className="size-6" />
           </SheetTrigger>
 
+          {/* Panel lateral: SIN marca duplicada */}
           <SheetContent side="left" className="w-80 p-0">
             <SheetHeader className="px-5 py-4">
-              <SheetTitle className="text-left">
-                Daniel Reyna — Psicólogo
-              </SheetTitle>
+              <SheetTitle>Menú</SheetTitle>
             </SheetHeader>
-
-            <nav className="px-5 py-2 space-y-2">
-              <Link className="block py-2 text-lg" href="/">Inicio</Link>
-              <Link className="block py-2 text-lg" href="/servicios">Servicios</Link>
-              <Link className="block py-2 text-lg" href="/tienda">Tienda</Link>
-              <Link className="block py-2 text-lg" href="/blog">Blog</Link>
-              <Link className="block py-2 text-lg" href="/sobre-mi">Sobre mí</Link>
-              <Button asChild className="mt-2 w-full">
-                <Link href="/agendar">Agenda</Link>
-              </Button>
+            <nav className="px-5 pb-5 pt-2">
+              <ul className="space-y-3 text-lg">
+                <li>
+                  <SheetClose asChild>
+                    <Link href="/" className="block hover:underline">
+                      Inicio
+                    </Link>
+                  </SheetClose>
+                </li>
+                <li>
+                  <SheetClose asChild>
+                    <Link href="/servicios" className="block hover:underline">
+                      Servicios
+                    </Link>
+                  </SheetClose>
+                </li>
+                <li>
+                  <SheetClose asChild>
+                    <Link href="/tienda" className="block hover:underline">
+                      Tienda
+                    </Link>
+                  </SheetClose>
+                </li>
+                <li>
+                  <SheetClose asChild>
+                    <Link href="/blog" className="block hover:underline">
+                      Blog
+                    </Link>
+                  </SheetClose>
+                </li>
+                <li>
+                  <SheetClose asChild>
+                    <Link href="/sobre-mi" className="block hover:underline">
+                      Sobre mí
+                    </Link>
+                  </SheetClose>
+                </li>
+                <li>
+                  <SheetClose asChild>
+                    <Link
+                      href="/agendar"
+                      className="block rounded-md bg-emerald-600 px-3 py-2 text-white hover:bg-emerald-700"
+                    >
+                      Agenda
+                    </Link>
+                  </SheetClose>
+                </li>
+              </ul>
             </nav>
           </SheetContent>
         </Sheet>
 
-        {/* Título del sitio (centro, solo md+) */}
+        {/* Centro: ÚNICA marca visible */}
         <Link
           href="/"
-          className="hidden md:block font-semibold tracking-tight text-[15px]"
+          className="pointer-events-auto absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-semibold text-gray-900"
         >
           Daniel Reyna — Psicólogo
         </Link>
 
-        {/* Redes (derecha) */}
+        {/* Derecha: redes */}
         <div className="flex items-center gap-4">
-          <Link href="https://www.instagram.com/psic.danielreyna/" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+          <Link
+            href="https://www.instagram.com/psic.danielreyna/"
+            aria-label="Instagram"
+            className="hover:text-gray-700"
+          >
             <Instagram className="size-5" />
           </Link>
-          <Link href="https://www.facebook.com/psic.danielreyna/" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+          <Link
+            href="https://www.facebook.com/psic.danielreyna/"
+            aria-label="Facebook"
+            className="hover:text-gray-700"
+          >
             <Facebook className="size-5" />
           </Link>
-          <Link href="https://www.youtube.com/@PsicDanielReyna" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+          <Link
+            href="https://www.youtube.com/@PsicDanielReyna"
+            aria-label="YouTube"
+            className="hover:text-gray-700"
+          >
             <Youtube className="size-5" />
           </Link>
-          <Link href="https://x.com/psicdanreyna" aria-label="X (Twitter)" target="_blank" rel="noopener noreferrer">
+          <Link
+            href="https://x.com/psicdanreyna"
+            aria-label="X (Twitter)"
+            className="hover:text-gray-700"
+          >
             <Twitter className="size-5" />
           </Link>
         </div>
