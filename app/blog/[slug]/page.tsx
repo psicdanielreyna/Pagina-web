@@ -1,59 +1,42 @@
-// app/blog/[slug]/page.tsx
 import { notFound } from "next/navigation";
-import { getSlugs, getPostBySlug } from "@/lib/posts";
-import { compileMDX } from "next-mdx-remote/rsc"; // no necesita provider
+import Image from "next/image";
+import { getAllPosts, getPostBySlug } from "@/lib/posts";
 
-export const dynamic = "error"; // para SSG/ISR consistentes
+type Params = { slug: string };
 
 export async function generateStaticParams() {
-  const slugs = await getSlugs();
-  return slugs.map((slug) => ({ slug }));
+  const posts = await getAllPosts();
+  return posts.map((p) => ({ slug: p.slug }));
 }
 
-type Params = { params: { slug: string } };
+export default async function PostPage({ params }: { params: Params }) {
+  const post = await getPostBySlug(params.slug);
+  if (!post) notFound();
 
-export default async function BlogPostPage({ params }: Params) {
-  const { slug } = params;
-  try {
-    const post = await getPostBySlug(slug);
-    if (!post) return notFound();
+  const d = post.meta.date && !isNaN(Date.parse(post.meta.date))
+    ? new Date(post.meta.date).toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" })
+    : "";
 
-    // renderiza el contenido MDX (el frontmatter ya lo parseamos con gray-matter)
-    const { content } = await compileMDX<{}>
-      ({ source: post.content, options: { parseFrontmatter: false } });
-
-    const { title, date, cover } = post.frontMatter;
-
-    return (
-      <article className="prose prose-zinc max-w-3xl">
-        <header className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold">{title}</h1>
-          {date && (
-            <time dateTime={date} className="text-sm text-muted-foreground">
-              {new Date(date).toLocaleDateString("es-MX", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </time>
-          )}
-          {cover ? (
-            // si ya usas next/image, cámbialo a <Image .../>
-            <img
-              src={cover}
-              alt={title}
-              className="mt-6 rounded-xl border"
+  return (
+    <article className="container max-w-3xl py-10 prose prose-neutral dark:prose-invert">
+      <header className="mb-6">
+        <h1 className="mb-2">{post.meta.title}</h1>
+        {d && <p className="text-sm text-muted-foreground">{d}</p>}
+        {post.meta.cover && (
+          <div className="mt-4">
+            <Image
+              src={post.meta.cover}
+              alt=""
               width={1200}
               height={630}
+              className="rounded-xl object-cover w-full h-auto"
+              priority
             />
-          ) : null}
-        </header>
+          </div>
+        )}
+      </header>
 
-        {/* Contenido MDX */}
-        <div className="prose">{content}</div>
-      </article>
-    );
-  } catch {
-    return notFound();
-  }
+      {post.content}
+    </article>
+  );
 }
