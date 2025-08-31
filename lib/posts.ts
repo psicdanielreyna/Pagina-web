@@ -1,41 +1,61 @@
-import fs from 'fs'
-import path from 'path'
-import matter from 'gray-matter'
+// lib/posts.ts
+import fs from "fs/promises";
+import path from "path";
+import matter from "gray-matter";
 
-export type PostMeta = {
-  slug: string
-  title: string
-  date: string // ISO
-  excerpt?: string
-  cover?: string
+const POSTS_DIR = path.join(process.cwd(), "content", "posts");
+
+export type PostFrontMatter = {
+  title: string;
+  slug?: string;
+  date?: string;          // "YYYY-MM-DD"
+  excerpt?: string;
+  cover?: string;
+  draft?: boolean;
+};
+
+export async function getSlugs() {
+  const files = await fs.readdir(POSTS_DIR);
+  return files
+    .filter((f) => f.endsWith(".md") || f.endsWith(".mdx"))
+    .map((f) => f.replace(/\.mdx?$/, ""));
 }
 
-const POSTS_DIR = path.join(process.cwd(), 'content', 'posts')
+export async function getPostBySlug(slug: string) {
+  const fullPathMDX = path.join(POSTS_DIR, `${slug}.mdx`);
+  const fullPathMD = path.join(POSTS_DIR, `${slug}.md`);
 
-export function getAllPostSlugs() {
-  return fs
-    .readdirSync(POSTS_DIR)
-    .filter((f) => f.endsWith('.mdx') || f.endsWith('.md'))
-    .map((f) => f.replace(/\.mdx?$/, ''))
-}
+  // soporta .mdx y .md
+  let filePath = fullPathMDX;
+  try { await fs.access(filePath); } 
+  catch { filePath = fullPathMD; }
 
-export function getPostMeta(slug: string): PostMeta {
-  const fullPath = path.join(POSTS_DIR, `${slug}.mdx`)
-  const file = fs.readFileSync(fullPath, 'utf8')
-  const { data } = matter(file)
+  const raw = await fs.readFile(filePath, "utf8");
+  const { data, content } = matter(raw);
+  const fm = data as Partial<PostFrontMatter>;
+
   return {
     slug,
-    title: data.title ?? slug,
-    date: data.date ?? '1970-01-01',
-    excerpt: data.excerpt ?? '',
-    cover: data.cover ?? '',
-  }
+    frontMatter: {
+      title: fm.title ?? slug,
+      slug: fm.slug ?? slug,
+      date: fm.date ?? undefined,
+      excerpt: fm.excerpt ?? "",
+      cover: fm.cover ?? "",
+      draft: fm.draft ?? false,
+    },
+    content,
+  };
 }
 
-export function getAllPosts(): PostMeta[] {
-  const slugs = getAllPostSlugs()
-  const posts = slugs.map(getPostMeta)
+export async function getAllPosts() {
+  const slugs = await getSlugs();
+  const posts = await Promise.all(slugs.map(getPostBySlug));
   return posts
-    .filter((p) => new Date(p.date).getTime() <= Date.now()) // solo publicados
-    .sort((a, b) => (a.date < b.date ? 1 : -1))
+    .filter((p) => !p.frontMatter.draft)
+    .sort(
+      (a, b) =>
+        new Date(b.frontMatter.date ?? 0).getTime() -
+        new Date(a.frontMatter.date ?? 0).getTime()
+    );
 }
