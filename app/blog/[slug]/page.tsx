@@ -1,52 +1,32 @@
-import { PortableText } from '@portabletext/react';
-import Image from 'next/image';
-import { client } from '@/lib/sanity.client';
-import { urlFor } from '@/lib/sanity.image';
-import groq from 'groq';
+import fs from 'fs'
+import path from 'path'
+import matter from 'gray-matter'
+import { MDXRemote } from 'next-mdx-remote/rsc'
+import type { Metadata } from 'next'
+import { getAllPostSlugs, getPostMeta } from '@/lib/posts'
 
-const query = groq`*[_type == "post" && slug.current == $slug][0]{
-  title,
-  "slug": slug.current,
-  "date": coalesce(date, _createdAt),
-  cover{asset, alt},
-  content
-}`;
+const POSTS_DIR = path.join(process.cwd(), 'content', 'posts')
 
-export default async function BlogPost({ params }: { params: { slug: string } }) {
-  const post = await client.fetch(query, { slug: params.slug });
+export const revalidate = 60
 
-  if (!post) {
-    return <div className="container py-10">No encontrado.</div>;
-  }
+export async function generateStaticParams() {
+  return getAllPostSlugs().map((slug) => ({ slug }))
+}
 
-  const date = new Date(post.date);
-  const fecha = isNaN(date.getTime())
-    ? ''
-    : date.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const meta = getPostMeta(params.slug)
+  return { title: meta.title, description: meta.excerpt }
+}
+
+export default function PostPage({ params }: { params: { slug: string } }) {
+  const fullPath = path.join(POSTS_DIR, `${params.slug}.mdx`)
+  const source = fs.readFileSync(fullPath, 'utf8')
+  const { content } = matter(source)
 
   return (
-    <article className="container py-10 prose prose-neutral max-w-none">
-      <h1>{post.title}</h1>
-      {fecha && <p className="text-sm text-muted-foreground">{fecha}</p>}
-
-      {post.cover?.asset && (
-        <div className="my-6">
-          <Image
-            src={urlFor(post.cover).width(1600).height(900).fit('crop').url()}
-            alt={post.cover?.alt || 'Portada'}
-            width={1600}
-            height={900}
-            className="rounded-xl"
-            priority
-          />
-        </div>
-      )}
-
-      {Array.isArray(post.content) && post.content.length > 0 ? (
-        <PortableText value={post.content} />
-      ) : (
-        <p>Próximamente…</p>
-      )}
+    <article className="max-w-3xl mx-auto py-10 prose prose-neutral">
+      {/* El título/fecha vienen del frontmatter si quieres mostrarlos arriba */}
+      <MDXRemote source={content} />
     </article>
-  );
+  )
 }
