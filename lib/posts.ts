@@ -2,60 +2,82 @@
 import fs from "fs/promises";
 import path from "path";
 import matter from "gray-matter";
+import { compileMDX } from "next-mdx-remote/rsc";
+
+export type PostMeta = {
+  slug: string;
+  title: string;
+  date: string;     // ISO string en frontmatter
+  excerpt?: string;
+  cover?: string;
+};
+
+export type Post = {
+  meta: PostMeta;
+  content: React.ReactNode;
+};
 
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
 
-export type PostFrontMatter = {
-  title: string;
-  slug?: string;
-  date?: string;          // "YYYY-MM-DD"
-  excerpt?: string;
-  cover?: string;
-  draft?: boolean;
-};
-
-export async function getSlugs() {
-  const files = await fs.readdir(POSTS_DIR);
-  return files
-    .filter((f) => f.endsWith(".md") || f.endsWith(".mdx"))
-    .map((f) => f.replace(/\.mdx?$/, ""));
+async function listFiles(): Promise<string[]> {
+  try {
+    const all = await fs.readdir(POSTS_DIR);
+    return all.filter((f) => f.endsWith(".mdx"));
+  } catch {
+    return [];
+  }
 }
 
-export async function getPostBySlug(slug: string) {
-  const fullPathMDX = path.join(POSTS_DIR, `${slug}.mdx`);
-  const fullPathMD = path.join(POSTS_DIR, `${slug}.md`);
+export async function getAllPosts(): Promise<PostMeta[]> {
+  const files = await listFiles();
 
-  // soporta .mdx y .md
-  let filePath = fullPathMDX;
-  try { await fs.access(filePath); } 
-  catch { filePath = fullPathMD; }
+  const metas = await Promise.all(
+    files.map(async (file) => {
+      const full = await fs.readFile(path.join(POSTS_DIR, file), "utf8");
+      const { data } = matter(full);
 
-  const raw = await fs.readFile(filePath, "utf8");
-  const { data, content } = matter(raw);
-  const fm = data as Partial<PostFrontMatter>;
+      const slug = file.replace(/\.mdx$/, "");
+      const title = String(data.title ?? slug);
+      const date = String(data.date ?? "");
+      const excerpt = data.excerpt ? String(data.excerpt) : undefined;
+      const cover = data.cover ? String(data.cover) : undefined;
 
-  return {
-    slug,
-    frontMatter: {
-      title: fm.title ?? slug,
-      slug: fm.slug ?? slug,
-      date: fm.date ?? undefined,
-      excerpt: fm.excerpt ?? "",
-      cover: fm.cover ?? "",
-      draft: fm.draft ?? false,
-    },
-    content,
-  };
+      return { slug, title, date, excerpt, cover } as PostMeta;
+    })
+  );
+
+  // ordena por fecha desc; si no hay fecha válida, lo manda abajo
+  return metas.sort((a, b) => {
+    const da = Date.parse(a.date || "");
+    const db = Date.parse(b.date || "");
+    if (isNaN(da) && isNaN(db)) return 0;
+    if (isNaN(da)) return 1;
+    if (isNaN(db)) return -1;
+    return db - da;
+  });
 }
 
-export async function getAllPosts() {
-  const slugs = await getSlugs();
-  const posts = await Promise.all(slugs.map(getPostBySlug));
-  return posts
-    .filter((p) => !p.frontMatter.draft)
-    .sort(
-      (a, b) =>
-        new Date(b.frontMatter.date ?? 0).getTime() -
-        new Date(a.frontMatter.date ?? 0).getTime()
-    );
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  const filePath = path.join(POSTS_DIR, `${slug}.mdx`);
+  try {
+    const source = await fs.readFile(filePath, "utf8");
+    const { content, data } = matter(source);
+
+    const mdx = await compileMDX({
+      source: content,
+      options: { parseFrontmatter: false },
+    });
+
+    const meta: PostMeta = {
+      slug,
+      title: String(data.title ?? slug),
+      date: String(data.date ?? ""),
+      excerpt: data.excerpt ? String(data.excerpt) : undefined,
+      cover: data.cover ? String(data.cover) : undefined,
+    };
+
+    return { meta, content: mdx.content };
+  } catch {
+    return null;
+  }
 }
