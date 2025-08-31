@@ -1,32 +1,59 @@
-import fs from 'fs'
-import path from 'path'
-import matter from 'gray-matter'
-import { MDXRemote } from 'next-mdx-remote/rsc'
-import type { Metadata } from 'next'
-import { getAllPostSlugs, getPostMeta } from '@/lib/posts'
+// app/blog/[slug]/page.tsx
+import { notFound } from "next/navigation";
+import { getSlugs, getPostBySlug } from "@/lib/posts";
+import { compileMDX } from "next-mdx-remote/rsc"; // no necesita provider
 
-const POSTS_DIR = path.join(process.cwd(), 'content', 'posts')
-
-export const revalidate = 60
+export const dynamic = "error"; // para SSG/ISR consistentes
 
 export async function generateStaticParams() {
-  return getAllPostSlugs().map((slug) => ({ slug }))
+  const slugs = await getSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const meta = getPostMeta(params.slug)
-  return { title: meta.title, description: meta.excerpt }
-}
+type Params = { params: { slug: string } };
 
-export default function PostPage({ params }: { params: { slug: string } }) {
-  const fullPath = path.join(POSTS_DIR, `${params.slug}.mdx`)
-  const source = fs.readFileSync(fullPath, 'utf8')
-  const { content } = matter(source)
+export default async function BlogPostPage({ params }: Params) {
+  const { slug } = params;
+  try {
+    const post = await getPostBySlug(slug);
+    if (!post) return notFound();
 
-  return (
-    <article className="max-w-3xl mx-auto py-10 prose prose-neutral">
-      {/* El título/fecha vienen del frontmatter si quieres mostrarlos arriba */}
-      <MDXRemote source={content} />
-    </article>
-  )
+    // renderiza el contenido MDX (el frontmatter ya lo parseamos con gray-matter)
+    const { content } = await compileMDX<{}>
+      ({ source: post.content, options: { parseFrontmatter: false } });
+
+    const { title, date, cover } = post.frontMatter;
+
+    return (
+      <article className="prose prose-zinc max-w-3xl">
+        <header className="mb-8">
+          <h1 className="mb-2 text-3xl font-bold">{title}</h1>
+          {date && (
+            <time dateTime={date} className="text-sm text-muted-foreground">
+              {new Date(date).toLocaleDateString("es-MX", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
+          )}
+          {cover ? (
+            // si ya usas next/image, cámbialo a <Image .../>
+            <img
+              src={cover}
+              alt={title}
+              className="mt-6 rounded-xl border"
+              width={1200}
+              height={630}
+            />
+          ) : null}
+        </header>
+
+        {/* Contenido MDX */}
+        <div className="prose">{content}</div>
+      </article>
+    );
+  } catch {
+    return notFound();
+  }
 }
