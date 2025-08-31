@@ -1,36 +1,63 @@
-// app/blog/page.tsx
 import Link from "next/link";
+import Image from "next/image";
 import { getAllPosts } from "@/lib/posts";
 
-export default async function BlogIndex() {
+function formatDate(d: string) {
+  const ms = Date.parse(d || "");
+  if (isNaN(ms)) return ""; // evita 1970
+  return new Date(ms).toLocaleDateString("es-MX", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+export default async function BlogPage() {
   const posts = await getAllPosts();
 
   return (
-    <section className="mx-auto max-w-4xl">
-      <h1 className="mb-4 text-4xl font-bold">Blog</h1>
-      <p className="mb-8 text-muted-foreground">
+    <section className="container max-w-4xl py-12">
+      <h1 className="text-4xl font-extrabold tracking-tight">Blog</h1>
+      <p className="text-muted-foreground mt-2">
         Lecturas breves y aplicables para sentirte mejor.
       </p>
 
-      <ul className="space-y-4">
-        {posts.map(({ slug, frontMatter }) => (
-          <li key={slug} className="rounded-xl bg-muted/40 p-4">
-            <Link href={`/blog/${slug}`} className="block">
-              <h2 className="text-lg font-semibold">{frontMatter.title}</h2>
-              {frontMatter.date && (
-                <p className="text-xs text-muted-foreground">
-                  {new Date(frontMatter.date).toLocaleDateString("es-MX")}
-                </p>
+      <div className="mt-8 space-y-5">
+        {posts.length === 0 && (
+          <p className="text-muted-foreground">Próximamente…</p>
+        )}
+
+        {posts.map((p) => (
+          <Link
+            key={p.slug}
+            href={`/blog/${p.slug}`}
+            className="block rounded-xl bg-muted/40 hover:bg-muted p-4 transition"
+          >
+            <div className="flex items-center gap-4">
+              {p.cover && (
+                <Image
+                  src={p.cover}
+                  alt=""
+                  width={80}
+                  height={80}
+                  className="rounded-md object-cover"
+                />
               )}
-              {frontMatter.excerpt && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {frontMatter.excerpt}
+              <div>
+                <h3 className="font-semibold">{p.title}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {formatDate(p.date)}
                 </p>
-              )}
-            </Link>
-          </li>
+                {p.excerpt && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {p.excerpt}
+                  </p>
+                )}
+              </div>
+            </div>
+          </Link>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
