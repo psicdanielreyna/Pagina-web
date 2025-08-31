@@ -1,36 +1,36 @@
-import Link from 'next/link'
-import { getAllPosts } from '@/lib/posts'
+// app/blog/page.tsx
+import Link from "next/link";
+import { getAllPosts } from "@/lib/posts";
 
-export const revalidate = 60
-
-export default function BlogIndex() {
-  const posts = getAllPosts()
-
-  if (!posts.length) {
-    return (
-      <div className="max-w-3xl mx-auto py-10">
-        <h1 className="text-3xl font-bold mb-4">Blog</h1>
-        <p>Próximamente…</p>
-      </div>
-    )
-  }
+export default async function BlogIndex() {
+  const posts = await getAllPosts();
 
   return (
-    <div className="max-w-3xl mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Blog</h1>
-      <ul className="space-y-6">
-        {posts.map((p) => (
-          <li key={p.slug} className="border-b pb-4">
-            <Link href={`/blog/${p.slug}`} className="text-xl font-semibold hover:underline">
-              {p.title}
+    <section className="mx-auto max-w-4xl">
+      <h1 className="mb-4 text-4xl font-bold">Blog</h1>
+      <p className="mb-8 text-muted-foreground">
+        Lecturas breves y aplicables para sentirte mejor.
+      </p>
+
+      <ul className="space-y-4">
+        {posts.map(({ slug, frontMatter }) => (
+          <li key={slug} className="rounded-xl bg-muted/40 p-4">
+            <Link href={`/blog/${slug}`} className="block">
+              <h2 className="text-lg font-semibold">{frontMatter.title}</h2>
+              {frontMatter.date && (
+                <p className="text-xs text-muted-foreground">
+                  {new Date(frontMatter.date).toLocaleDateString("es-MX")}
+                </p>
+              )}
+              {frontMatter.excerpt && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {frontMatter.excerpt}
+                </p>
+              )}
             </Link>
-            <div className="text-sm text-gray-500">
-              {new Date(p.date).toLocaleDateString()}
-            </div>
-            {p.excerpt && <p className="mt-2 text-gray-700">{p.excerpt}</p>}
           </li>
         ))}
       </ul>
-    </div>
-  )
+    </section>
+  );
 }
