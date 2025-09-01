@@ -1,42 +1,39 @@
+// app/blog/[slug]/page.tsx
 import { notFound } from "next/navigation";
-import Image from "next/image";
+import { compileMDX } from "next-mdx-remote/rsc";
 import { getAllPosts, getPostBySlug } from "@/lib/posts";
 
-type Params = { slug: string };
+type Params = { params: { slug: string } };
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
-  return posts.map((p) => ({ slug: p.slug }));
+  // Para SSG en build/netlify
+  return getAllPosts().map((p) => ({ slug: p.slug }));
 }
 
-export default async function PostPage({ params }: { params: Params }) {
-  const post = await getPostBySlug(params.slug);
-  if (!post) notFound();
+export default async function BlogPostPage({ params }: Params) {
+  const record = getPostBySlug(params.slug);
+  if (!record) return notFound();
 
-  const d = post.meta.date && !isNaN(Date.parse(post.meta.date))
-    ? new Date(post.meta.date).toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" })
-    : "";
+  // Compilar el MDX (el frontmatter ya lo leímos en lib/posts.ts)
+  const { content } = await compileMDX({
+    source: record.content,
+    options: {
+      parseFrontmatter: false,
+    },
+  });
 
   return (
-    <article className="container max-w-3xl py-10 prose prose-neutral dark:prose-invert">
-      <header className="mb-6">
-        <h1 className="mb-2">{post.meta.title}</h1>
-        {d && <p className="text-sm text-muted-foreground">{d}</p>}
-        {post.meta.cover && (
-          <div className="mt-4">
-            <Image
-              src={post.meta.cover}
-              alt=""
-              width={1200}
-              height={630}
-              className="rounded-xl object-cover w-full h-auto"
-              priority
-            />
-          </div>
-        )}
-      </header>
+    <article className="container mx-auto px-4 py-10 prose prose-neutral max-w-3xl">
+      <h1 className="mb-2">{record.meta.title}</h1>
+      <p className="text-sm text-neutral-500">
+        {new Date(record.meta.date).toLocaleDateString("es-MX", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      </p>
 
-      {post.content}
+      <div className="mt-6">{content}</div>
     </article>
   );
 }
