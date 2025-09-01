@@ -1,63 +1,74 @@
+// app/blog/page.tsx
 import Link from "next/link";
 import Image from "next/image";
 import { getAllPosts } from "@/lib/posts";
 
-function formatDate(d: string) {
-  const ms = Date.parse(d || "");
-  if (isNaN(ms)) return ""; // evita 1970
-  return new Date(ms).toLocaleDateString("es-MX", {
+export const metadata = {
+  title: "Blog",
+};
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("es-MX", {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
 }
 
-export default async function BlogPage() {
-  const posts = await getAllPosts();
+export default async function BlogIndexPage() {
+  const posts = getAllPosts();
+
+  if (posts.length === 0) {
+    return (
+      <section className="container mx-auto px-4 py-10">
+        <h1 className="text-3xl font-bold mb-6">Blog</h1>
+        <p>Próximamente…</p>
+      </section>
+    );
+  }
 
   return (
-    <section className="container max-w-4xl py-12">
-      <h1 className="text-4xl font-extrabold tracking-tight">Blog</h1>
-      <p className="text-muted-foreground mt-2">
-        Lecturas breves y aplicables para sentirte mejor.
-      </p>
+    <section className="container mx-auto px-4 py-10">
+      <h1 className="text-3xl font-bold mb-6">Blog</h1>
 
-      <div className="mt-8 space-y-5">
-        {posts.length === 0 && (
-          <p className="text-muted-foreground">Próximamente…</p>
-        )}
+      <ul className="space-y-4">
+        {posts.map(({ slug, meta }) => (
+          <li key={slug}>
+            <Link
+              href={`/blog/${slug}`}
+              className="block rounded-xl bg-neutral-50 hover:bg-neutral-100 p-4 transition"
+            >
+              <div className="flex items-start gap-4">
+                {meta.cover ? (
+                  <Image
+                    src={meta.cover}
+                    alt={meta.title}
+                    width={72}
+                    height={72}
+                    className="rounded-md object-cover aspect-square"
+                  />
+                ) : null}
 
-        {posts.map((p) => (
-          <Link
-            key={p.slug}
-            href={`/blog/${p.slug}`}
-            className="block rounded-xl bg-muted/40 hover:bg-muted p-4 transition"
-          >
-            <div className="flex items-center gap-4">
-              {p.cover && (
-                <Image
-                  src={p.cover}
-                  alt=""
-                  width={80}
-                  height={80}
-                  className="rounded-md object-cover"
-                />
-              )}
-              <div>
-                <h3 className="font-semibold">{p.title}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {formatDate(p.date)}
-                </p>
-                {p.excerpt && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {p.excerpt}
+                <div className="min-w-0">
+                  <h2 className="text-lg font-semibold line-clamp-2">
+                    {meta.title}
+                  </h2>
+                  <p className="text-sm text-neutral-500">
+                    {formatDate(meta.date)}
                   </p>
-                )}
+                  {meta.excerpt ? (
+                    <p className="mt-1 text-neutral-700 line-clamp-2">
+                      {meta.excerpt}
+                    </p>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
