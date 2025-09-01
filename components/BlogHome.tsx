@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import posts from "@/data/blog"; // ✅ default import
+import { posts } from "@/data/blog"; // <- nombrado
 
-// -- Nuevo helper: convierte string de fecha a timestamp seguro
 const toTime = (d?: string) => {
   if (!d) return 0;
   const t = Date.parse(d);
@@ -10,8 +9,8 @@ const toTime = (d?: string) => {
 };
 
 export default function BlogHome() {
-  // Muestra solo los 3 más recientes
   const latest = posts
+    .slice() // no mutar el array original
     .sort((a, b) => (toTime(a.date) < toTime(b.date) ? 1 : -1))
     .slice(0, 3);
 
