@@ -1,82 +1,91 @@
 // lib/posts.ts
-import "server-only";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import matter from "gray-matter";
 
 export type PostMeta = {
   title: string;
-  date: string;            // ISO: 2025-08-22
+  date?: string;       // ISO yyyy-mm-dd
   excerpt?: string;
-  cover?: string;          // ruta pública opcional
-};
-
-export type PostRecord = {
+  cover?: string;
   slug: string;
-  meta: PostMeta;
-  content: string;
 };
 
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
 
-function readFile(slug: string) {
-  const withExt = slug.endsWith(".mdx") || slug.endsWith(".md")
-    ? slug
-    : `${slug}.mdx`;
-
-  const full = path.join(POSTS_DIR, withExt);
-  return fs.readFileSync(full, "utf8");
+function normalizeDate(d?: string) {
+  if (!d) return undefined;
+  // Acepta "2025-08-22" o ISO; normaliza a yyyy-mm-dd
+  const dt = new Date(d);
+  if (Number.isNaN(dt.getTime())) return undefined;
+  return dt.toISOString().slice(0, 10);
 }
 
-export function getAllPosts(): PostRecord[] {
-  if (!fs.existsSync(POSTS_DIR)) return [];
+export async function getAllPosts(): Promise<PostMeta[]> {
+  const entries = await fs.readdir(POSTS_DIR);
+  const files = entries.filter((f) => f.endsWith(".md") || f.endsWith(".mdx"));
 
-  const files = fs
-    .readdirSync(POSTS_DIR)
-    .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
+  const posts: PostMeta[] = [];
+  for (const file of files) {
+    const slug = file.replace(/\.mdx?$/, "");
+    const full = path.join(POSTS_DIR, file);
+    const raw = await fs.readFile(full, "utf8");
+    const { data } = matter(raw);
 
-  const posts = files.map((file) => {
-    const raw = fs.readFileSync(path.join(POSTS_DIR, file), "utf8");
-    const { data, content } = matter(raw);
-
-    const meta: PostMeta = {
-      title: data.title ?? "Sin título",
-      date: data.date ?? "1970-01-01",
+    posts.push({
+      title: data.title ?? slug,
+      date: normalizeDate(data.date),
       excerpt: data.excerpt ?? "",
       cover: data.cover ?? "",
-    };
+      slug,
+    });
+  }
 
-    return {
-      slug: file.replace(/\.mdx?$/, ""),
-      meta,
-      content,
-    };
+  // Ordena por fecha desc (los sin fecha al final)
+  posts.sort((a, b) => {
+    if (!a.date && !b.date) return 0;
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return a.date > b.date ? -1 : 1;
   });
 
-  // Ordenar por fecha desc (si no hay fecha válida, van al final)
-  return posts.sort((a, b) => {
-    const da = new Date(a.meta.date).getTime() || 0;
-    const db = new Date(b.meta.date).getTime() || 0;
-    return db - da;
-  });
+  return posts;
 }
 
-export function getPostBySlug(slug: string): PostRecord | null {
-  try {
-    const raw = readFile(slug);
-    const { data, content } = matter(raw);
+export async function getPostBySlug(slug: string): Promise<{
+  meta: PostMeta;
+  content: string; // markdown crudo
+}> {
+  const tryPaths = [
+    path.join(POSTS_DIR, `${slug}.mdx`),
+    path.join(POSTS_DIR, `${slug}.md`),
+  ];
 
-    return {
-      slug: slug.replace(/\.mdx?$/, ""),
-      meta: {
-        title: data.title ?? "Sin título",
-        date: data.date ?? "1970-01-01",
-        excerpt: data.excerpt ?? "",
-        cover: data.cover ?? "",
-      },
-      content,
-    };
-  } catch {
-    return null;
+  let filePath: string | null = null;
+  for (const p of tryPaths) {
+    try {
+      await fs.access(p);
+      filePath = p;
+      break;
+    } catch {
+      /* continue */
+    }
   }
+
+  if (!filePath) {
+    throw new Error(`Post not found: ${slug}`);
+  }
+
+  const raw = await fs.readFile(filePath, "utf8");
+  const { data, content } = matter(raw);
+
+  const meta: PostMeta = {
+    title: data.title ?? slug,
+    date: normalizeDate(data.date),
+    excerpt: data.excerpt ?? "",
+    cover: data.cover ?? "",
+    slug,
+  };
+
+  return { meta, content };
 }
