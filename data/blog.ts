@@ -1,40 +1,35 @@
-// data/blog.ts
-export type BlogCard = {
-  slug: string;          // para /blog/[slug]
+export type PostMeta = {
+  slug: string;
   title: string;
-  date: string;          // ISO (YYYY-MM-DD) para ordenar bien
+  date: string;
   excerpt: string;
-  cover: string;         // ruta a la portada
-  alt?: string;
+  image?: string; // ✅ opcional, para que TS no marque error
 };
 
-const posts: BlogCard[] = [
+const posts: PostMeta[] = [
   {
-    slug: "apagar-mente",
-    title: "Cómo apagar tu mente",
-    date: "2025-08-10",
+    slug: "autoayuda-funciona",
+    title: "¿Los libros de autoayuda realmente funcionan?",
+    date: "2025-08-22",
     excerpt:
-      "Técnicas concretas para bajar el ruido mental cuando sientes que la cabeza no para.",
-    cover: "/images/blog/apagar-mente.png",
-    alt: "Portada: Apagar la mente",
+      "Analizamos si los libros de autoayuda pueden sustituir la terapia o si son un buen complemento para tu crecimiento personal.",
+    image: "/images/autoayuda.jpg", // ✅ ejemplo demo
   },
   {
-    slug: "el-arte-de-creer-en-ti",
-    title: "El arte de creer en ti",
-    date: "2025-08-05",
+    slug: "burnout-mini-test",
+    title: "Mini test de burnout",
+    date: "2025-07-15",
     excerpt:
-      "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
-    cover: "/images/blog/el-arte-de-creer-en-ti.png",
-    alt: "Portada: El arte de creer en ti",
+      "Un test breve de 2 minutos para identificar si estás en riesgo de burnout y cómo tomar acción a tiempo.",
+    image: "/images/burnout.jpg",
   },
   {
-    slug: "ansiedad-3-pasos",
-    title: "Ansiedad en 3 pasos",
-    date: "2025-07-28",
+    slug: "procrastinacion",
+    title: "La verdad sobre dejar de procrastinar",
+    date: "2025-06-30",
     excerpt:
-      "Un mini-protocolo para reconocer, regular y responder mejor ante la ansiedad.",
-    cover: "/images/blog/ansiedad-3-pasos.png",
-    alt: "Portada: Ansiedad en 3 pasos",
+      "Desmitificamos la eficiencia constante y explicamos por qué procrastinamos y cómo dejar de hacerlo paso a paso.",
+    image: "/images/procrastinacion.jpg",
   },
 ];
 
