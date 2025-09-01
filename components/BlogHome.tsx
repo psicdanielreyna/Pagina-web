@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { posts } from "@/data/blog"; // <- nombrado
+import posts from "@/data/blog"; // <- nombrado
 
 const toTime = (d?: string) => {
   if (!d) return 0;
