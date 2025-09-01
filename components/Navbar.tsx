@@ -1,28 +1,22 @@
 // components/Navbar.tsx
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <header className="border-b bg-white/80 backdrop-blur">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="font-semibold">
-          Daniel Reyna — Psicólogo
+    <header className="sticky top-0 z-40 w-full border-b bg-white/80 backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-center px-4">
+        <Link href="/" aria-label="Ir al inicio" className="inline-flex">
+          <Image
+            src="/logo.png"       // asegúrate de tener /public/logo.png
+            alt="Daniel Reyna — Psicólogo"
+            width={200}           // ajusta a tu gusto
+            height={52}
+            priority
+          />
         </Link>
-
-        <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link href="/servicios" className="hover:underline">Servicios</Link>
-          <Link href="/tienda" className="hover:underline">Tienda</Link>
-          <Link href="/blog" className="hover:underline">Blog</Link>
-          <Link href="/sobre-mi" className="hover:underline">Sobre mí</Link>
-          <Link
-            href="/agenda"
-            className="inline-flex items-center rounded-full px-4 py-2 bg-emerald-700 text-white hover:bg-emerald-800 transition"
-          >
-            Agenda
-          </Link>
-        </nav>
       </div>
     </header>
   );
