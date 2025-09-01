@@ -3,72 +3,59 @@ import Link from "next/link";
 import Image from "next/image";
 import { getAllPosts } from "@/lib/posts";
 
-export const metadata = {
-  title: "Blog",
-};
-
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString("es-MX", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-export default async function BlogIndexPage() {
-  const posts = getAllPosts();
+export default async function BlogIndex() {
+  const posts = await getAllPosts();
 
   if (posts.length === 0) {
     return (
-      <section className="container mx-auto px-4 py-10">
-        <h1 className="text-3xl font-bold mb-6">Blog</h1>
-        <p>Próximamente…</p>
-      </section>
+      <div className="container max-w-3xl mx-auto px-4 py-10">
+        <h1 className="text-3xl font-bold">Blog</h1>
+        <p className="text-muted-foreground mt-2">Próximamente…</p>
+      </div>
     );
   }
 
   return (
-    <section className="container mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-6">Blog</h1>
+    <div className="container max-w-3xl mx-auto px-4 py-10">
+      <h1 className="text-3xl font-bold">Blog</h1>
+      <p className="text-muted-foreground mt-2">
+        Lecturas breves y aplicables para sentirte mejor.
+      </p>
 
-      <ul className="space-y-4">
-        {posts.map(({ slug, meta }) => (
-          <li key={slug}>
-            <Link
-              href={`/blog/${slug}`}
-              className="block rounded-xl bg-neutral-50 hover:bg-neutral-100 p-4 transition"
-            >
-              <div className="flex items-start gap-4">
-                {meta.cover ? (
+      <ul className="mt-8 space-y-6">
+        {posts.map((p) => (
+          <li key={p.slug} className="rounded-lg bg-muted/30 p-4 hover:bg-muted/50">
+            <Link href={`/blog/${p.slug}`} className="block">
+              <div className="flex items-center gap-4">
+                {p.cover ? (
                   <Image
-                    src={meta.cover}
-                    alt={meta.title}
+                    src={p.cover}
+                    alt=""
                     width={72}
                     height={72}
-                    className="rounded-md object-cover aspect-square"
+                    className="rounded-md object-cover"
                   />
                 ) : null}
-
-                <div className="min-w-0">
-                  <h2 className="text-lg font-semibold line-clamp-2">
-                    {meta.title}
-                  </h2>
-                  <p className="text-sm text-neutral-500">
-                    {formatDate(meta.date)}
-                  </p>
-                  {meta.excerpt ? (
-                    <p className="mt-1 text-neutral-700 line-clamp-2">
-                      {meta.excerpt}
+                <div>
+                  <h2 className="font-semibold">{p.title}</h2>
+                  {p.date && (
+                    <p className="text-xs text-muted-foreground">
+                      {new Intl.DateTimeFormat("es-MX", { dateStyle: "medium" }).format(
+                        new Date(p.date)
+                      )}
                     </p>
-                  ) : null}
+                  )}
+                  {p.excerpt && (
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                      {p.excerpt}
+                    </p>
+                  )}
                 </div>
               </div>
             </Link>
           </li>
         ))}
       </ul>
-    </section>
+    </div>
   );
 }
