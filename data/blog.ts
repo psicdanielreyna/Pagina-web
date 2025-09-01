@@ -1,49 +1,41 @@
 // data/blog.ts
-export type PostHome = {
-  slug: string;
+export type BlogCard = {
+  slug: string;          // para /blog/[slug]
   title: string;
+  date: string;          // ISO (YYYY-MM-DD) para ordenar bien
   excerpt: string;
-  img: string;
-  alt: string;
-  date: string;
-  href: string;
+  cover: string;         // ruta a la portada
+  alt?: string;
 };
 
-// 👇 datos estáticos (puedes cambiar imágenes/rutas a las tuyas)
-export const postsHome: PostHome[] = [
+const posts: BlogCard[] = [
   {
-    slug: "como-apagar-tu-mente",
+    slug: "apagar-mente",
     title: "Cómo apagar tu mente",
+    date: "2025-08-10",
     excerpt:
       "Técnicas concretas para bajar el ruido mental cuando sientes que la cabeza no para.",
-    img: "/images/post-1.png",
-    alt: "Cómo apagar tu mente",
-    date: "2025-08-10",
-    href: "/blog/como-apagar-tu-mente",
+    cover: "/images/blog/apagar-mente.png",
+    alt: "Portada: Apagar la mente",
   },
   {
     slug: "el-arte-de-creer-en-ti",
     title: "El arte de creer en ti",
+    date: "2025-08-05",
     excerpt:
       "Pequeños cambios que fortalecen tu autoconfianza sin frases mágicas ni humo.",
-    img: "/images/post-2.png",
-    alt: "El arte de creer en ti",
-    date: "2025-08-05",
-    href: "/blog/el-arte-de-creer-en-ti",
+    cover: "/images/blog/el-arte-de-creer-en-ti.png",
+    alt: "Portada: El arte de creer en ti",
   },
   {
-    slug: "ansiedad-en-3-pasos",
-    title: "Ansiedad en 3 pasos prácticos",
+    slug: "ansiedad-3-pasos",
+    title: "Ansiedad en 3 pasos",
+    date: "2025-07-28",
     excerpt:
       "Un mini-protocolo para reconocer, regular y responder mejor ante la ansiedad.",
-    img: "/images/post-3.png",
-    alt: "Ansiedad en 3 pasos",
-    date: "2025-07-28",
-    href: "/blog/ansiedad-en-3-pasos",
+    cover: "/images/blog/ansiedad-3-pasos.png",
+    alt: "Portada: Ansiedad en 3 pasos",
   },
 ];
 
-// (opcional) función async para cuando migremos a Sanity:
-export async function fetchPostsHome(): Promise<PostHome[]> {
-  return postsHome;
-}
+export default posts;
