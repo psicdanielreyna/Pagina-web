@@ -19,3 +19,8 @@
 
 /* Contenedor base que usas en las páginas */
 .container { @apply mx-auto max-w-6xl; }
+
+/* ---- Sheet / Drawer ajustes suaves ---- */
+[data-state="open"].fixed.inset-0.bg-black\/80 { opacity: 1; }
+div[data-side="left"].fixed { background: #fff; }
+div[data-side="left"].fixed .overflow-y-auto { overscroll-behavior: contain; }
