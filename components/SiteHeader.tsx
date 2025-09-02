@@ -37,16 +37,36 @@ function IconX(props: React.SVGProps<SVGSVGElement>) {
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
 
-  // Bloquear scroll del body cuando el drawer está abierto
+  /**
+   * Bloqueo de scroll robusto:
+   * - Ocultamos overflow en <html> y <body>
+   * - Compensamos el ancho de la barra de scroll con padding-right
+   * - Restauramos todo al cerrar
+   */
   useEffect(() => {
-    const prev = document.body.style.overflow;
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    const prevBodyPaddingRight = body.style.paddingRight;
+
     if (open) {
-      document.body.style.overflow = "hidden";
+      const scrollbar = window.innerWidth - html.clientWidth;
+      html.style.overflow = "hidden";
+      body.style.overflow = "hidden";
+      if (scrollbar > 0) {
+        body.style.paddingRight = `${scrollbar}px`;
+      }
     } else {
-      document.body.style.overflow = prev || "";
+      html.style.overflow = prevHtmlOverflow || "";
+      body.style.overflow = prevBodyOverflow || "";
+      body.style.paddingRight = prevBodyPaddingRight || "";
     }
+
     return () => {
-      document.body.style.overflow = prev || "";
+      html.style.overflow = prevHtmlOverflow || "";
+      body.style.overflow = prevBodyOverflow || "";
+      body.style.paddingRight = prevBodyPaddingRight || "";
     };
   }, [open]);
 
@@ -58,7 +78,7 @@ export default function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    <header className="sticky top-0 z-[40] border-b bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container mx-auto flex h-14 items-center px-4">
         {/* Hamburguesa (izquierda) */}
         <button
@@ -73,18 +93,18 @@ export default function SiteHeader() {
           <span className="mt-1 block h-0.5 w-5 bg-current" />
         </button>
 
-        {/* Marca centrada con LOGO */}
+        {/* Marca centrada con LOGO (más grande) */}
         <div className="relative flex-1">
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <Link href="/" aria-label="Ir al inicio" className="pointer-events-auto inline-flex items-center">
               <Image
                 src="/logo.png"
                 alt="Daniel Reyna - Psicólogo"
-                width={320}
-                height={64}
+                width={480}
+                height={112}
                 priority
-                className="h-8 w-auto md:h-10"
-                sizes="(max-width: 768px) 160px, 320px"
+                className="h-14 w-auto md:h-16"
+                sizes="(max-width: 768px) 220px, 480px"
               />
             </Link>
           </div>
@@ -111,15 +131,15 @@ export default function SiteHeader() {
       {/* Drawer */}
       {open && (
         <>
-          {/* fondo */}
+          {/* overlay por ENCIMA del header */}
           <button
             aria-label="Cerrar menú"
             onClick={() => setOpen(false)}
-            className="fixed inset-0 z-40 bg-black/40"
+            className="fixed inset-0 z-[60] bg-black/40"
           />
-          {/* panel */}
+          {/* panel por encima del overlay */}
           <aside
-            className="fixed left-0 top-0 z-50 h-full w-80 max-w-[85vw] overflow-y-auto bg-white shadow-xl"
+            className="fixed left-0 top-0 z-[70] h-full w-80 max-w-[85vw] overflow-y-auto bg-white shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b px-4 py-3">
