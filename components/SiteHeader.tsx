@@ -58,7 +58,7 @@ export default function SiteHeader() {
             <Image
               src="/logo.png"
               alt="Daniel Reyna - Psicólogo"
-              width={260}     // <- tamaño del logo
+              width={250}     // <- tamaño del logo
               height={60}
               className="mx-auto h-auto w-[220px] sm:w-[260px] object-contain"
               priority
