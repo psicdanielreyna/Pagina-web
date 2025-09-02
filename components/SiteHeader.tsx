@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
-/** SVG icons (sin librerías externas) */
+/** SVG icons */
 function IconInstagram(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" {...props}>
@@ -11,7 +12,6 @@ function IconInstagram(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
 function IconFacebook(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" {...props}>
@@ -19,7 +19,6 @@ function IconFacebook(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
 function IconYouTube(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" {...props}>
@@ -27,7 +26,6 @@ function IconYouTube(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
 function IconX(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" {...props}>
@@ -39,6 +37,19 @@ function IconX(props: React.SVGProps<SVGSVGElement>) {
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
 
+  // Bloquear scroll del body cuando el drawer está abierto
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = prev || "";
+    }
+    return () => {
+      document.body.style.overflow = prev || "";
+    };
+  }, [open]);
+
   const social = [
     { href: "https://instagram.com/psic.danielreyna", label: "Instagram", Icon: IconInstagram },
     { href: "https://facebook.com/psic.danielreyna", label: "Facebook", Icon: IconFacebook },
@@ -49,10 +60,11 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container mx-auto flex h-14 items-center px-4">
-        {/* Botón hamburguesa (izquierda) */}
+        {/* Hamburguesa (izquierda) */}
         <button
           type="button"
           aria-label="Abrir menú"
+          aria-expanded={open}
           onClick={() => setOpen(true)}
           className="mr-3 rounded p-2 hover:bg-black/5"
         >
@@ -61,15 +73,19 @@ export default function SiteHeader() {
           <span className="mt-1 block h-0.5 w-5 bg-current" />
         </button>
 
-        {/* Marca centrada */}
+        {/* Marca centrada con LOGO */}
         <div className="relative flex-1">
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <Link
-              id="brand"
-              href="/"
-              className="pointer-events-auto select-none text-base font-serif font-semibold tracking-tight hover:opacity-80"
-            >
-              Daniel Reyna – Psicólogo
+            <Link href="/" aria-label="Ir al inicio" className="pointer-events-auto inline-flex items-center">
+              <Image
+                src="/logo.png"
+                alt="Daniel Reyna - Psicólogo"
+                width={320}
+                height={64}
+                priority
+                className="h-8 w-auto md:h-10"
+                sizes="(max-width: 768px) 160px, 320px"
+              />
             </Link>
           </div>
         </div>
@@ -83,7 +99,7 @@ export default function SiteHeader() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className="inline-flex items-center gap-2 text-sm text-foreground hover:opacity-80"
+              className="inline-flex items-center text-foreground hover:opacity-80"
               title={label}
             >
               <Icon />
@@ -92,7 +108,7 @@ export default function SiteHeader() {
         </nav>
       </div>
 
-      {/* Drawer lateral */}
+      {/* Drawer */}
       {open && (
         <>
           {/* fondo */}
@@ -102,7 +118,10 @@ export default function SiteHeader() {
             className="fixed inset-0 z-40 bg-black/40"
           />
           {/* panel */}
-          <aside className="fixed left-0 top-0 z-50 h-full w-80 max-w-[85vw] overflow-y-auto bg-white shadow-xl">
+          <aside
+            className="fixed left-0 top-0 z-50 h-full w-80 max-w-[85vw] overflow-y-auto bg-white shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between border-b px-4 py-3">
               <span className="text-sm text-muted-foreground">Menú</span>
               <button
