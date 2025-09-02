@@ -1,62 +1,104 @@
-import posts from "@/data/blog";
-import Link from "next/link";
+// app/blog/scroll/page.tsx
 import Image from "next/image";
+import Link from "next/link";
+import posts from "@/data/blog";
+import { compileMDX } from "next-mdx-remote/rsc";
 
-export const metadata = {
-  title: "Blog — Lectura continua",
-  description: "Lee los artículos de forma continua",
+type Post = {
+  slug: string;
+  title: string;
+  date?: string;
+  excerpt?: string;
+  cover?: string; // <- opcional
+  content: string;
 };
 
 const toTime = (d?: string) => (d ? new Date(d).getTime() : 0);
 
-export default function BlogScroll() {
-  const ordered = [...posts].sort((a, b) => (toTime(a.date) < toTime(b.date) ? 1 : -1));
+export default async function BlogScroll() {
+  // ordena del más nuevo al más viejo
+  const ordered = (posts as Post[])
+    .slice()
+    .sort((a, b) => (toTime(b.date) - toTime(a.date)));
 
   return (
-    <main className="container mx-auto max-w-3xl px-4 py-10">
-      <nav className="mb-6 text-sm text-muted-foreground">
-        <Link href="/blog" className="underline">
-          ← Volver al listado
+    <main className="container max-w-3xl mx-auto px-4 py-10">
+      <header className="mb-10">
+        <Link href="/blog" className="text-sm text-muted-foreground hover:underline">
+          ← Volver al blog
         </Link>
-      </nav>
+        <h1 className="text-3xl md:text-4xl font-bold mt-2">Lecturas continuas</h1>
+        <p className="text-muted-foreground">
+          Recorre los artículos uno tras otro, como una revista.
+        </p>
+      </header>
 
-      <h1 className="mb-8 text-3xl font-bold">Blog</h1>
+      <div className="space-y-20">
+        {await Promise.all(
+          ordered.map(async (p, idx) => {
+            // compila el MDX de cada post
+            const { content } = await compileMDX<{ }>(
+              { source: p.content }
+            );
 
-      {ordered.map((p, idx) => (
-        <article key={p.slug} className="prose prose-neutral dark:prose-invert max-w-none">
-          <header className="mb-6">
-            <h2 className="mb-1 text-2xl font-semibold">
-              <Link href={`/blog/${p.slug}`}>{p.title}</Link>
-            </h2>
+            return (
+              <article key={p.slug} className="scroll-mt-24">
+                {/* título y meta */}
+                <header className="mb-4">
+                  <h2 className="text-2xl md:text-3xl font-semibold leading-tight">
+                    {p.title}
+                  </h2>
+                  {p.date && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {new Date(p.date).toLocaleDateString("es-MX", {
+                        dateStyle: "long",
+                      })}
+                    </p>
+                  )}
+                  {p.excerpt && (
+                    <p className="text-muted-foreground mt-2">{p.excerpt}</p>
+                  )}
+                </header>
 
-            {p.date && (
-              <p className="text-sm text-muted-foreground">
-                {new Date(p.date).toLocaleDateString("es-MX", { dateStyle: "long" })}
-              </p>
-            )}
+                {/* portada opcional */}
+                {p.cover && (
+                  <div className="my-6">
+                    <Image
+                      src={p.cover}
+                      alt={p.title}
+                      width={1200}
+                      height={630}
+                      className="w-full h-auto rounded-xl object-cover"
+                      priority={idx === 0}
+                    />
+                  </div>
+                )}
 
-            {p.cover && (
-              <Image
-                src={p.cover}
-                alt={p.title}
-                width={1200}
-                height={630}
-                className="my-4 h-auto w-full rounded-lg object-cover"
-              />
-            )}
-          </header>
+                {/* cuerpo MDX */}
+                <div className="prose prose-neutral max-w-none prose-headings:scroll-mt-24">
+                  {content}
+                </div>
 
-          {p.excerpt && <p className="mb-6">{p.excerpt}</p>}
+                {/* separador visual hacia el siguiente post */}
+                {idx < ordered.length - 1 && (
+                  <div className="my-10 border-t pt-8 flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Siguiente artículo</span>
+                    <Link
+                      href={`#${ordered[idx + 1].slug}`}
+                      className="font-medium hover:underline"
+                    >
+                      {ordered[idx + 1].title}
+                    </Link>
+                  </div>
+                )}
 
-          <p className="mb-12">
-            <Link href={`/blog/${p.slug}`} className="text-primary underline">
-              Leer este artículo completo →
-            </Link>
-          </p>
-
-          {idx < ordered.length - 1 && <hr className="my-12" />}
-        </article>
-      ))}
+                {/* ancla para navegación interna */}
+                <div id={p.slug} />
+              </article>
+            );
+          })
+        )}
+      </div>
     </main>
   );
 }
