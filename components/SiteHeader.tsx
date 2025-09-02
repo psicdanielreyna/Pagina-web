@@ -3,185 +3,146 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetClose,
-} from "@/components/ui/sheet";
-import { Menu, X, Instagram, Facebook, Youtube, CircleEllipsis as XLogo } from "lucide-react";
+import { Instagram, Facebook, Youtube, Menu, X as Close } from "lucide-react";
+
+/** SVG limpio para el logo de X (Twitter) */
+function XLogo({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 1200 1227"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="X"
+      className={className}
+      fill="currentColor"
+    >
+      <path d="M714 519 1166 0H1024L662 417 372 0H0l472 648L0 1227h142l383-438 304 438h372L714 519Zm-135 155-44-61L194 96h136l221 308 44 61 365 506H824L579 674Z"/>
+    </svg>
+  );
+}
+
+type Social = { name: string; href: string; icon: React.ComponentType<{ className?: string }> };
+
+const socials: Social[] = [
+  { name: "Instagram", href: "https://instagram.com/psic.danielreyna", icon: Instagram },
+  { name: "Facebook",  href: "https://facebook.com/Psic.danielreyna", icon: Facebook  },
+  { name: "YouTube",   href: "https://youtube.com/@Psicdanielreyna", icon: Youtube   },
+  { name: "X",         href: "https://x.com/psicdanreyna",        icon: XLogo     },
+];
+
+const nav = [
+  { name: "Blog",      href: "/blog" },
+  { name: "Servicios", href: "/servicios" },
+  { name: "Sobre mí",  href: "/sobre-mi" },
+  { name: "Contacto",  href: "/contacto" },
+];
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75">
+    <header className="relative border-b bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70">
       <div className="container mx-auto flex h-14 items-center px-4">
-        {/* IZQUIERDA: Hamburguesa */}
-        <div className="mr-2 flex items-center">
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <button
-                aria-label="Abrir menú"
-                className="p-2 rounded-md hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                <Menu className="h-6 w-6" />
-              </button>
-            </SheetTrigger>
+        {/* Izquierda: botón hamburguesa */}
+        <button
+          aria-label="Abrir menú"
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
 
-            <SheetContent
-              side="left"
-              className="w-80 sm:w-96 p-0 bg-white"
-              aria-describedby={undefined}
-            >
-              <div className="flex items-center justify-between px-4 py-3 border-b">
-                <SheetTitle className="text-lg font-semibold">Menú</SheetTitle>
-                <SheetClose asChild>
-                  <button
-                    aria-label="Cerrar menú"
-                    className="p-2 rounded-md hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </SheetClose>
-              </div>
-
-              <nav className="flex flex-col gap-1 px-4 py-3">
-                <Link
-                  href="/blog"
-                  className="rounded-md px-3 py-2 text-sm hover:bg-muted/60"
-                  onClick={() => setOpen(false)}
-                >
-                  Blog
-                </Link>
-                <Link
-                  href="/servicios"
-                  className="rounded-md px-3 py-2 text-sm hover:bg-muted/60"
-                  onClick={() => setOpen(false)}
-                >
-                  Servicios
-                </Link>
-                <Link
-                  href="/sobre-mi"
-                  className="rounded-md px-3 py-2 text-sm hover:bg-muted/60"
-                  onClick={() => setOpen(false)}
-                >
-                  Sobre mí
-                </Link>
-                <Link
-                  href="/contacto"
-                  className="rounded-md px-3 py-2 text-sm hover:bg-muted/60"
-                  onClick={() => setOpen(false)}
-                >
-                  Contacto
-                </Link>
-              </nav>
-
-              <div className="px-4 py-3 border-t">
-                <p className="mb-2 text-xs font-medium text-muted-foreground">Sígueme</p>
-                <div className="flex flex-wrap gap-2">
-                  <a
-                    href="https://instagram.com/psic.danielreyna"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted/60"
-                  >
-                    <Instagram className="h-4 w-4" />
-                    Instagram
-                  </a>
-                  <a
-                    href="https://facebook.com/psic.danielreyna"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted/60"
-                  >
-                    <Facebook className="h-4 w-4" />
-                    Facebook
-                  </a>
-                  <a
-                    href="https://youtube.com/@Psicdanielreyna"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted/60"
-                  >
-                    <Youtube className="h-4 w-4" />
-                    YouTube
-                  </a>
-                  <a
-                    href="https://x.com/psicdanielreyna"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted/60"
-                  >
-                    <XLogo className="h-4 w-4" />
-                    X
-                  </a>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-
-        {/* CENTRO: LOGO (más grande) */}
-        <div className="relative mx-auto select-none">
-          <Link
-            href="/"
-            aria-label="Ir al inicio"
-            className="block"
-          >
+        {/* Centro: marca (logo) — centrado absoluto */}
+        <div className="pointer-events-none absolute left-1/2 -translate-x-1/2">
+          <Link href="/" className="pointer-events-auto block" aria-label="Ir al inicio">
             <Image
               src="/logo.png"
               alt="Daniel Reyna - Psicólogo"
-              width={220}     // ← agrandado
-              height={44}
+              width={260}     // <- tamaño del logo
+              height={60}
+              className="mx-auto h-auto w-[220px] sm:w-[260px] object-contain"
               priority
-              className="mx-auto h-10 sm:h-[44px] w-auto object-contain"
             />
           </Link>
         </div>
 
-        {/* DERECHA: Redes (íconos) */}
-        <div className="ml-auto flex items-center gap-4 pr-1">
-          <a
-            href="https://instagram.com/psic.danielreyna"
-            aria-label="Instagram"
-            target="_blank"
-            rel="noreferrer"
-            className="p-1.5 rounded-md hover:bg-muted/60"
-          >
-            <Instagram className="h-5 w-5" />
-          </a>
-          <a
-            href="https://facebook.com/psic.danielreyna"
-            aria-label="Facebook"
-            target="_blank"
-            rel="noreferrer"
-            className="p-1.5 rounded-md hover:bg-muted/60"
-          >
-            <Facebook className="h-5 w-5" />
-          </a>
-          <a
-            href="https://youtube.com/@Psicdanielreyna"
-            aria-label="YouTube"
-            target="_blank"
-            rel="noreferrer"
-            className="p-1.5 rounded-md hover:bg-muted/60"
-          >
-            <Youtube className="h-5 w-5" />
-          </a>
-          <a
-            href="https://x.com/psicdanielreyna"
-            aria-label="X"
-            target="_blank"
-            rel="noreferrer"
-            className="p-1.5 rounded-md hover:bg-muted/60"
-          >
-            <XLogo className="h-5 w-5" />
-          </a>
-        </div>
+        {/* Derecha: redes */}
+        <nav className="ml-auto flex items-center gap-4">
+          {socials.map(({ name, href, icon: Icon }) => (
+            <Link
+              key={name}
+              href={href}
+              aria-label={name}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              <Icon className="h-5 w-5" />
+              <span className="hidden sm:inline">{name}</span>
+            </Link>
+          ))}
+        </nav>
       </div>
+
+      {/* Drawer (menú) */}
+      {open && (
+        <>
+          {/* Fondo */}
+          <button
+            aria-label="Cerrar menú"
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          />
+          {/* Panel */}
+          <aside className="fixed left-0 top-0 z-50 h-full w-80 max-w-[90vw] rounded-r-xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b px-4 py-3">
+              <span className="text-lg font-medium">Menú</span>
+              <button
+                aria-label="Cerrar menú"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100"
+              >
+                <Close className="h-5 w-5" />
+              </button>
+            </div>
+
+            <nav className="px-4 py-3">
+              <ul className="space-y-2">
+                {nav.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className="block rounded-md px-3 py-2 text-base hover:bg-gray-100"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="my-4 border-t" />
+
+              <p className="px-3 pb-2 text-sm text-gray-500">Sígueme</p>
+              <div className="grid grid-cols-2 gap-2 px-3">
+                {socials.map(({ name, href, icon: Icon }) => (
+                  <Link
+                    key={`drawer-${name}`}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-gray-50"
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span>{name}</span>
+                  </Link>
+                ))}
+              </div>
+            </nav>
+          </aside>
+        </>
+      )}
     </header>
   );
 }

@@ -2,25 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ========== Utilidades opcionales ========== */
+/* Utilidades opcionales */
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
-/* Botones (opcional, si los usas) */
+/* Botones de ejemplo (si los usas) */
 .btn-primary { @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition; }
 .btn-secondary { @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition; }
 
-/* ====== IMPORTANTE: NO ocultar enlaces en el header ====== */
-/* (Antes tenías algo así y ocultaba tu marca)
-   header a[href="#"] { display: none; }
-*/
-
-/* Contenedor base que usas en las páginas */
+/* Contenedor base */
 .container { @apply mx-auto max-w-6xl; }
 
-/* ---- Sheet / Drawer ajustes suaves ---- */
-[data-state="open"].fixed.inset-0.bg-black\/80 { opacity: 1; }
-div[data-side="left"].fixed { background: #fff; }
-div[data-side="left"].fixed .overflow-y-auto { overscroll-behavior: contain; }
+/* Drawer */
+[data-state="open"].fixed.inset-0.bg-black\/50 { opacity: 1; }
