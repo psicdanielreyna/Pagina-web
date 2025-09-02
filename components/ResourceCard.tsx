@@ -1,35 +1,43 @@
-import Image from "next/image";
+// components/ResourceCard.tsx
 import Link from "next/link";
-import type { Recurso } from "@/types/content";
+import Image from "next/image";
 
-export default function ResourceCard({ r }: { r: Recurso }) {
+interface ResourceCardProps {
+  title: string;
+  description: string;
+  href: string;
+  image?: string;
+}
+
+export default function ResourceCard({
+  title,
+  description,
+  href,
+  image,
+}: ResourceCardProps) {
   return (
-    <Link
-      href={r.href}
-      className="block rounded-2xl border border-slate-100 bg-white hover:bg-slate-50 transition"
-    >
-      <div className="p-6">
-        <div className="mx-auto relative w-[200px] h-[260px]">
+    <div className="rounded-lg shadow-md overflow-hidden border bg-white hover:shadow-lg transition">
+      {image && (
+        <div className="relative w-full h-40">
           <Image
-            src={r.img}
-            alt={r.alt}
+            src={image}
+            alt={title}
             fill
-            className="object-contain"
-            sizes="200px"
-            priority
+            className="object-cover"
+            sizes="100vw"
           />
         </div>
+      )}
+      <div className="p-4">
+        <h3 className="font-semibold text-lg mb-2">{title}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{description}</p>
+        <Link
+          href={href}
+          className="inline-block px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-primary/90 transition"
+        >
+          Ver recurso
+        </Link>
       </div>
-
-      <div className="px-6 pb-6">
-        <h3 className="font-semibold text-slate-900">{r.title}</h3>
-        <p className="mt-1 text-slate-600 text-sm">{r.excerpt}</p>
-        <div className="mt-3">
-          <span className="inline-flex items-center rounded-full border px-3 py-1 text-sm">
-            Leer más
-          </span>
-        </div>
-      </div>
-    </Link>
+    </div>
   );
 }
