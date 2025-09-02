@@ -1,20 +1,20 @@
-// app/layout.tsx
-import type { Metadata } from "next";
 import "./globals.css";
-import SiteHeader from "@/components/SiteHeader"; // ⬅️ usa SOLO este
+import type { Metadata } from "next";
+import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: "Daniel Reyna — Psicólogo",
-  description:
-    "Terapia clara y práctica para sentirte mejor. Herramientas simples que puedes aplicar en tu día a día.",
+  description: "Terapia clara y práctica para sentirte mejor.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
+    <html lang="es-MX">
       <body className="min-h-screen bg-white text-neutral-900 antialiased">
         <SiteHeader />
-        <main className="mx-auto max-w-6xl px-4 sm:px-6">{children}</main>
+        <main>
+          {children}
+        </main>
       </body>
     </html>
   );
