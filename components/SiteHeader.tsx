@@ -56,33 +56,33 @@ export default function SiteHeader() {
     <>
       <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          {/* Barra superior */}
-          <div className="relative flex h-14 items-center justify-between">
+          {/* Grid: [hamburguesa] [marca centrada] [redes] */}
+          <div className="grid h-14 grid-cols-[auto_1fr_auto] items-center">
             {/* IZQ: hamburguesa */}
             <button
               type="button"
               onClick={() => setOpen(true)}
               aria-label="Abrir menú"
-              className="relative z-10 inline-flex items-center justify-center rounded-md p-2 hover:bg-neutral-100"
+              className="inline-flex items-center justify-center rounded-md p-2 hover:bg-neutral-100"
             >
               <svg className="h-6 w-6 text-neutral-800" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" />
               </svg>
             </button>
 
-            {/* CENTRO: marca ABSOLUTA y centrada */}
-            <div className="absolute left-1/2 -translate-x-1/2">
+            {/* CENTRO: marca (siempre visible) */}
+            <div className="justify-self-center">
               <Link
                 href="/"
-                aria-label="Ir al inicio"
                 className="select-none text-sm sm:text-base font-semibold tracking-wide text-neutral-900"
+                aria-label="Ir al inicio"
               >
                 Daniel Reyna — Psicólogo
               </Link>
             </div>
 
-            {/* DER: redes (solo iconos) */}
-            <nav className="relative z-10 flex items-center gap-4 text-neutral-700">
+            {/* DER: redes */}
+            <nav className="flex items-center gap-4 text-neutral-700">
               {SOCIAL.map((s) => (
                 <a
                   key={s.name}
@@ -104,13 +104,11 @@ export default function SiteHeader() {
       {/* OVERLAY + DRAWER */}
       {open && (
         <div className="fixed inset-0 z-50">
-          {/* fondo opaco */}
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
-          {/* panel */}
           <aside className="absolute left-0 top-0 h-full w-80 max-w-[90vw] bg-white shadow-xl">
             <div className="flex items-center justify-between px-4 h-14 border-b">
               <span className="font-medium">Menú</span>
@@ -137,7 +135,6 @@ export default function SiteHeader() {
                 </Link>
               ))}
 
-              {/* Redes en GRID 2xN */}
               <div className="mt-4 border-t pt-4">
                 <p className="px-1 pb-2 text-sm text-neutral-500">Sígueme</p>
                 <div className="grid grid-cols-2 gap-2">
