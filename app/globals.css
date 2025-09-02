@@ -17,3 +17,6 @@
 
 /* Drawer */
 [data-state="open"].fixed.inset-0.bg-black\/50 { opacity: 1; }
+
+/* Drawer: asegúrate de que el panel es opaco y el overlay visible */
+.fixed.inset-0.bg-black\/50 { opacity: 1; }

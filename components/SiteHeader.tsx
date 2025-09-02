@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Instagram, Facebook, Youtube, Menu, X as Close } from "lucide-react";
 
-/** SVG limpio para el logo de X (Twitter) */
+/** SVG propio para el logo de X */
 function XLogo({ className = "w-5 h-5" }: { className?: string }) {
   return (
     <svg
@@ -27,7 +27,7 @@ const socials: Social[] = [
   { name: "Instagram", href: "https://instagram.com/psic.danielreyna", icon: Instagram },
   { name: "Facebook",  href: "https://facebook.com/Psic.danielreyna", icon: Facebook  },
   { name: "YouTube",   href: "https://youtube.com/@Psicdanielreyna", icon: Youtube   },
-  { name: "X",         href: "https://x.com/psicdanreyna",        icon: XLogo     },
+  { name: "X",         href: "https://x.com/psicdanielreyna",        icon: XLogo     },
 ];
 
 const nav = [
@@ -40,10 +40,19 @@ const nav = [
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
 
+  // Bloquear scroll del body cuando el drawer está abierto
+  useEffect(() => {
+    if (open) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [open]);
+
   return (
     <header className="relative border-b bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70">
       <div className="container mx-auto flex h-14 items-center px-4">
-        {/* Izquierda: botón hamburguesa */}
+        {/* Izquierda: hamburguesa */}
         <button
           aria-label="Abrir menú"
           onClick={() => setOpen(true)}
@@ -52,22 +61,22 @@ export default function SiteHeader() {
           <Menu className="h-6 w-6" />
         </button>
 
-        {/* Centro: marca (logo) — centrado absoluto */}
+        {/* Centro: logo (más grande y centrado) */}
         <div className="pointer-events-none absolute left-1/2 -translate-x-1/2">
           <Link href="/" className="pointer-events-auto block" aria-label="Ir al inicio">
             <Image
               src="/logo.png"
               alt="Daniel Reyna - Psicólogo"
-              width={250}     // <- tamaño del logo
-              height={60}
-              className="mx-auto h-auto w-[220px] sm:w-[260px] object-contain"
+              width={300}
+              height={70}
+              className="mx-auto h-auto w-[260px] sm:w-[300px] object-contain"
               priority
             />
           </Link>
         </div>
 
         {/* Derecha: redes */}
-        <nav className="ml-auto flex items-center gap-4">
+        <nav className="ml-auto flex items-center gap-2 sm:gap-4">
           {socials.map(({ name, href, icon: Icon }) => (
             <Link
               key={name}
@@ -84,62 +93,64 @@ export default function SiteHeader() {
         </nav>
       </div>
 
-      {/* Drawer (menú) */}
+      {/* Drawer */}
       {open && (
         <>
-          {/* Fondo */}
+          {/* Fondo (oscurecido) */}
           <button
             aria-label="Cerrar menú"
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           />
-          {/* Panel */}
-          <aside className="fixed left-0 top-0 z-50 h-full w-80 max-w-[90vw] rounded-r-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b px-4 py-3">
-              <span className="text-lg font-medium">Menú</span>
-              <button
-                aria-label="Cerrar menú"
-                onClick={() => setOpen(false)}
-                className="inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100"
-              >
-                <Close className="h-5 w-5" />
-              </button>
-            </div>
-
-            <nav className="px-4 py-3">
-              <ul className="space-y-2">
-                {nav.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setOpen(false)}
-                      className="block rounded-md px-3 py-2 text-base hover:bg-gray-100"
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="my-4 border-t" />
-
-              <p className="px-3 pb-2 text-sm text-gray-500">Sígueme</p>
-              <div className="grid grid-cols-2 gap-2 px-3">
-                {socials.map(({ name, href, icon: Icon }) => (
-                  <Link
-                    key={`drawer-${name}`}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setOpen(false)}
-                    className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-gray-50"
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span>{name}</span>
-                  </Link>
-                ))}
+          {/* Panel blanco 100% sólido */}
+          <aside className="fixed left-0 top-0 z-50 h-full w-80 max-w-[90vw]">
+            <div className="flex h-full w-full flex-col rounded-r-xl bg-white shadow-2xl">
+              <div className="flex items-center justify-between border-b px-4 py-3">
+                <span className="text-lg font-medium">Menú</span>
+                <button
+                  aria-label="Cerrar menú"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100"
+                >
+                  <Close className="h-5 w-5" />
+                </button>
               </div>
-            </nav>
+
+              <nav className="px-4 py-3">
+                <ul className="space-y-2">
+                  {nav.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                        className="block rounded-md px-3 py-2 text-base hover:bg-gray-100"
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="my-4 border-t" />
+
+                <p className="px-3 pb-2 text-sm text-gray-500">Sígueme</p>
+                <div className="grid grid-cols-2 gap-2 px-3">
+                  {socials.map(({ name, href, icon: Icon }) => (
+                    <Link
+                      key={`drawer-${name}`}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setOpen(false)}
+                      className="inline-flex items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </nav>
+            </div>
           </aside>
         </>
       )}
