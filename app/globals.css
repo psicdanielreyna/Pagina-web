@@ -20,3 +20,17 @@
 
 /* Drawer: asegúrate de que el panel es opaco y el overlay visible */
 .fixed.inset-0.bg-black\/50 { opacity: 1; }
+
+/* ==== Forzar menú hamburguesa sólido ==== */
+[data-state="open"].fixed.inset-0.bg-black\/80 {
+  background: rgba(0, 0, 0, 0.5); /* overlay oscuro */
+}
+
+div[data-side="left"].fixed {
+  background-color: #ffffff !important; /* menú blanco */
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* sombra lateral */
+}
+
+div[data-side="left"].fixed .overflow-y-auto {
+  overscroll-behavior: contain;
+}
