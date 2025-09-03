@@ -2,35 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Utilidades opcionales */
+/* ========== UTILIDADES PERSONALIZADAS ========== */
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  /* Ocultar scrollbars cuando se use la clase no-scrollbar */
+  .no-scrollbar::-webkit-scrollbar { 
+    display: none; 
+  }
+  .no-scrollbar { 
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+  }
 }
 
-/* Botones de ejemplo (si los usas) */
-.btn-primary { @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition; }
-.btn-secondary { @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition; }
-
-/* Contenedor base */
-.container { @apply mx-auto max-w-6xl; }
-
-/* Drawer */
-[data-state="open"].fixed.inset-0.bg-black\/50 { opacity: 1; }
-
-/* Drawer: asegúrate de que el panel es opaco y el overlay visible */
-.fixed.inset-0.bg-black\/50 { opacity: 1; }
-
-/* ==== Forzar menú hamburguesa sólido ==== */
-[data-state="open"].fixed.inset-0.bg-black\/80 {
-  background: rgba(0, 0, 0, 0.5); /* overlay oscuro */
+/* ========== BOTONES ========== */
+.btn-primary { 
+  @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition; 
+}
+.btn-secondary { 
+  @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition; 
 }
 
-div[data-side="left"].fixed {
-  background-color: #ffffff !important; /* menú blanco */
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* sombra lateral */
+/* ========== CONTENEDORES ========== */
+.container { 
+  @apply mx-auto max-w-6xl; 
 }
 
-div[data-side="left"].fixed .overflow-y-auto {
-  overscroll-behavior: contain;
+/* ========== AJUSTES DE HEADER Y DRAWER ========== */
+/* El header siempre arriba */
+header.sticky { 
+  z-index: 60; 
+}
+
+/* Overlay negro al abrir menú */
+[data-state="open"].fixed.inset-0.bg-black\/80 { 
+  opacity: 1; 
+}
+
+/* Drawer lateral izquierdo */
+div[data-side="left"].fixed { 
+  background: #fff; 
+}
+
+/* Control del scroll dentro del drawer */
+div[data-side="left"].fixed .overflow-y-auto { 
+  overscroll-behavior: contain; 
 }
