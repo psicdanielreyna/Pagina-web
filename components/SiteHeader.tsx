@@ -16,7 +16,7 @@ const socials = [
   { name: "Instagram", href: "https://instagram.com/psic.danielreyna", icon: Instagram },
   { name: "Facebook",  href: "https://facebook.com/psic.danielreyna", icon: Facebook },
   { name: "YouTube",   href: "https://youtube.com/@Psicdanielreyna", icon: Youtube },
-  { name: "X",         href: "https://x.com/psicdanielreyna", icon: Twitter }, // si usas X ícono, cambia aquí
+  { name: "X",         href: "https://x.com/psicdanreyna", icon: Twitter }, // si usas X ícono, cambia aquí
 ];
 
 export default function SiteHeader() {
