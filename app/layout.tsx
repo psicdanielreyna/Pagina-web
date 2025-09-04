@@ -1,3 +1,4 @@
+// app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -9,8 +10,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Daniel Reyna — Psicólogo",
   description: "Terapia clara y práctica para sentirte mejor.",
+  // ✅ Next 13+ ya detecta app/icon.png automáticamente
   icons: {
-    icon: "/favicon.ico", // asegúrate que favicon.ico o favicon.png esté en /public
+    icon: "/favicon.ico", // fallback
+    shortcut: "/favicon.png",
+    apple: "/apple-touch-icon.png", // lo usaremos para iOS
   },
 };
 
@@ -22,9 +26,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        {/* Si quieres compatibilidad extra, puedes agregar: */}
+        {/* Compatibilidad extra (opcional) */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className={`${inter.className} bg-white text-neutral-900`}>
         <SiteHeader />
