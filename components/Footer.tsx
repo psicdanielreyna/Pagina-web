@@ -34,7 +34,7 @@ const SOCIAL = [
   },
   {
     label: "X",
-    href: "https://x.com/psicdanielreyna",
+    href: "https://x.com/psicdanreyna",
     Icon: FaXTwitter,
   },
 ];
