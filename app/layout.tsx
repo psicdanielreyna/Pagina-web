@@ -29,7 +29,7 @@ export default function RootLayout({
         {/* Compatibilidad extra (opcional) */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" href="/favicon.png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
       </head>
       <body className={`${inter.className} bg-white text-neutral-900`}>
         <SiteHeader />
