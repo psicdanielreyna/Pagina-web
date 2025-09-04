@@ -10,11 +10,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Daniel Reyna — Psicólogo",
   description: "Terapia clara y práctica para sentirte mejor.",
-  // ✅ Next 13+ ya detecta app/icon.png automáticamente
   icons: {
-    icon: "/favicon.ico", // fallback
-    shortcut: "/favicon.png",
-    apple: "/apple-touch-icon.png", // lo usaremos para iOS
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/favicon.png", type: "image/png" }, // respaldo
+    ],
   },
 };
 
