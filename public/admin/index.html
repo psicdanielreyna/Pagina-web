@@ -4,13 +4,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Decap CMS</title>
-    <!-- Evita problemas de caché -->
-    <meta http-equiv="Cache-Control" content="no-store" />
+
+    <!-- Decap CMS -->
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+
+    <!-- Netlify Identity widget (necesario para login, confirm y recovery) -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
   <body>
-    <!-- Decap CMS montará aquí su UI -->
-
-    <!-- Cargar Decap justo al final del body -->
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script>
+      // Si llega con #recovery_token, abre el modal para fijar contraseña
+      (function () {
+        const hash = window.location.hash || "";
+        function handle() {
+          if (window.netlifyIdentity) {
+            // init (carga estado actual)
+            window.netlifyIdentity.init();
+            if (hash.includes("recovery_token=")) {
+              window.netlifyIdentity.open("recovery");
+            }
+          }
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", handle);
+        } else {
+          handle();
+        }
+      })();
+    </script>
   </body>
 </html>
