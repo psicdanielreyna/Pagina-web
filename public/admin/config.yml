@@ -1,9 +1,6 @@
 backend:
-  name: github
-  repo: https://github.com/psicdanielreyna/Pagina-web # <--- reemplaza con tu usuario/repo exacto
+  name: git-gateway
   branch: main
-  auth_scope: repo
-  site_domain: danielreyna.com
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
