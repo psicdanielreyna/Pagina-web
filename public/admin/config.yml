@@ -5,6 +5,9 @@ backend:
 site_url: https://danielreyna.com
 logo_url: https://danielreyna.com/logo.png
 
+# opcional: flujo con borradores y revisiones
+publish_mode: editorial_workflow
+
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
@@ -18,4 +21,5 @@ collections:
     fields:
       - { label: "Título", name: "title", widget: "string" }
       - { label: "Fecha", name: "date", widget: "datetime" }
+      - { label: "Descripción (SEO)", name: "description", widget: "string", required: false }
       - { label: "Contenido", name: "body", widget: "markdown" }
