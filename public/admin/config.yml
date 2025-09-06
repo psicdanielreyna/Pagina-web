@@ -1,12 +1,32 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin</title>
-    <!-- Versión recomendada de Decap CMS desde CDN -->
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  </head>
-  <body>
-  </body>
-</html>
+# public/admin/config.yml
+backend:
+  name: git-gateway
+  branch: main     # tu rama por defecto
+
+local_backend: true
+
+site_url: https://danielreyna.com      # tu dominio/Netlify principal
+display_url: https://danielreyna.com
+logo_url: /logo.png
+
+media_folder: "public/images/uploads"   # dónde se guardan los archivos en el repo
+public_folder: "/images/uploads"        # cómo se referencian en el sitio
+
+collections:
+  - name: "blog"
+    label: "Blog"
+    label_singular: "Entrada"
+    folder: "content/blog"
+    create: true
+    slug: "{{slug}}"
+    preview_path: "blog/{{slug}}"
+    extension: "mdx"
+    fields:
+      - { name: "title", label: "Título", widget: "string" }
+      - { name: "date", label: "Fecha", widget: "datetime" }
+      - { name: "excerpt", label: "Resumen", widget: "text", hint: "2–3 líneas" }
+      - { name: "cover", label: "Imagen de portada", widget: "image", required: false }
+      - { name: "tags", label: "Etiquetas", widget: "list", required: false }
+      - label: "Contenido"
+        name: "body"
+        widget: "markdown"
