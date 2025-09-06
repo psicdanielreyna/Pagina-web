@@ -1,22 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
   <head>
     <meta charset="utf-8" />
-    <title>Content Manager</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Decap CMS</title>
+    <!-- Evita problemas de caché cuando estás probando -->
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <!-- Carga Decap desde unpkg -->
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   </head>
   <body>
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on("init", (user) => {
-          if (!user) {
-            window.netlifyIdentity.on("login", () => {
-              document.location.href = "/admin/";
-            });
-          }
-        });
-      }
-    </script>
+    <!-- Decap se monta solo -->
   </body>
 </html>
