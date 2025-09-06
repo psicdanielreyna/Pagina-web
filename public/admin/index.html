@@ -1,36 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Decap CMS</title>
+    <meta http-equiv="Cache-Control" content="no-store" />
 
-    <!-- Decap CMS -->
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <!-- Decap CMS (defer para que espere a <body>) -->
+    <script defer src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 
-    <!-- Netlify Identity widget (necesario para login, confirm y recovery) -->
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <!-- Netlify Identity widget (para login/reset) -->
+    <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
   <body>
     <script>
-      // Si llega con #recovery_token, abre el modal para fijar contraseña
-      (function () {
-        const hash = window.location.hash || "";
-        function handle() {
-          if (window.netlifyIdentity) {
-            // init (carga estado actual)
-            window.netlifyIdentity.init();
-            if (hash.includes("recovery_token=")) {
-              window.netlifyIdentity.open("recovery");
-            }
+      // Arrancamos cuando todo ya cargó
+      window.addEventListener("load", () => {
+        if (window.netlifyIdentity) {
+          // Forzamos español si quieres
+          netlifyIdentity.init({ locale: "es" });
+
+          // Si vienes desde el correo con #recovery_token=...
+          const hash = window.location.hash.startsWith("#")
+            ? window.location.hash.slice(1)
+            : "";
+          const params = new URLSearchParams(hash);
+          const recovery = params.get("recovery_token");
+          if (recovery) {
+            // Abre el modal de recuperación
+            netlifyIdentity.recover(recovery, true);
           }
         }
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", handle);
-        } else {
-          handle();
-        }
-      })();
+      });
     </script>
   </body>
 </html>
