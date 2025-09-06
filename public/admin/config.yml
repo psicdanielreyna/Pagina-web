@@ -1,9 +1,12 @@
 backend:
-  name: git-gateway
-  branch: main # Rama principal de tu repo
+  name: github
+  repo: https://github.com/psicdanielreyna/Pagina-web # <--- reemplaza con tu usuario/repo exacto
+  branch: main
+  auth_scope: repo
+  site_domain: danielreyna.com
 
-media_folder: "public/uploads" # Carpeta donde se suben imágenes
-public_folder: "/uploads"      # Cómo se accede a esas imágenes desde el frontend
+media_folder: "public/uploads"
+public_folder: "/uploads"
 
 collections:
   - name: "blog"
@@ -12,28 +15,7 @@ collections:
     create: true
     slug: "{{slug}}"
     format: "frontmatter"
-    extension: "md"
     fields:
-      - { name: "title", label: "Título", widget: "string" }
-      - { name: "date", label: "Fecha", widget: "datetime" }
-      - { name: "description", label: "Descripción", widget: "text" }
-      - { name: "image", label: "Imagen destacada", widget: "image", required: false }
-      - { name: "body", label: "Contenido", widget: "markdown" }
-
-  - name: "pages"
-    label: "Páginas"
-    files:
-      - file: "content/pages/sobre-mi.md"
-        label: "Sobre mí"
-        name: "sobre-mi"
-        format: "frontmatter"
-        fields:
-          - { name: "title", label: "Título", widget: "string" }
-          - { name: "body", label: "Contenido", widget: "markdown" }
-      - file: "content/pages/contacto.md"
-        label: "Contacto"
-        name: "contacto"
-        format: "frontmatter"
-        fields:
-          - { name: "title", label: "Título", widget: "string" }
-          - { name: "body", label: "Contenido", widget: "markdown" }
+      - { label: "Título", name: "title", widget: "string" }
+      - { label: "Fecha", name: "date", widget: "datetime" }
+      - { label: "Contenido", name: "body", widget: "markdown" }
