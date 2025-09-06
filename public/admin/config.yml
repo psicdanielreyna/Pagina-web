@@ -18,6 +18,4 @@ collections:
     fields:
       - { label: "Título", name: "title", widget: "string" }
       - { label: "Fecha", name: "date", widget: "datetime" }
-      - { label: "Contenido", name: "body", widget: "markdown" }git add public/admin/index.html public/admin/config.yml
-git commit -m "fix(cms): load Decap CMS script correctly"
-git push origin main
+      - { label: "Contenido", name: "body", widget: "markdown" }
