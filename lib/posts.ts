@@ -1,26 +1,23 @@
+// lib/posts.ts
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { remark } from "remark";
-import html from "remark-html";
-
-const POSTS_DIR = path.join(process.cwd(), "content", "blog");
+import remarkHtml from "remark-html";
+import remarkGfm from "remark-gfm";
 
 export type PostMeta = {
   slug: string;
   title: string;
-  date: string; // ISO o YYYY-MM-DD
+  date: string;           // ISO string en el frontmatter
+  description?: string;   // opcional
+  image?: string;         // opcional (ruta absoluta o /uploads/…)
 };
 
-function mdPathFor(slug: string): string | null {
-  const md = path.join(POSTS_DIR, `${slug}.md`);
-  const mdx = path.join(POSTS_DIR, `${slug}.mdx`);
-  if (fs.existsSync(md)) return md;
-  if (fs.existsSync(mdx)) return mdx;
-  return null;
-}
+const POSTS_DIR = path.join(process.cwd(), "content", "blog");
 
-export function getAllSlugs(): string[] {
+// Lee todos los archivos .md (o .mdx si cambias la extensión)
+function getAllSlugs(): string[] {
   if (!fs.existsSync(POSTS_DIR)) return [];
   return fs
     .readdirSync(POSTS_DIR)
@@ -28,48 +25,61 @@ export function getAllSlugs(): string[] {
     .map((f) => f.replace(/\.mdx?$/, ""));
 }
 
-export function getPostMeta(slug: string): PostMeta | null {
-  const filePath = mdPathFor(slug);
-  if (!filePath) return null;
+function getPostMeta(slug: string): PostMeta | null {
+  const fullPathMd = path.join(POSTS_DIR, `${slug}.md`);
+  const fullPathMdx = path.join(POSTS_DIR, `${slug}.mdx`);
+  const fullPath = fs.existsSync(fullPathMd) ? fullPathMd : fullPathMdx;
 
-  const { data } = matter.read(filePath);
-  const date =
-    data.date instanceof Date ? data.date.toISOString() : (data.date ?? "");
+  if (!fs.existsSync(fullPath)) return null;
+
+  const file = fs.readFileSync(fullPath, "utf-8");
+  const { data } = matter(file);
+
+  // title y date son lo mínimo para listar; si falta title, descartamos
+  if (!data?.title) return null;
 
   return {
     slug,
-    title: data.title ?? slug,
-    date,
+    title: String(data.title),
+    date: data.date ? String(data.date) : "",
+    description: data.description ? String(data.description) : undefined,
+    image: data.image ? String(data.image) : undefined,
   };
 }
 
-export function getAllPostsMeta(): PostMeta[] {
+export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
     .map(getPostMeta)
-    .filter((v): v is PostMeta => Boolean(v))
+    .filter((m): m is PostMeta => Boolean(m))
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-export async function getPostHtml(
-  slug: string
-): Promise<{ meta: PostMeta; html: string }> {
-  const filePath = mdPathFor(slug);
-  if (!filePath) {
-    throw new Error(`Post not found: ${slug}`);
+export async function getPostHtml(slug: string): Promise<{
+  meta: PostMeta;
+  html: string;
+}> {
+  const fullPathMd = path.join(POSTS_DIR, `${slug}.md`);
+  const fullPathMdx = path.join(POSTS_DIR, `${slug}.mdx`);
+  const fullPath = fs.existsSync(fullPathMd) ? fullPathMd : fullPathMdx;
+
+  if (!fs.existsSync(fullPath)) {
+    throw new Error(`No existe el post: ${slug}`);
   }
 
-  const file = fs.readFileSync(filePath, "utf8");
+  const file = fs.readFileSync(fullPath, "utf-8");
   const { data, content } = matter(file);
-
-  const processed = await remark().use(html).process(content);
-  const htmlString = processed.toString();
 
   const meta: PostMeta = {
     slug,
-    title: data.title ?? slug,
-    date:
-      data.date instanceof Date ? data.date.toISOString() : (data.date ?? ""),
+    title: String(data.title ?? ""),
+    date: data.date ? String(data.date) : "",
+    description: data.description ? String(data.description) : undefined,
+    image: data.image ? String(data.image) : undefined,
   };
 
-  return { meta, html: htmlString };
+  // Convierte Markdown → HTML (con tablas, listas, etc. de GFM)
+  const processed = await remark().use(remarkGfm).use(remarkHtml).process(content);
+  const html = processed.toString();
+
+  return { meta, html };
 }
