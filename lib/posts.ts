@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { marked } from "marked";
 
 export type PostMeta = {
   slug: string;
@@ -11,55 +12,60 @@ export type PostMeta = {
   image?: string | null;
 };
 
-const POSTS_DIR = path.join(process.cwd(), "content", "blog");
+const BLOG_DIR = path.join(process.cwd(), "content", "blog");
+
+function readPost(slug: string) {
+  const filePath = path.join(BLOG_DIR, `${slug}.md`);
+  const file = fs.readFileSync(filePath, "utf-8");
+  return matter(file); // { data, content }
+}
 
 export function getAllSlugs(): string[] {
+  if (!fs.existsSync(BLOG_DIR)) return [];
   return fs
-    .readdirSync(POSTS_DIR)
-    .filter((f) => f.endsWith(".md") || f.endsWith(".mdx"))
-    .map((f) => f.replace(/\.mdx?$/, ""));
+    .readdirSync(BLOG_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => f.replace(/\.md$/, ""));
 }
 
 export function getPostMeta(slug: string): PostMeta | null {
-  const fp = path.join(POSTS_DIR, `${slug}.md`);
-  if (!fs.existsSync(fp)) return null;
+  const { data } = readPost(slug);
 
-  const { data } = matter(fs.readFileSync(fp, "utf8"));
-
-  // Normaliza fecha: acepta ISO con hora y devuelve YYYY-MM-DD
-  const iso = data?.date ? new Date(String(data.date)) : null;
-  const date = iso && !isNaN(iso.getTime())
-    ? iso.toISOString().slice(0, 10)
-    : "1970-01-01";
+  if (!data?.title || !data?.date) {
+    return null;
+  }
 
   return {
     slug,
-    title: data?.title ?? slug,
-    date,
-    description: data?.description ?? "",
-    image: data?.image ? String(data.image) : null,
+    title: String(data.title),
+    date: String(data.date),
+    description: data.description ? String(data.description) : undefined,
+    image: data.image ? String(data.image) : null,
   };
 }
 
-export function getPostsMeta(): PostMeta[] {
+export function getAllPosts(): PostMeta[] {
   return getAllSlugs()
     .map(getPostMeta)
-    .filter(Boolean) as PostMeta[]
+    .filter((p): p is PostMeta => Boolean(p))
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-export async function getPostHtml(slug: string): Promise<{
-  meta: PostMeta;
-  html: string;
-}> {
-  const fp = path.join(POSTS_DIR, `${slug}.md`);
-  if (!fs.existsSync(fp)) throw new Error(`Post not found: ${slug}`);
+export async function getPostHtml(
+  slug: string
+): Promise<PostMeta & { html: string; content: string }> {
+  const { data, content } = readPost(slug);
 
-  const raw = fs.readFileSync(fp, "utf8");
-  const { content } = matter(raw);
-  const meta = getPostMeta(slug);
-  if (!meta) throw new Error(`Invalid front-matter: ${slug}`);
+  const meta: PostMeta = {
+    slug,
+    title: String(data?.title ?? slug),
+    date: String(data?.date ?? ""),
+    description: data?.description ? String(data.description) : undefined,
+    image: data?.image ? String(data.image) : null,
+  };
 
-  // Si usas remark/rehype, deja tu pipeline aquí; por ahora, devolvemos tal cual:
-  return { meta, html: content };
+  // Markdown → HTML
+  const html = marked.parse(content) as string;
+
+  return { ...meta, html, content };
 }
