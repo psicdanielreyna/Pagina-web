@@ -24,3 +24,23 @@ div[data-side="left"].fixed .overflow-y-auto { overscroll-behavior: contain; }
 .prose { @apply prose-neutral max-w-none; }
 .prose a { @apply underline; }
 .prose img { @apply rounded-xl; }
+
+/* ===== BLOG: limitar ancho de imágenes ===== */
+.post-content img {
+  display: block;
+  margin: 1.25rem auto;        /* centradas y con espacio vertical */
+  width: 100%;                  /* responsive */
+  max-width: 960px;             /* <- tope de ancho real de la foto */
+  height: auto;
+  border-radius: 0.75rem;       /* esquinas redondeadas */
+}
+
+/* Opcional: que los iframes/videos también respeten un ancho razonable */
+.post-content iframe,
+.post-content video {
+  display: block;
+  margin: 1.25rem auto;
+  max-width: 960px;
+  width: 100%;
+  border-radius: 0.5rem;
+}
