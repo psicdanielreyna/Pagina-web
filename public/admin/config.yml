@@ -3,26 +3,20 @@ backend:
   branch: main
 
 site_url: https://danielreyna.com
-logo_url: /logo.png
+logo_url: https://danielreyna.com/logo.png
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
-publish_mode: editorial_workflow  # permite "Draft / In review / Ready"
-
 collections:
   - name: "blog"
     label: "Blog"
-    label_singular: "Entrada"
     folder: "content/blog"
     create: true
     slug: "{{slug}}"
     format: "frontmatter"
-    sortable_fields: ["date", "title"]
-    summary: "{{title}} — {{day}}/{{month}}/{{year}}"
     fields:
       - { label: "Título", name: "title", widget: "string" }
-      - { label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
-      - { label: "Descripción (SEO)", name: "description", widget: "text", hint: "Resumen corto para listados y meta description" }
+      - { label: "Fecha", name: "date", widget: "datetime" }
       - { label: "Imagen destacada", name: "image", widget: "image", allow_multiple: false }
       - { label: "Contenido", name: "body", widget: "markdown" }
