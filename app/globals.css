@@ -2,48 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ========== UTILIDADES PERSONALIZADAS ========== */
+/* ===== Utilidades ===== */
 @layer utilities {
-  /* Ocultar scrollbars cuando se use la clase no-scrollbar */
-  .no-scrollbar::-webkit-scrollbar { 
-    display: none; 
-  }
-  .no-scrollbar { 
-    -ms-overflow-style: none; 
-    scrollbar-width: none; 
-  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
-/* ========== BOTONES ========== */
-.btn-primary { 
-  @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition; 
-}
-.btn-secondary { 
-  @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition; 
-}
+/* Botones base */
+.btn-primary { @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition; }
+.btn-secondary { @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition; }
 
-/* ========== CONTENEDORES ========== */
-.container { 
-  @apply mx-auto max-w-6xl; 
-}
+/* Contenedor base */
+.container { @apply mx-auto max-w-6xl; }
 
-/* ========== AJUSTES DE HEADER Y DRAWER ========== */
-/* El header siempre arriba */
-header.sticky { 
-  z-index: 60; 
-}
+/* Sheet / Drawer (hamburguesa) */
+[data-state="open"].fixed.inset-0.bg-black\/80 { opacity: 1; }
+div[data-side="left"].fixed { background: #fff; }
+div[data-side="left"].fixed .overflow-y-auto { overscroll-behavior: contain; }
 
-/* Overlay negro al abrir menú */
-[data-state="open"].fixed.inset-0.bg-black\/80 { 
-  opacity: 1; 
-}
-
-/* Drawer lateral izquierdo */
-div[data-side="left"].fixed { 
-  background: #fff; 
-}
-
-/* Control del scroll dentro del drawer */
-div[data-side="left"].fixed .overflow-y-auto { 
-  overscroll-behavior: contain; 
-}
+/* Prosa (contenido del blog) */
+.prose { @apply prose-neutral max-w-none; }
+.prose a { @apply underline; }
+.prose img { @apply rounded-xl; }

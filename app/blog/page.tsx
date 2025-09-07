@@ -1,61 +1,28 @@
-// app/blog/page.tsx
 import Link from "next/link";
-import Image from "next/image";
-import { getAllPosts } from "@/lib/posts";
+import { getPostsMeta } from "@/lib/posts";
 
-export default async function BlogIndex() {
-  const posts = await getAllPosts();
+export const revalidate = 60; // ISR: rehidrata cada minuto
 
-  if (posts.length === 0) {
-    return (
-      <div className="container max-w-3xl mx-auto px-4 py-10">
-        <h1 className="text-3xl font-bold">Blog</h1>
-        <p className="text-muted-foreground mt-2">Próximamente…</p>
-      </div>
-    );
-  }
+export default function BlogIndex() {
+  const posts = getPostsMeta();
 
   return (
-    <div className="container max-w-3xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold">Blog</h1>
-      <p className="text-muted-foreground mt-2">
-        Lecturas breves y aplicables para sentirte mejor.
-      </p>
+    <main className="container mx-auto max-w-4xl px-4 py-12">
+      <h1 className="text-3xl font-bold mb-6">Blog</h1>
 
-      <ul className="mt-8 space-y-6">
+      {posts.length === 0 && <p>No hay publicaciones aún.</p>}
+
+      <ul className="space-y-6">
         {posts.map((p) => (
-          <li key={p.slug} className="rounded-lg bg-muted/30 p-4 hover:bg-muted/50">
+          <li key={p.slug} className="border rounded-xl p-5 hover:shadow-sm">
             <Link href={`/blog/${p.slug}`} className="block">
-              <div className="flex items-center gap-4">
-                {p.cover ? (
-                  <Image
-                    src={p.cover}
-                    alt=""
-                    width={72}
-                    height={72}
-                    className="rounded-md object-cover"
-                  />
-                ) : null}
-                <div>
-                  <h2 className="font-semibold">{p.title}</h2>
-                  {p.date && (
-                    <p className="text-xs text-muted-foreground">
-                      {new Intl.DateTimeFormat("es-MX", { dateStyle: "medium" }).format(
-                        new Date(p.date)
-                      )}
-                    </p>
-                  )}
-                  {p.excerpt && (
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {p.excerpt}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <h2 className="text-xl font-semibold">{p.title}</h2>
+              <p className="text-sm text-neutral-500">{new Date(p.date).toLocaleDateString("es-MX")}</p>
+              {p.description && <p className="mt-2 text-neutral-700">{p.description}</p>}
             </Link>
           </li>
         ))}
       </ul>
-    </div>
+    </main>
   );
 }

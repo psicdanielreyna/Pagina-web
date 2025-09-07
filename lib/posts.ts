@@ -1,67 +1,72 @@
-// lib/posts.ts
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import matter from "gray-matter";
+import { remark } from "remark";
+import html from "remark-html";
 
 export type PostMeta = {
-  title: string;
   slug: string;
-  date?: string;
-  excerpt?: string;
-  /** ✅ para la imagen de portada opcional */
-  cover?: string;
+  title: string;
+  date: string;
+  description?: string;
+  image?: string;
 };
 
-const POSTS_DIR = path.join(process.cwd(), "content", "posts");
+const postsDir = path.join(process.cwd(), "content", "blog");
 
-export async function getAllPosts(): Promise<PostMeta[]> {
-  const files = await fs.readdir(POSTS_DIR);
-
-  const posts = await Promise.all(
-    files
-      .filter((f) => f.endsWith(".md") || f.endsWith(".mdx"))
-      .map(async (filename) => {
-        const filePath = path.join(POSTS_DIR, filename);
-        const raw = await fs.readFile(filePath, "utf8");
-        const { data } = matter(raw);
-
-        const slug = filename.replace(/\.mdx?$/, "");
-
-        return {
-          title: data.title ?? slug,
-          slug,
-          date: data.date ?? undefined,
-          excerpt: data.excerpt ?? undefined,
-          /** ✅ traer cover del front-matter si existe */
-          cover: data.cover ?? undefined,
-        } as PostMeta;
-      })
-  );
-
-  // orden por fecha desc (si falta date, va al final)
-  const toTime = (d?: string) => (d ? new Date(d).getTime() : 0);
-  return posts.sort((a, b) => (toTime(a.date) < toTime(b.date) ? 1 : -1));
+export function getAllSlugs(): string[] {
+  if (!fs.existsSync(postsDir)) return [];
+  return fs
+    .readdirSync(postsDir)
+    .filter((f) => f.endsWith(".md") || f.endsWith(".mdx"))
+    .map((f) => f.replace(/\.mdx?$/, ""));
 }
 
-export async function getPostBySlug(slug: string) {
-  const mdxPath = path.join(POSTS_DIR, `${slug}.mdx`);
-  const mdPath = path.join(POSTS_DIR, `${slug}.md`);
+export function getPostMeta(slug: string): PostMeta | null {
+  const full = path.join(postsDir, `${slug}.md`);
+  const fullMdx = path.join(postsDir, `${slug}.mdx`);
+  const filepath = fs.existsSync(full) ? full : fs.existsSync(fullMdx) ? fullMdx : null;
+  if (!filepath) return null;
 
-  const filePath = await fs
-    .stat(mdxPath)
-    .then(() => mdxPath)
-    .catch(() => mdPath);
+  const raw = fs.readFileSync(filepath, "utf8");
+  const { data } = matter(raw);
+  return {
+    slug,
+    title: data.title ?? slug,
+    date: data.date ?? "",
+    description: data.description ?? "",
+    image: data.image ?? "",
+  };
+}
 
-  const raw = await fs.readFile(filePath, "utf8");
+export function getPostsMeta(): PostMeta[] {
+  return getAllSlugs()
+    .map(getPostMeta)
+    .filter(Boolean) as PostMeta[]
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
+export async function getPostHtml(slug: string): Promise<{
+  meta: PostMeta;
+  html: string;
+}> {
+  const full = path.join(postsDir, `${slug}.md`);
+  const fullMdx = path.join(postsDir, `${slug}.mdx`);
+  const filepath = fs.existsSync(full) ? full : fs.existsSync(fullMdx) ? fullMdx : null;
+  if (!filepath) throw new Error(`Post not found: ${slug}`);
+
+  const raw = fs.readFileSync(filepath, "utf8");
   const { data, content } = matter(raw);
+  const processed = await remark().use(html).process(content);
+  const contentHtml = processed.toString();
 
   const meta: PostMeta = {
-    title: data.title ?? slug,
     slug,
-    date: data.date ?? undefined,
-    excerpt: data.excerpt ?? undefined,
-    cover: data.cover ?? undefined, // ✅
+    title: data.title ?? slug,
+    date: data.date ?? "",
+    description: data.description ?? "",
+    image: data.image ?? "",
   };
 
-  return { meta, content };
+  return { meta, html: contentHtml };
 }
