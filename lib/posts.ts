@@ -20,36 +20,33 @@ export function getAllSlugs(): string[] {
     .map((f) => f.replace(/\.md$/, ""));
 }
 
-// — helpers para comparar slugs con/ sin acentos/URL encoding
+// ---------- helpers de slug ----------
 const normalize = (s: string) =>
   s
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // quita diacríticos
-    .replace(/[^\w-]+/g, "-")        // espacios y signos → guiones
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w-]+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
 
 function findFilenameForSlug(slug: string): string | null {
   const files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md"));
-  const baseSlugs = files.map((f) => f.replace(/\.md$/, ""));
-
+  const base = files.map((f) => f.replace(/\.md$/, ""));
   const wanted = decodeURIComponent(slug);
 
-  // 1) match directo
-  let i = baseSlugs.findIndex((s) => s === wanted);
+  let i = base.findIndex((s) => s === wanted);
   if (i !== -1) return files[i];
 
-  // 2) match contra URL-encoded
-  i = baseSlugs.findIndex((s) => encodeURIComponent(s) === slug);
+  i = base.findIndex((s) => encodeURIComponent(s) === slug);
   if (i !== -1) return files[i];
 
-  // 3) match normalizado
   const wantedNorm = normalize(wanted);
-  i = baseSlugs.findIndex((s) => normalize(s) === wantedNorm);
+  i = base.findIndex((s) => normalize(s) === wantedNorm);
   if (i !== -1) return files[i];
 
   return null;
 }
+// -------------------------------------
 
 export function getPostMeta(slug: string): PostMeta | null {
   const filename = findFilenameForSlug(slug);
@@ -69,9 +66,9 @@ export function getPostMeta(slug: string): PostMeta | null {
 
 export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
-    .map(getPostMeta)
+    .map((s) => getPostMeta(s))
     .filter(Boolean) as PostMeta[]
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+    .sort((a: PostMeta, b: PostMeta) => (a.date < b.date ? 1 : -1));
 }
 
 export async function getPostHtml(
@@ -94,5 +91,5 @@ export async function getPostHtml(
   return { meta, content };
 }
 
-// alias para imports antiguos
+// Alias por compatibilidad con imports antiguos
 export { getPostsMeta as getAllPosts };
