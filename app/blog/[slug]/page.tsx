@@ -1,10 +1,11 @@
-import { getAllSlugs, getPostHtml } from "@/lib/posts";
+import { getPostsMeta, getPostHtml } from "@/lib/posts";
 import type { Metadata } from "next";
 
 type Props = { params: { slug: string } };
 
 export async function generateStaticParams() {
-  return getAllSlugs().map((slug) => ({ slug }));
+  const meta = getPostsMeta();
+  return meta.map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -15,7 +16,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: meta.title,
       description: meta.description,
-      images: meta.image ? [{ url: meta.image }] : [],
+      images: meta.image ? [meta.image] : undefined,
+      type: "article",
     },
   };
 }
@@ -24,15 +26,17 @@ export default async function BlogPostPage({ params }: Props) {
   const { meta, html } = await getPostHtml(params.slug);
 
   return (
-    <main className="container mx-auto max-w-3xl px-4 py-12">
-      <article>
-        <h1 className="text-3xl font-bold mb-2">{meta.title}</h1>
-        <p className="text-sm text-neutral-500 mb-8">
-          {meta.date ? new Date(meta.date).toLocaleDateString("es-MX") : null}
-        </p>
-        {/* eslint-disable-next-line react/no-danger */}
-        <div className="prose prose-neutral max-w-none" dangerouslySetInnerHTML={{ __html: html }} />
-      </article>
-    </main>
+    <article className="container mx-auto px-4 py-10 prose prose-neutral max-w-3xl">
+      <h1>{meta.title}</h1>
+      {meta.description && <p className="lead">{meta.description}</p>}
+      {meta.image && (
+        <img
+          src={meta.image}
+          alt={meta.title}
+          className="rounded-2xl w-full my-6"
+        />
+      )}
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+    </article>
   );
 }
