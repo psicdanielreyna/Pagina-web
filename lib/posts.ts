@@ -3,69 +3,85 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 
+/** Dónde viven los posts en Markdown */
+const POSTS_DIR = path.join(process.cwd(), "content", "blog");
+
+/** Tipo de metadatos que usamos en la app */
 export type PostMeta = {
   slug: string;
   title: string;
-  date: string;          // YYYY-MM-DD o ISO
+  date: string;           // ISO YYYY-MM-DD o similar
   description?: string;
-  image?: string | null;
+  image?: string | null;  // ruta pública (ej. /uploads/...)
 };
 
-const BLOG_DIR = path.join(process.cwd(), "content", "blog");
-
-function readFile(slug: string) {
-  const file = path.join(BLOG_DIR, `${slug}.md`);
-  return fs.readFileSync(file, "utf8");
-}
-
+/** Lee todos los archivos .md / .mdx y devuelve sus slugs (sin extensión) */
 export function getAllSlugs(): string[] {
-  if (!fs.existsSync(BLOG_DIR)) return [];
-  return fs
-    .readdirSync(BLOG_DIR)
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => f.replace(/\.md$/, ""));
+  if (!fs.existsSync(POSTS_DIR)) return [];
+  const files = fs.readdirSync(POSTS_DIR);
+  return files
+    .filter((f) => f.endsWith(".md") || f.endsWith(".mdx"))
+    .map((f) => f.replace(/\.mdx?$/, ""));
 }
 
+/** Lee un archivo de post por slug y devuelve { content, data(frontmatter) } */
+function getPostContent(slug: string): { content: string; data: Record<string, any> } {
+  const mdPath = path.join(POSTS_DIR, `${slug}.md`);
+  const mdxPath = path.join(POSTS_DIR, `${slug}.mdx`);
+
+  let filePath = "";
+  if (fs.existsSync(mdPath)) filePath = mdPath;
+  else if (fs.existsSync(mdxPath)) filePath = mdxPath;
+  else throw new Error(`No se encontró el post: ${slug}`);
+
+  const raw = fs.readFileSync(filePath, "utf8");
+  const { content, data } = matter(raw);
+  return { content, data };
+}
+
+/** Extrae metadatos seguros de un slug. Si falta título/fecha, puede devolver null. */
 export function getPostMeta(slug: string): PostMeta | null {
   try {
-    const raw = readFile(slug);
-    const { data } = matter(raw);
+    const { data } = getPostContent(slug);
+    const title = (data.title ?? "").toString().trim();
+    const date = (data.date ?? "").toString().trim();
 
-    return {
-      slug,
-      title: data.title ?? slug,
-      date: data.date ?? "",
-      description: data.description ?? "",
-      image: data.image ?? null,
-    };
+    if (!title || !date) return null;
+
+    const description = data.description ? String(data.description) : undefined;
+    const image = data.image ? String(data.image) : null;
+
+    return { slug, title, date, description, image };
   } catch {
     return null;
   }
 }
 
+/** Lista de posts ordenada por fecha desc */
 export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
-    .map(getPostMeta)
-    .filter(Boolean) as PostMeta[]
+    .map((slug) => getPostMeta(slug))
+    .filter((meta): meta is PostMeta => meta !== null)
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-export async function getPostHtml(slug: string): Promise<{
-  meta: PostMeta;
-  content: string;
-}> {
-  const raw = readFile(slug);
-  const { data, content } = matter(raw);
+/** Devuelve metadatos + contenido en texto (Markdown crudo) para un slug */
+export async function getPostHtml(
+  slug: string
+): Promise<{ meta: PostMeta; content: string }> {
+  const { content, data } = getPostContent(slug);
+
   const meta: PostMeta = {
     slug,
-    title: data.title ?? slug,
+    title: data.title ?? "",
     date: data.date ?? "",
     description: data.description ?? "",
     image: data.image ?? null,
   };
-  // si luego conviertes MD→HTML, reemplaza 'content' por el HTML renderizado
+
+  // Si más adelante renderizas Markdown a HTML, cambia `content` por el HTML.
   return { meta, content };
 }
 
-// alias por si quedaban imports antiguos
+/** Aliases por compatibilidad con imports anteriores */
 export { getPostsMeta as getAllPosts };
