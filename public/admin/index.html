@@ -2,30 +2,48 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>Decap CMS</title>
-
-    <!-- Evita problemas de caché al probar -->
+    <!-- Evita cache duro mientras iteramos -->
     <meta http-equiv="Cache-Control" content="no-store" />
 
-    <!-- Cargar Decap CMS desde unpkg -->
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <!-- Decap CMS -->
+    <script
+      defer
+      src="https://unpkg.com/decap-cms@^3.2.0/dist/decap-cms.js"
+    ></script>
 
-    <!-- Netlify Identity Widget (para login con Git Gateway) -->
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <!-- Netlify Identity widget (necesario para git-gateway) -->
+    <script
+      defer
+      src="https://identity.netlify.com/v1/netlify-identity-widget.js"
+    ></script>
   </head>
   <body>
-    <!-- Decap CMS se monta automáticamente -->
+    <!-- A veces Decap intenta montar antes de que exista body/nc-root; prevenimos eso -->
     <script>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on("init", user => {
-          if (!user) {
-            window.netlifyIdentity.on("login", () => {
-              document.location.href = "/admin/";
-            });
-          }
-        });
-      }
+      window.addEventListener("DOMContentLoaded", function () {
+        // Asegura un contenedor si Decap lo necesita
+        if (!document.getElementById("nc-root")) {
+          const root = document.createElement("div");
+          root.id = "nc-root";
+          document.body.appendChild(root);
+        }
+
+        // Opcional: redirigir al /admin/ tras login con Netlify Identity
+        if (window.netlifyIdentity) {
+          netlifyIdentity.on("init", (user) => {
+            if (!user) {
+              netlifyIdentity.on("login", () => {
+                document.location.href = "/admin/";
+              });
+            }
+          });
+        }
+      });
     </script>
   </body>
 </html>
