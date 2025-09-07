@@ -14,8 +14,6 @@ Por primera vez nos enfrentamos a decisiones más grandes: independizarnos, defi
 
 La combinación de todo esto puede sentirse como una montaña rusa emocional: un día sientes que avanzas, y al siguiente, que estás completamente perdido.
 
-
-
 ## Factores que la alimentan
 
 Aunque no todos la viven igual, hay cuatro factores comunes que intensifican esta crisis:
@@ -38,16 +36,18 @@ Para generaciones anteriores, éxito significaba estabilidad y seguridad. Para m
 
 ## Cómo manejar la crisis de los veintes
 
-La buena noticia es que esta crisis no es el fin del mundo: es una etapa de transición. Y aunque puede sentirse abrumadora, hay formas de atravesarla con más claridad:
+La buena noticia es que esta crisis no es el fin del mundo: es una etapa de transición. Y aunque puede sentirse abrumadora, hay formas de atravesarla con más claridad
 
-	**•Deja de compararte.** Cada persona tiene su propio proceso y su propio tiempo.
+* **Deja de compararte.** Cada persona tiene su propio proceso y su propio tiempo.
 
-	**•Define tu propio éxito.** Haz una lista de metas que reflejen lo que tú valoras, no lo que otros esperan.
 
-	**•Acepta la incertidumbre.** No tener todo resuelto a los 25 no significa fracasar; significa estar en proceso.
+* **Define tu propio éxito**. Haz una lista de metas que reflejen lo que tú valoras, no lo que otros esperan.
 
-	**•Busca apoyo.** La terapia, las amistades y las comunidades de confianza ayudan a sobrellevar los momentos de duda.
 
+* **Aceptar la incertidumbre.** No tener todo resuelto a los 25 **No significa fracasar**; significa estar en proceso.
+
+
+* **Busca apoyo.** La terapia, las amistades y las comunidades de confianza ayudan a sobrellevar los momentos de duda.
 
 
 
