@@ -1,56 +1,50 @@
 // lib/posts.ts
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import matter from "gray-matter";
-import { remark } from "remark";
-import remarkHtml from "remark-html";
-import remarkGfm from "remark-gfm";
 
 export type PostMeta = {
   slug: string;
   title: string;
-  date: string;           // ISO string en el frontmatter
-  description?: string;   // opcional
-  image?: string;         // opcional (ruta absoluta o /uploads/…)
+  date: string;            // YYYY-MM-DD
+  description?: string;
+  image?: string | null;
 };
 
 const POSTS_DIR = path.join(process.cwd(), "content", "blog");
 
-// Lee todos los archivos .md (o .mdx si cambias la extensión)
-function getAllSlugs(): string[] {
-  if (!fs.existsSync(POSTS_DIR)) return [];
+export function getAllSlugs(): string[] {
   return fs
     .readdirSync(POSTS_DIR)
     .filter((f) => f.endsWith(".md") || f.endsWith(".mdx"))
     .map((f) => f.replace(/\.mdx?$/, ""));
 }
 
-function getPostMeta(slug: string): PostMeta | null {
-  const fullPathMd = path.join(POSTS_DIR, `${slug}.md`);
-  const fullPathMdx = path.join(POSTS_DIR, `${slug}.mdx`);
-  const fullPath = fs.existsSync(fullPathMd) ? fullPathMd : fullPathMdx;
+export function getPostMeta(slug: string): PostMeta | null {
+  const fp = path.join(POSTS_DIR, `${slug}.md`);
+  if (!fs.existsSync(fp)) return null;
 
-  if (!fs.existsSync(fullPath)) return null;
+  const { data } = matter(fs.readFileSync(fp, "utf8"));
 
-  const file = fs.readFileSync(fullPath, "utf-8");
-  const { data } = matter(file);
-
-  // title y date son lo mínimo para listar; si falta title, descartamos
-  if (!data?.title) return null;
+  // Normaliza fecha: acepta ISO con hora y devuelve YYYY-MM-DD
+  const iso = data?.date ? new Date(String(data.date)) : null;
+  const date = iso && !isNaN(iso.getTime())
+    ? iso.toISOString().slice(0, 10)
+    : "1970-01-01";
 
   return {
     slug,
-    title: String(data.title),
-    date: data.date ? String(data.date) : "",
-    description: data.description ? String(data.description) : undefined,
-    image: data.image ? String(data.image) : undefined,
+    title: data?.title ?? slug,
+    date,
+    description: data?.description ?? "",
+    image: data?.image ? String(data.image) : null,
   };
 }
 
 export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
     .map(getPostMeta)
-    .filter((m): m is PostMeta => Boolean(m))
+    .filter(Boolean) as PostMeta[]
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
@@ -58,28 +52,14 @@ export async function getPostHtml(slug: string): Promise<{
   meta: PostMeta;
   html: string;
 }> {
-  const fullPathMd = path.join(POSTS_DIR, `${slug}.md`);
-  const fullPathMdx = path.join(POSTS_DIR, `${slug}.mdx`);
-  const fullPath = fs.existsSync(fullPathMd) ? fullPathMd : fullPathMdx;
+  const fp = path.join(POSTS_DIR, `${slug}.md`);
+  if (!fs.existsSync(fp)) throw new Error(`Post not found: ${slug}`);
 
-  if (!fs.existsSync(fullPath)) {
-    throw new Error(`No existe el post: ${slug}`);
-  }
+  const raw = fs.readFileSync(fp, "utf8");
+  const { content } = matter(raw);
+  const meta = getPostMeta(slug);
+  if (!meta) throw new Error(`Invalid front-matter: ${slug}`);
 
-  const file = fs.readFileSync(fullPath, "utf-8");
-  const { data, content } = matter(file);
-
-  const meta: PostMeta = {
-    slug,
-    title: String(data.title ?? ""),
-    date: data.date ? String(data.date) : "",
-    description: data.description ? String(data.description) : undefined,
-    image: data.image ? String(data.image) : undefined,
-  };
-
-  // Convierte Markdown → HTML (con tablas, listas, etc. de GFM)
-  const processed = await remark().use(remarkGfm).use(remarkHtml).process(content);
-  const html = processed.toString();
-
-  return { meta, html };
+  // Si usas remark/rehype, deja tu pipeline aquí; por ahora, devolvemos tal cual:
+  return { meta, html: content };
 }
