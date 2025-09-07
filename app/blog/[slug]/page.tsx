@@ -1,14 +1,14 @@
 // app/blog/[slug]/page.tsx
-import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { getAllPosts, getPostHtml } from "@/lib/posts";
+import type { Metadata } from "next";
 
 type Props = { params: { slug: string } };
 
-// Para SSG
-export function generateStaticParams() {
-  return getAllPosts().map(({ slug }) => ({ slug }));
+export async function generateStaticParams() {
+  // usamos los metas para obtener los slugs
+  return getAllPosts().map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -30,37 +30,39 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <h1 className="text-4xl font-extrabold leading-tight tracking-tight">
-          {post.title}
-        </h1>
-        <p className="mt-2 text-sm text-gray-500">{post.date}</p>
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">{post.title}</h1>
+        {post.date && (
+          <p className="mt-1 text-sm text-gray-500">{post.date}</p>
+        )}
+        {post.description && (
+          <p className="mt-2 text-gray-600">{post.description}</p>
+        )}
       </header>
 
       {post.image && (
-        <div className="mb-8">
-          <Image
+        <div className="my-6">
+          {/* Si tus imágenes vienen de /uploads, usa <img> para evitar domain config de next/image */}
+          <img
             src={post.image}
             alt={post.title}
-            width={1280}
-            height={720}
-            className="mx-auto h-auto max-h-[480px] w-auto max-w-full rounded-xl object-cover"
-            priority
+            className="mx-auto rounded-lg"
+            style={{ maxWidth: "800px", width: "100%", height: "auto" }}
           />
         </div>
       )}
 
-      {/* Contenido del post (HTML) */}
+      {/* Contenido:
+         - Si `post.html` ya es HTML, se mostrará tal cual.
+         - Si `post.html` es Markdown, puedes cambiar esto por un renderer (react-markdown) más adelante.
+      */}
       <div
-        className="prose prose-neutral max-w-none prose-img:mx-auto prose-img:rounded-xl"
+        className="prose prose-neutral max-w-none"
         dangerouslySetInnerHTML={{ __html: post.html }}
       />
 
-      <footer className="mt-12">
-        <Link
-          href="/blog"
-          className="inline-block rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
-        >
+      <footer className="mt-10">
+        <Link href="/blog" className="text-green-700 hover:underline">
           ← Volver al blog
         </Link>
       </footer>

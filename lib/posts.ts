@@ -2,7 +2,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { marked } from "marked";
 
 export type PostMeta = {
   slug: string;
@@ -12,60 +11,66 @@ export type PostMeta = {
   image?: string | null;
 };
 
-const BLOG_DIR = path.join(process.cwd(), "content", "blog");
-
-function readPost(slug: string) {
-  const filePath = path.join(BLOG_DIR, `${slug}.md`);
-  const file = fs.readFileSync(filePath, "utf-8");
-  return matter(file); // { data, content }
-}
+const postsDir = path.join(process.cwd(), "content", "blog");
 
 export function getAllSlugs(): string[] {
-  if (!fs.existsSync(BLOG_DIR)) return [];
+  if (!fs.existsSync(postsDir)) return [];
   return fs
-    .readdirSync(BLOG_DIR)
+    .readdirSync(postsDir)
     .filter((f) => f.endsWith(".md"))
     .map((f) => f.replace(/\.md$/, ""));
 }
 
 export function getPostMeta(slug: string): PostMeta | null {
-  const { data } = readPost(slug);
+  try {
+    const filePath = path.join(postsDir, `${slug}.md`);
+    const raw = fs.readFileSync(filePath, "utf8");
+    const { data } = matter(raw);
 
-  if (!data?.title || !data?.date) {
+    return {
+      slug,
+      title: data.title ?? slug,
+      date: data.date ?? "",
+      description: data.description ?? "",
+      image: data.image ?? null,
+    };
+  } catch {
     return null;
   }
-
-  return {
-    slug,
-    title: String(data.title),
-    date: String(data.date),
-    description: data.description ? String(data.description) : undefined,
-    image: data.image ? String(data.image) : null,
-  };
 }
 
-export function getAllPosts(): PostMeta[] {
+/** Lista para el índice del blog */
+export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
     .map(getPostMeta)
-    .filter((p): p is PostMeta => Boolean(p))
+    .filter(Boolean) as PostMeta[]
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
+/** Alias por compatibilidad con imports previos */
+export const getAllPosts = getPostsMeta;
+
+/** Contenido completo de un post */
 export async function getPostHtml(
   slug: string
 ): Promise<PostMeta & { html: string; content: string }> {
-  const { data, content } = readPost(slug);
+  const filePath = path.join(postsDir, `${slug}.md`);
+  const raw = fs.readFileSync(filePath, "utf8");
+  const { data, content } = matter(raw);
 
-  const meta: PostMeta = {
+  // Aquí devolvemos `html` como el contenido tal cual.
+  // Si ya tienes un pipeline que convierte Markdown -> HTML,
+  // este campo lo consumirá sin cambios. Si no, la página
+  // puede renderizar `content` con un renderer de markdown.
+  const html = content;
+
+  return {
     slug,
-    title: String(data?.title ?? slug),
-    date: String(data?.date ?? ""),
-    description: data?.description ? String(data.description) : undefined,
-    image: data?.image ? String(data.image) : null,
+    title: data.title ?? slug,
+    date: data.date ?? "",
+    description: data.description ?? "",
+    image: data.image ?? null,
+    html,
+    content,
   };
-
-  // Markdown → HTML
-  const html = marked.parse(content) as string;
-
-  return { ...meta, html, content };
 }
