@@ -11,10 +11,9 @@ export const metadata: Metadata = {
   title: "Daniel Reyna — Psicólogo",
   description: "Terapia clara y práctica para sentirte mejor.",
   icons: {
-    icon: [
-      { url: "/favicon.ico", type: "image/x-icon" },
-      { url: "/favicon.png", type: "image/png" }, // respaldo
-    ],
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 };
 
@@ -26,10 +25,26 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        {/* Compatibilidad extra (opcional) */}
+        {/* Favicon fallbacks */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" href="/favicon.png" />
-        <link rel="apple-touch-icon" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+        {/* Redirige tokens de Netlify Identity al panel de Decap (/admin) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function () {
+  try {
+    var h = (typeof window !== 'undefined') ? window.location.hash : '';
+    if (/#(invite_token|confirmation_token|recovery_token)=/.test(h)) {
+      window.location.replace('/admin/' + h);
+    }
+  } catch (e) { /* no-op */ }
+})();
+`,
+          }}
+        />
       </head>
       <body className={`${inter.className} bg-white text-neutral-900`}>
         <SiteHeader />
