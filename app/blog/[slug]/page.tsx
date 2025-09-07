@@ -1,71 +1,41 @@
-// app/blog/[slug]/page.tsx
+// app/blog/page.tsx
 import Link from "next/link";
-import Image from "next/image";
-import { getAllPosts, getPostHtml } from "@/lib/posts";
-import type { Metadata } from "next";
+import { getPostsMeta } from "@/lib/posts";
 
-type Props = { params: { slug: string } };
+export const metadata = {
+  title: "Blog | Daniel Reyna",
+  description: "Entradas del blog de psicología y bienestar",
+};
 
-export async function generateStaticParams() {
-  // usamos los metas para obtener los slugs
-  return getAllPosts().map((p) => ({ slug: p.slug }));
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPostHtml(params.slug);
-  return {
-    title: post.title,
-    description: post.description,
-    openGraph: {
-      title: post.title,
-      description: post.description,
-      images: post.image ? [post.image] : undefined,
-      type: "article",
-    },
-  };
-}
-
-export default async function BlogPostPage({ params }: Props) {
-  const post = await getPostHtml(params.slug);
-
+export default function BlogPage() {
+  const posts = getPostsMeta();
   return (
-    <article className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">{post.title}</h1>
-        {post.date && (
-          <p className="mt-1 text-sm text-gray-500">{post.date}</p>
-        )}
-        {post.description && (
-          <p className="mt-2 text-gray-600">{post.description}</p>
-        )}
-      </header>
+    <section className="mx-auto max-w-3xl px-4 py-10">
+      <h1 className="mb-6 text-3xl font-bold">Blog</h1>
 
-      {post.image && (
-        <div className="my-6">
-          {/* Si tus imágenes vienen de /uploads, usa <img> para evitar domain config de next/image */}
-          <img
-            src={post.image}
-            alt={post.title}
-            className="mx-auto rounded-lg"
-            style={{ maxWidth: "800px", width: "100%", height: "auto" }}
-          />
-        </div>
-      )}
-
-      {/* Contenido:
-         - Si `post.html` ya es HTML, se mostrará tal cual.
-         - Si `post.html` es Markdown, puedes cambiar esto por un renderer (react-markdown) más adelante.
-      */}
-      <div
-        className="prose prose-neutral max-w-none"
-        dangerouslySetInnerHTML={{ __html: post.html }}
-      />
-
-      <footer className="mt-10">
-        <Link href="/blog" className="text-green-700 hover:underline">
-          ← Volver al blog
-        </Link>
-      </footer>
-    </article>
+      <div className="space-y-6">
+        {posts.map((post) => (
+          <article key={post.slug} className="rounded-xl border p-5">
+            <h2 className="text-xl font-semibold">
+              <Link href={`/blog/${post.slug}`} className="hover:underline">
+                {post.title}
+              </Link>
+            </h2>
+            {post.date && (
+              <p className="mt-1 text-sm text-gray-500">{post.date}</p>
+            )}
+            {post.description && (
+              <p className="mt-2 text-gray-700">{post.description}</p>
+            )}
+            <Link
+              href={`/blog/${post.slug}`}
+              className="mt-3 inline-block text-green-700 hover:underline"
+            >
+              Página del artículo…
+            </Link>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
