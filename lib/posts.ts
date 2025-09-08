@@ -24,7 +24,7 @@ export interface PostData {
 }
 
 // Ruta donde están los posts
-const postsDirectory = path.join(process.cwd(), "content", "posts");
+const postsDirectory = path.join(process.cwd(), "content", "blog");
 
 // ------------- utilidades -------------
 function getPostFilePath(slug: string) {
