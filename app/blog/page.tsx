@@ -1,7 +1,7 @@
 // app/blog/page.tsx
-import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
 import { getPostsMeta } from "@/lib/posts";
 
 export const metadata: Metadata = {
@@ -10,76 +10,83 @@ export const metadata: Metadata = {
     "Artículos de psicología y bienestar: ansiedad, hábitos, relaciones y más.",
 };
 
-function formatDate(iso: string) {
+function formatDate(iso?: string) {
   if (!iso) return "";
-  return new Date(iso)
-    .toLocaleDateString("es-MX", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    })
-    .replace(/\./g, "");
+  const d = new Date(iso);
+  return d.toLocaleDateString("es-MX", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
 }
 
 export default async function BlogPage() {
   const posts = getPostsMeta();
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="text-4xl font-extrabold tracking-tight text-neutral-900">
-        Blog
-      </h1>
+    <section className="mx-auto max-w-4xl px-6 sm:px-8 md:px-10">
+      <h1 className="mb-8 mt-10 text-4xl font-extrabold tracking-tight">Blog</h1>
 
-      {!posts.length ? (
-        <p className="mt-10 text-neutral-600">No hay artículos todavía.</p>
-      ) : (
-        <ul className="mt-8 divide-y divide-neutral-200">
-          {posts.map((post) => (
-            <li key={post.slug} className="py-6">
-              <Link
-                href={`/blog/${post.slug}`}
-                className="group flex gap-6"
-              >
-                {/* Miniatura visible */}
-                {post.image ? (
-                  <div className="relative h-28 w-44 shrink-0 overflow-hidden rounded-xl">
+      {posts.length === 0 && (
+        <p className="text-neutral-500">No hay artículos todavía.</p>
+      )}
+
+      <div className="space-y-12">
+        {posts.map((post) => {
+          const href = `/blog/${post.slug}`;
+          const date = formatDate(post.date);
+
+          return (
+            <article key={post.slug} className="pb-12 border-b border-neutral-200">
+              {/* Título grande, estilo editorial */}
+              <h2 className="text-3xl sm:text-4xl font-extrabold leading-snug">
+                <Link href={href} className="hover:underline">
+                  {post.title}
+                </Link>
+              </h2>
+
+              {/* Fecha */}
+              {date && (
+                <div className="mt-2 text-sm text-neutral-500">{date}</div>
+              )}
+
+              {/* Imagen amplia (si existe) */}
+              {post.image && (
+                <div className="mt-6">
+                  <Link href={href} aria-label={`Abrir ${post.title}`}>
                     <Image
                       src={post.image}
                       alt={post.title}
-                      fill
-                      sizes="176px"
-                      className="object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+                      width={1600}
+                      height={900}
+                      sizes="(min-width: 1024px) 896px, (min-width: 640px) 600px, 90vw"
+                      className="w-full h-auto rounded-md"
+                      priority={false}
                     />
-                  </div>
-                ) : (
-                  <div className="h-28 w-44 shrink-0 rounded-xl bg-neutral-100" />
-                )}
-
-                {/* Contenido */}
-                <div className="min-w-0">
-                  <h2 className="line-clamp-2 text-xl font-semibold text-neutral-900 underline-offset-4 group-hover:underline">
-                    {post.title}
-                  </h2>
-
-                  <div className="mt-1 text-sm text-neutral-500">
-                    {formatDate(post.date)}
-                  </div>
-
-                  {post.description && (
-                    <p className="mt-2 line-clamp-2 text-neutral-700">
-                      {post.description}
-                    </p>
-                  )}
-
-                  <span className="mt-3 inline-block text-sm font-semibold text-emerald-700">
-                    Página del artículo…
-                  </span>
+                  </Link>
                 </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+              )}
+
+              {/* Extracto */}
+              {post.description && (
+                <p className="mt-6 text-lg leading-relaxed text-neutral-800">
+                  {post.description}
+                </p>
+              )}
+
+              {/* Link “Página del artículo…” al estilo simple */}
+              <div className="mt-4">
+                <Link
+                  href={href}
+                  className="text-emerald-700 hover:text-emerald-800 underline underline-offset-4"
+                >
+                  Página del artículo…
+                </Link>
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </section>
   );
 }
