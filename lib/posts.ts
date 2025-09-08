@@ -1,83 +1,90 @@
-// lib/posts.ts
-import fs from "node:fs";
-import path from "node:path";
+import fs from "fs";
+import path from "path";
 import matter from "gray-matter";
+import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";
 
-export type PostMeta = {
+// Tipos
+export interface PostMeta {
   slug: string;
   title: string;
-  date: string;            // ← string, no Date
+  date: string;
   description?: string;
   image?: string | null;
-};
-
-export type PostData = { meta: PostMeta; content: string };
-
-const BLOG_DIR = path.join(process.cwd(), "content", "blog");
-
-export function getAllSlugs(): string[] {
-  return fs
-    .readdirSync(BLOG_DIR)
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => f.replace(/\.md$/, ""));
 }
 
+export interface PostData {
+  meta: PostMeta;
+  content: string; // Contenido en HTML limpio
+}
+
+const postsDirectory = path.join(process.cwd(), "content/posts");
+
+// Lee todos los slugs
+export function getAllSlugs(): string[] {
+  return fs
+    .readdirSync(postsDirectory)
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => file.replace(/\.md$/, ""));
+}
+
+// Obtiene metadata de un post
 export function getPostMeta(slug: string): PostMeta | null {
-  const file = path.join(BLOG_DIR, `${slug}.md`);
-  if (!fs.existsSync(file)) return null;
+  const fullPath = path.join(postsDirectory, `${slug}.md`);
 
-  const { data } = matter(fs.readFileSync(file, "utf8"));
+  if (!fs.existsSync(fullPath)) return null;
 
-  // normalizamos fecha a ISO string
-  const iso = data?.date
-    ? new Date(data.date as string).toISOString()
-    : "";
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const { data } = matter(fileContents);
 
   return {
     slug,
-    title: data?.title ?? "",
-    date: iso,
-    description: data?.description ?? "",
-    image: data?.image ?? null,
+    title: data.title ?? "",
+    date: data.date ?? "",
+    description: data.description ?? "",
+    image: data.image ?? null,
   };
 }
 
+// Obtiene metadata de todos los posts ordenados por fecha
 export function getPostsMeta(): PostMeta[] {
-  return (
-    getAllSlugs()
-      .map((s) => getPostMeta(s))
-      .filter((meta): meta is PostMeta => meta !== null) // type guard
-      .sort((a, b) => (a.date < b.date ? 1 : -1))
-  );
+  return getAllSlugs()
+    .map((slug) => getPostMeta(slug))
+    .filter((meta): meta is PostMeta => meta !== null)
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
+// Obtiene post completo con HTML renderizado
 export async function getPostHtml(slug: string): Promise<PostData | null> {
-  const file = path.join(BLOG_DIR, `${slug}.md`);
-  if (!fs.existsSync(file)) return null;
+  const fullPath = path.join(postsDirectory, `${slug}.md`);
 
-  const { data, content } = matter(fs.readFileSync(file, "utf8"));
+  if (!fs.existsSync(fullPath)) return null;
+
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const { data, content } = matter(fileContents);
+
+  // Markdown -> HTML
+  const rawHtml = marked(content);
+
+  // Sanitizar HTML
+  const clean = sanitizeHtml(rawHtml, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      img: ["src", "alt"],
+    },
+  });
 
   const meta: PostMeta = {
     slug,
-    title: data?.title ?? "",
-    date: data?.date ? new Date(data.date as string).toISOString() : "",
-    description: data?.description ?? "",
-    image: data?.image ?? null,
+    title: data.title ?? "",
+    date: data.date ?? "",
+    description: data.description ?? "",
+    image: data.image ?? null,
   };
-
-  const clean = sanitizeHtml(content, {
-    allowedAttributes: { "*": ["class", "id", "style"] },
-    transformTags: {
-      a: (tagName, attribs) => ({
-        tagName,
-        attribs: { rel: "noopener noreferrer", ...attribs },
-      }),
-    },
-  });
 
   return { meta, content: clean };
 }
 
-// alias por compatibilidad con imports antiguos
+// Alias por compatibilidad
 export { getPostsMeta as getAllPosts };
