@@ -1,70 +1,68 @@
 // app/blog/[slug]/page.tsx
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getAllSlugs, getPostHtml } from "@/lib/posts";
 
 type Props = { params: { slug: string } };
 
-// Rutas estáticas
-export function generateStaticParams() {
+export async function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
 }
 
-// SEO dinámico
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPostHtml(params.slug);
-  if (!post) return { title: "Entrada no encontrada" };
-
-  const { meta } = post;
+  const data = await getPostHtml(params.slug);
   return {
-    title: meta.title,
-    description: meta.description,
-    openGraph: {
-      title: meta.title,
-      description: meta.description,
-      images: meta.image ? [{ url: meta.image }] : undefined,
-      type: "article",
-    },
+    title: data?.meta.title ?? "Blog",
+    description: data?.meta.description,
+    openGraph: { title: data?.meta.title, description: data?.meta.description },
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
-  const post = await getPostHtml(params.slug);
-  if (!post) return notFound();
+function formatDate(iso?: string) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleString("es-MX", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
+}
 
-  const { meta, content } = post;
+export default async function BlogPostPage({ params }: Props) {
+  const data = await getPostHtml(params.slug);
+  if (!data) return null;
+
+  const { meta, content } = data;
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-4xl font-extrabold tracking-tight mb-3">
-        {meta.title}
-      </h1>
+      <h1 className="text-4xl font-extrabold tracking-tight">{meta.title}</h1>
 
-      <p className="text-sm text-gray-500 mb-6">{meta.date}</p>
-
-      {meta.image && (
-        <div className="mb-8">
-          <Image
-            src={meta.image}
-            alt={meta.title}
-            width={1200}
-            height={630}
-            className="rounded-xl w-full h-auto object-cover"
-            priority
-          />
-        </div>
+      {meta.date && (
+        <p className="mt-2 text-sm text-gray-500">
+          <time dateTime={meta.date}>{formatDate(meta.date)}</time>
+        </p>
       )}
 
-      {/* contenido ya viene saneado en HTML */}
+      {meta.image && (
+        <img
+          src={meta.image}
+          alt={meta.title}
+          className="mt-6 rounded-xl w-full max-w-2xl mx-auto object-cover"
+        />
+      )}
+
       <div
-        className="prose prose-neutral max-w-none"
+        className="prose prose-neutral mt-8"
+        // contenido ya viene saneado a HTML
         dangerouslySetInnerHTML={{ __html: content }}
       />
 
       <footer className="mt-10">
-        <Link href="/blog" className="text-sm underline">
+        <Link href="/blog" className="text-sm text-gray-600 hover:underline">
           ← Volver al blog
         </Link>
       </footer>

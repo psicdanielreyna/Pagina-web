@@ -1,91 +1,81 @@
+// lib/posts.ts
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import sanitizeHtml from "sanitize-html";
 
-// Ruta donde están los posts
-const postsDirectory = path.join(process.cwd(), "content/blog");
-
-// Tipos
 export type PostMeta = {
   slug: string;
   title: string;
-  date: string;
+  date: string;            // ← string, no Date
   description?: string;
   image?: string | null;
 };
 
-export type PostData = {
-  meta: PostMeta;
-  content: string;
-};
+export type PostData = { meta: PostMeta; content: string };
 
-// Obtener todos los slugs
+const BLOG_DIR = path.join(process.cwd(), "content", "blog");
+
 export function getAllSlugs(): string[] {
   return fs
-    .readdirSync(postsDirectory)
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => file.replace(/\.md$/, ""));
+    .readdirSync(BLOG_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => f.replace(/\.md$/, ""));
 }
 
-// Obtener metadata de un post por slug
 export function getPostMeta(slug: string): PostMeta | null {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
-  if (!fs.existsSync(fullPath)) return null;
+  const file = path.join(BLOG_DIR, `${slug}.md`);
+  if (!fs.existsSync(file)) return null;
 
-  const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { data } = matter(fileContents);
+  const { data } = matter(fs.readFileSync(file, "utf8"));
+
+  // normalizamos fecha a ISO string
+  const iso = data?.date
+    ? new Date(data.date as string).toISOString()
+    : "";
 
   return {
     slug,
-    title: data.title ?? "Sin título",
-    date: data.date ?? "",
-    description: data.description ?? "",
-    image: data.image ?? null,
+    title: data?.title ?? "",
+    date: iso,
+    description: data?.description ?? "",
+    image: data?.image ?? null,
   };
 }
 
-// Listado de posts ordenados por fecha
 export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
-    .map((slug) => getPostMeta(slug))
-    .filter((meta): meta is PostMeta => meta !== null)
+    .map((s) => getPostMeta(s))
+    .filter(Boolean) as PostMeta[]
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-// Obtener contenido completo de un post
 export async function getPostHtml(slug: string): Promise<PostData | null> {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
-  if (!fs.existsSync(fullPath)) return null;
+  const file = path.join(BLOG_DIR, `${slug}.md`);
+  if (!fs.existsSync(file)) return null;
 
-  const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { data, content } = matter(fileContents);
+  const { data, content } = matter(fs.readFileSync(file, "utf8"));
 
   const meta: PostMeta = {
     slug,
-    title: data.title ?? "Sin título",
-    date: data.date ?? "",
-    description: data.description ?? "",
-    image: data.image ?? null,
+    title: data?.title ?? "",
+    date: data?.date ? new Date(data.date as string).toISOString() : "",
+    description: data?.description ?? "",
+    image: data?.image ?? null,
   };
 
-  // Sanitizar contenido (en caso de que haya HTML dentro del MD)
   const clean = sanitizeHtml(content, {
-    allowedAttributes: {
-      "*": ["class", "id", "style"],
-    },
+    allowedAttributes: { "*": ["class", "id", "style"] },
     transformTags: {
-      a: (tagName, attribs) => {
-        return {
-          tagName,
-          attribs: { rel: "noopener noreferrer", ...attribs },
-        };
-      },
+      a: (tagName, attribs) => ({
+        tagName,
+        attribs: { rel: "noopener noreferrer", ...attribs },
+      }),
     },
   });
 
   return { meta, content: clean };
 }
 
-// Alias por compatibilidad
-export { getPostsMeta as getAllPosts }; 
+// alias por compatibilidad con imports antiguos
+export { getPostsMeta as getAllPosts };
