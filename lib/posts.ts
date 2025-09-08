@@ -14,13 +14,14 @@ export type PostMeta = {
 const BLOG_DIR = path.join(process.cwd(), "content/blog");
 
 export function getAllSlugs(): string[] {
+  if (!fs.existsSync(BLOG_DIR)) return [];
   return fs
     .readdirSync(BLOG_DIR)
     .filter((f) => f.endsWith(".md"))
     .map((f) => f.replace(/\.md$/, ""));
 }
 
-// ---------- helpers de slug ----------
+// ---------- normalización de slug ----------
 const normalize = (s: string) =>
   s
     .normalize("NFD")
@@ -30,23 +31,28 @@ const normalize = (s: string) =>
     .replace(/^-|-$/g, "");
 
 function findFilenameForSlug(slug: string): string | null {
+  if (!fs.existsSync(BLOG_DIR)) return null;
+
   const files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md"));
   const bases = files.map((f) => f.replace(/\.md$/, ""));
   const wanted = decodeURIComponent(slug);
 
+  // 1) coincidencia exacta
   let i = bases.findIndex((s) => s === wanted);
   if (i !== -1) return files[i];
 
+  // 2) url-encoded
   i = bases.findIndex((s) => encodeURIComponent(s) === slug);
   if (i !== -1) return files[i];
 
+  // 3) normalizado (sin acentos/espacios)
   const wantedNorm = normalize(wanted);
   i = bases.findIndex((s) => normalize(s) === wantedNorm);
   if (i !== -1) return files[i];
 
   return null;
 }
-// -------------------------------------
+// -------------------------------------------
 
 export function getPostMeta(slug: string): PostMeta | null {
   const filename = findFilenameForSlug(slug);
@@ -67,8 +73,8 @@ export function getPostMeta(slug: string): PostMeta | null {
 export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
     .map((s) => getPostMeta(s))
-    .filter(Boolean) as PostMeta[]
-    .sort((a: PostMeta, b: PostMeta) => (a.date < b.date ? 1 : -1));
+    .filter((x): x is PostMeta => Boolean(x))
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
 export async function getPostHtml(
@@ -91,5 +97,5 @@ export async function getPostHtml(
   return { meta, content };
 }
 
-// Alias por compatibilidad
+// Alias por compatibilidad con imports previos
 export { getPostsMeta as getAllPosts };
