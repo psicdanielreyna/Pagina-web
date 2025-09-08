@@ -91,5 +91,5 @@ export async function getPostHtml(
   return { meta, content };
 }
 
-// Alias por compatibilidad con otros imports
+// Alias por compatibilidad
 export { getPostsMeta as getAllPosts };
