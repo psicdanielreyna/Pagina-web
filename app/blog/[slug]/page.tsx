@@ -1,32 +1,50 @@
-import { getAllSlugs, getPostHtml } from "@/lib/posts";
+import { notFound } from "next/navigation";
+import { getPostHtml } from "@/lib/posts";
 
-type Props = {
+export default async function BlogPostPage({
+  params,
+}: {
   params: { slug: string };
-};
+}) {
+  const data = await getPostHtml(params.slug);
+  if (!data) notFound();
 
-export async function generateStaticParams() {
-  return getAllSlugs().map((slug) => ({ slug }));
-}
+  const { meta, content } = data;
 
-export default async function PostPage({ params }: Props) {
-  const post = await getPostHtml(params.slug);
-
-  if (!post) {
-    return <p>Post no encontrado</p>;
-  }
+  // 👇 asegurar strings para la fecha
+  const d = new Date(meta.date ?? "");
+  const isValid = !Number.isNaN(d.getTime());
+  const dateISO = isValid ? d.toISOString() : "";
+  const dateLabel = isValid
+    ? d.toLocaleString("es-MX", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "UTC",
+      })
+    : meta.date || "";
 
   return (
     <article className="prose mx-auto px-4 py-8">
-      <h1>{post.meta.title}</h1>
-      <p className="text-sm text-gray-500">{post.meta.date}</p>
-      {post.meta.image && (
+      <h1>{meta.title}</h1>
+
+      <p className="text-sm text-neutral-500">
+        <time dateTime={dateISO}>{dateLabel}</time>
+      </p>
+
+      {meta.image ? (
         <img
-          src={post.meta.image}
-          alt={post.meta.title}
-          className="my-4 rounded-lg"
+          src={meta.image}
+          alt={meta.title}
+          className="rounded-xl my-6 w-full h-auto"
         />
-      )}
-      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+      ) : null}
+
+      <div dangerouslySetInnerHTML={{ __html: content }} />
     </article>
   );
 }

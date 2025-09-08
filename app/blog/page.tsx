@@ -1,56 +1,49 @@
-// app/blog/page.tsx
-import Link from "next/link";
 import { getPostsMeta } from "@/lib/posts";
 
-export const metadata = {
-  title: "Blog | Daniel Reyna",
-  description: "Reflexiones, artículos y recursos de psicología.",
-};
+export default function BlogPage() {
+  const posts = getPostsMeta();
 
-export default async function BlogPage() {
-  const posts = await getPostsMeta();
-
-  if (!posts || posts.length === 0) {
+  if (!posts.length) {
     return (
-      <section className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-6">Blog</h1>
-        <p className="text-neutral-600">No hay artículos todavía.</p>
+      <section className="prose mx-auto px-4 py-8">
+        <h1>Blog</h1>
+        <p>No hay artículos todavía.</p>
       </section>
     );
   }
 
   return (
-    <section className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-6">Blog</h1>
-      <div className="space-y-8">
-        {posts.map((post) => (
-          <article key={post.slug} className="border-b pb-6">
-            <h2 className="text-2xl font-semibold mb-2">
-              <Link
-                href={`/blog/${post.slug}`}
-                className="hover:text-blue-600 transition"
-              >
-                {post.title}
-              </Link>
-            </h2>
-            <p className="text-sm text-neutral-500">
-              {new Date(post.date).toLocaleDateString("es-MX", {
-                weekday: "long",
+    <section className="prose mx-auto px-4 py-8">
+      <h1>Blog</h1>
+
+      <ul className="list-none space-y-8 p-0">
+        {posts.map((post) => {
+          const d = new Date(post.date ?? "");
+          const isValid = !Number.isNaN(d.getTime());
+          const dateISO = isValid ? d.toISOString() : "";
+          const dateLabel = isValid
+            ? d.toLocaleDateString("es-MX", {
                 year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-            <p className="mt-3 text-neutral-700">{post.description}</p>
-            <Link
-              href={`/blog/${post.slug}`}
-              className="text-blue-600 hover:underline mt-2 inline-block"
-            >
-              Leer más →
-            </Link>
-          </article>
-        ))}
-      </div>
+                month: "short",
+                day: "2-digit",
+              })
+            : post.date || "";
+
+          return (
+            <li key={post.slug} className="border rounded-xl p-4">
+              <h2 className="m-0">
+                <a href={`/blog/${post.slug}`}>{post.title}</a>
+              </h2>
+
+              <p className="text-sm text-neutral-500 m-0">
+                <time dateTime={dateISO}>{dateLabel}</time>
+              </p>
+
+              {post.description && <p className="m-0">{post.description}</p>}
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
