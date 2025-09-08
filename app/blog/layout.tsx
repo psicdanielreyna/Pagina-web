@@ -1,9 +1,8 @@
-// app/blog/layout.tsx
-export default function BlogLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // No pintamos encabezado aquí; solo envolvemos el contenido de /blog
-  return <>{children}</>;
-}
+// app/layout.tsx
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://danielreyna.com"),
+  title: { default: "Daniel Reyna", template: "%s | Daniel Reyna" },
+  // ...
+};
