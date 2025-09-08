@@ -1,46 +1,53 @@
-/* globals.css */
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Base (paleta) ===== */
 html,
 body {
   @apply bg-almond text-evergreen;
 }
+
 /* ===== Utilidades ===== */
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
-/* Botones base */
-.btn-primary { @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition; }
-.btn-secondary { @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition; }
-
-/* Contenedor base */
+/* ===== Componentes comunes ===== */
+.btn-primary {
+  @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition;
+}
+.btn-secondary {
+  @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition;
+}
 .container { @apply mx-auto max-w-6xl; }
 
 /* Sheet / Drawer (hamburguesa) */
 [data-state="open"].fixed.inset-0.bg-black\/80 { opacity: 1; }
-div[data-side="left"].fixed { background: #fff; }
+div[data-side="left"].fixed { background: #fff; } /* Si quieres, cámbialo a #F6E9D9 */
 div[data-side="left"].fixed .overflow-y-auto { overscroll-behavior: contain; }
 
-/* Prosa (contenido del blog) */
-.prose { @apply prose-neutral max-w-none; }
+/* ===== Prosa (contenido del blog) ===== */
+.prose {
+  /* Ojo: nada de `prose-neutral` */
+  @apply prose max-w-none;
+  color: #043222;               /* evergreen */
+  background-color: #F6E9D9;    /* almond cream */
+}
 .prose a { @apply underline; }
 .prose img { @apply rounded-xl; }
 
-/* ===== BLOG: limitar ancho de imágenes ===== */
+/* ===== BLOG: limitar ancho de imágenes/embeds ===== */
 .post-content img {
   display: block;
-  margin: 1.25rem auto;        /* centradas y con espacio vertical */
-  width: 100%;                  /* responsive */
-  max-width: 960px;             /* <- tope de ancho real de la foto */
+  margin: 1.25rem auto;
+  width: 100%;
+  max-width: 960px;
   height: auto;
-  border-radius: 0.75rem;       /* esquinas redondeadas */
+  border-radius: 0.75rem;
 }
-
-/* Opcional: que los iframes/videos también respeten un ancho razonable */
 .post-content iframe,
 .post-content video {
   display: block;
