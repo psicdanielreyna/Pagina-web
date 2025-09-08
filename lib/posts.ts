@@ -44,10 +44,12 @@ export function getPostMeta(slug: string): PostMeta | null {
 }
 
 export function getPostsMeta(): PostMeta[] {
-  return getAllSlugs()
-    .map((s) => getPostMeta(s))
-    .filter(Boolean) as PostMeta[]
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+  return (
+    getAllSlugs()
+      .map((s) => getPostMeta(s))
+      .filter((meta): meta is PostMeta => meta !== null) // type guard
+      .sort((a, b) => (a.date < b.date ? 1 : -1))
+  );
 }
 
 export async function getPostHtml(slug: string): Promise<PostData | null> {
