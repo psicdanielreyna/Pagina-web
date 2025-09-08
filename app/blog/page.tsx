@@ -12,7 +12,6 @@ export const metadata: Metadata = {
 
 function formatDate(iso: string) {
   if (!iso) return "";
-  // ej. "07 sep 2025"
   return new Date(iso)
     .toLocaleDateString("es-MX", {
       day: "2-digit",
@@ -34,35 +33,31 @@ export default async function BlogPage() {
       {!posts.length ? (
         <p className="mt-10 text-neutral-600">No hay artículos todavía.</p>
       ) : (
-        <ul className="mt-8 space-y-6">
+        <ul className="mt-8 divide-y divide-neutral-200">
           {posts.map((post) => (
-            <li
-              key={post.slug}
-              className="rounded-2xl ring-1 ring-black/5 hover:ring-black/10 transition bg-white"
-            >
+            <li key={post.slug} className="py-6">
               <Link
                 href={`/blog/${post.slug}`}
-                className="flex gap-6 p-4 md:p-5"
+                className="group flex gap-6"
               >
-                {/* Miniatura */}
+                {/* Miniatura visible */}
                 {post.image ? (
-                  <div className="relative h-28 w-40 shrink-0 overflow-hidden rounded-xl md:h-32 md:w-48">
+                  <div className="relative h-28 w-44 shrink-0 overflow-hidden rounded-xl">
                     <Image
                       src={post.image}
                       alt={post.title}
                       fill
-                      sizes="(max-width: 768px) 160px, 192px"
-                      className="object-cover"
-                      priority={false}
+                      sizes="176px"
+                      className="object-cover transition-transform duration-200 group-hover:scale-[1.02]"
                     />
                   </div>
                 ) : (
-                  <div className="h-28 w-40 shrink-0 rounded-xl bg-neutral-100 md:h-32 md:w-48" />
+                  <div className="h-28 w-44 shrink-0 rounded-xl bg-neutral-100" />
                 )}
 
-                {/* Texto */}
+                {/* Contenido */}
                 <div className="min-w-0">
-                  <h2 className="line-clamp-2 text-xl font-semibold text-neutral-900 underline-offset-4 hover:underline">
+                  <h2 className="line-clamp-2 text-xl font-semibold text-neutral-900 underline-offset-4 group-hover:underline">
                     {post.title}
                   </h2>
 
@@ -76,7 +71,7 @@ export default async function BlogPage() {
                     </p>
                   )}
 
-                  <span className="mt-3 inline-block text-sm font-medium text-emerald-700">
+                  <span className="mt-3 inline-block text-sm font-semibold text-emerald-700">
                     Página del artículo…
                   </span>
                 </div>
