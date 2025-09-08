@@ -31,17 +31,17 @@ const normalize = (s: string) =>
 
 function findFilenameForSlug(slug: string): string | null {
   const files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md"));
-  const base = files.map((f) => f.replace(/\.md$/, ""));
+  const bases = files.map((f) => f.replace(/\.md$/, ""));
   const wanted = decodeURIComponent(slug);
 
-  let i = base.findIndex((s) => s === wanted);
+  let i = bases.findIndex((s) => s === wanted);
   if (i !== -1) return files[i];
 
-  i = base.findIndex((s) => encodeURIComponent(s) === slug);
+  i = bases.findIndex((s) => encodeURIComponent(s) === slug);
   if (i !== -1) return files[i];
 
   const wantedNorm = normalize(wanted);
-  i = base.findIndex((s) => normalize(s) === wantedNorm);
+  i = bases.findIndex((s) => normalize(s) === wantedNorm);
   if (i !== -1) return files[i];
 
   return null;
@@ -91,5 +91,5 @@ export async function getPostHtml(
   return { meta, content };
 }
 
-// Alias por compatibilidad con imports antiguos
+// Alias por compatibilidad con otros imports
 export { getPostsMeta as getAllPosts };
