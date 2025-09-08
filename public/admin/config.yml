@@ -14,6 +14,10 @@ collections:
     folder: "content/blog"
     create: true
     slug: "{{slug}}"
+    slugify:
+      clean_accents: true
+      trim: true
+      sanitize_replacement: "-"
     format: "frontmatter"
     fields:
       - { label: "Título", name: "title", widget: "string" }

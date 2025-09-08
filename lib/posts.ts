@@ -1,8 +1,12 @@
-// lib/posts.ts
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import sanitizeHtml from "sanitize-html";
 
+// Ruta donde están los posts
+const postsDirectory = path.join(process.cwd(), "content/blog");
+
+// Tipos
 export type PostMeta = {
   slug: string;
   title: string;
@@ -11,91 +15,77 @@ export type PostMeta = {
   image?: string | null;
 };
 
-const BLOG_DIR = path.join(process.cwd(), "content/blog");
+export type PostData = {
+  meta: PostMeta;
+  content: string;
+};
 
+// Obtener todos los slugs
 export function getAllSlugs(): string[] {
-  if (!fs.existsSync(BLOG_DIR)) return [];
   return fs
-    .readdirSync(BLOG_DIR)
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => f.replace(/\.md$/, ""));
+    .readdirSync(postsDirectory)
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => file.replace(/\.md$/, ""));
 }
 
-// ---------- normalización de slug ----------
-const normalize = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-
-function findFilenameForSlug(slug: string): string | null {
-  if (!fs.existsSync(BLOG_DIR)) return null;
-
-  const files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md"));
-  const bases = files.map((f) => f.replace(/\.md$/, ""));
-  const wanted = decodeURIComponent(slug);
-
-  // 1) coincidencia exacta
-  let i = bases.findIndex((s) => s === wanted);
-  if (i !== -1) return files[i];
-
-  // 2) url-encoded
-  i = bases.findIndex((s) => encodeURIComponent(s) === slug);
-  if (i !== -1) return files[i];
-
-  // 3) normalizado (sin acentos/espacios)
-  const wantedNorm = normalize(wanted);
-  i = bases.findIndex((s) => normalize(s) === wantedNorm);
-  if (i !== -1) return files[i];
-
-  return null;
-}
-// -------------------------------------------
-
+// Obtener metadata de un post por slug
 export function getPostMeta(slug: string): PostMeta | null {
-  const filename = findFilenameForSlug(slug);
-  if (!filename) return null;
+  const fullPath = path.join(postsDirectory, `${slug}.md`);
+  if (!fs.existsSync(fullPath)) return null;
 
-  const raw = fs.readFileSync(path.join(BLOG_DIR, filename), "utf8");
-  const { data } = matter(raw);
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const { data } = matter(fileContents);
 
   return {
-    slug: filename.replace(/\.md$/, ""),
-    title: data.title ?? "",
+    slug,
+    title: data.title ?? "Sin título",
     date: data.date ?? "",
     description: data.description ?? "",
     image: data.image ?? null,
   };
 }
 
+// Listado de posts ordenados por fecha
 export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
-    .map((s) => getPostMeta(s))
-    .filter((x): x is PostMeta => Boolean(x))
+    .map((slug) => getPostMeta(slug))
+    .filter((meta): meta is PostMeta => meta !== null)
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-export async function getPostHtml(
-  slug: string
-): Promise<{ meta: PostMeta; content: string }> {
-  const filename = findFilenameForSlug(slug);
-  if (!filename) throw new Error(`No se encontró el post: ${slug}`);
+// Obtener contenido completo de un post
+export async function getPostHtml(slug: string): Promise<PostData | null> {
+  const fullPath = path.join(postsDirectory, `${slug}.md`);
+  if (!fs.existsSync(fullPath)) return null;
 
-  const raw = fs.readFileSync(path.join(BLOG_DIR, filename), "utf8");
-  const { data, content } = matter(raw);
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const { data, content } = matter(fileContents);
 
   const meta: PostMeta = {
-    slug: filename.replace(/\.md$/, ""),
-    title: data.title ?? "",
+    slug,
+    title: data.title ?? "Sin título",
     date: data.date ?? "",
     description: data.description ?? "",
     image: data.image ?? null,
   };
 
-  return { meta, content };
+  // Sanitizar contenido (en caso de que haya HTML dentro del MD)
+  const clean = sanitizeHtml(content, {
+    allowedAttributes: {
+      "*": ["class", "id", "style"],
+    },
+    transformTags: {
+      a: (tagName, attribs) => {
+        return {
+          tagName,
+          attribs: { rel: "noopener noreferrer", ...attribs },
+        };
+      },
+    },
+  });
+
+  return { meta, content: clean };
 }
 
-// Alias por compatibilidad con imports previos
-export { getPostsMeta as getAllPosts };
+// Alias por compatibilidad
+export { getPostsMeta as getAllPosts }; 
