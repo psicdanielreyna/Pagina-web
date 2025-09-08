@@ -1,26 +1,18 @@
+// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./content/**/*.{md,mdx}",     // por si renderizas MD/MDX
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
-      typography: ({ theme }) => ({
-        DEFAULT: {
-          css: {
-            maxWidth: "65ch",
-            img: {
-              borderRadius: theme("borderRadius.xl"),
-              marginTop: theme("spacing.6"),
-              marginBottom: theme("spacing.6"),
-            },
-            a: { textDecoration: "none" },
-          },
-        },
-      }),
+      colors: {
+        almond: "#F6E9D9",
+        evergreen: "#043222",
+      },
     },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [],
 };
