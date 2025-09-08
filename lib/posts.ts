@@ -1,83 +1,65 @@
-// lib/posts.ts
-import fs from "node:fs";
-import fsp from "node:fs/promises";
-import path from "node:path";
+import fs from "fs";
+import path from "path";
 import matter from "gray-matter";
 import sanitizeHtml from "sanitize-html";
 
-export type PostMeta = {
+export interface PostMeta {
   slug: string;
   title: string;
-  date: string;            // YYYY-MM-DD o ISO
-  description?: string;
+  date: string;
+  description: string;
   image?: string | null;
-};
+}
 
-export type PostData = {
+export interface PostData {
   meta: PostMeta;
-  content: string;         // HTML seguro (sanitizado)
-};
-
-// Carpeta donde viven los .md
-const POSTS_DIR = path.join(process.cwd(), "content", "blog");
-
-// Helpers
-function mdFile(slug: string) {
-  return path.join(POSTS_DIR, `${slug}.md`);
+  content: string;
 }
 
-function fileToSlug(filename: string) {
-  return filename.replace(/\.md$/i, "");
-}
+// Ruta donde están los posts
+const postsDirectory = path.join(process.cwd(), "content", "posts");
 
-/** Slugs síncronos: útil para generateStaticParams() */
+// Obtener todos los slugs de los posts
 export function getAllSlugs(): string[] {
-  if (!fs.existsSync(POSTS_DIR)) return [];
   return fs
-    .readdirSync(POSTS_DIR, { withFileTypes: true })
-    .filter((d) => d.isFile() && d.name.toLowerCase().endsWith(".md"))
-    .map((d) => fileToSlug(d.name));
+    .readdirSync(postsDirectory)
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => file.replace(/\.md$/, ""));
 }
 
-/** Lee un post (MD) y regresa { content, data } */
-async function getPostContent(slug: string): Promise<{ content: string; data: any }> {
-  const full = mdFile(slug);
-  const raw = await fsp.readFile(full, "utf8");
-  const { content, data } = matter(raw);
-  return { content, data };
-}
-
-/** Deriva solo los metadatos de un slug */
+// Extraer metadata de un post
 export function getPostMeta(slug: string): PostMeta | null {
   try {
-    const raw = fs.readFileSync(mdFile(slug), "utf8");
-    const { data } = matter(raw);
+    const filePath = path.join(postsDirectory, `${slug}.md`);
+    const fileContents = fs.readFileSync(filePath, "utf8");
+    const { data } = matter(fileContents);
 
-    const meta: PostMeta = {
+    return {
       slug,
       title: data.title ?? "",
       date: data.date ?? "",
       description: data.description ?? "",
       image: data.image ?? null,
     };
-    return meta;
   } catch {
     return null;
   }
 }
 
-/** Lista de posts con metadata, ordenada desc por fecha */
+// Listar todos los posts con metadata
 export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
-    .map((s) => getPostMeta(s))
-    .filter(Boolean) as PostMeta[]
+    .map((slug) => getPostMeta(slug))
+    .filter((meta): meta is PostMeta => meta !== null)
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-/** Post completo con HTML sanitizado */
+// Obtener post completo con HTML
 export async function getPostHtml(slug: string): Promise<PostData | null> {
   try {
-    const { content, data } = await getPostContent(slug);
+    const filePath = path.join(postsDirectory, `${slug}.md`);
+    const fileContents = fs.readFileSync(filePath, "utf8");
+    const { data, content } = matter(fileContents);
 
     const meta: PostMeta = {
       slug,
@@ -87,15 +69,11 @@ export async function getPostHtml(slug: string): Promise<PostData | null> {
       image: data.image ?? null,
     };
 
-    // Si en el CMS pegas HTML, lo limpiamos.
-    // (Si algún día conviertes Markdown->HTML, reemplaza `content` por el HTML renderizado)
     const clean = sanitizeHtml(content, {
-      allowedAttributes: { "*": ["class", "id", "style"] },
-      transformTags: {
-        a: (tagName: string, attribs: any) => ({
-          tagName,
-          attribs: { rel: "noopener noreferrer", ...attribs },
-        }),
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+      allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        img: ["src", "alt"],
       },
     });
 
@@ -105,5 +83,5 @@ export async function getPostHtml(slug: string): Promise<PostData | null> {
   }
 }
 
-/** Alias por compatibilidad con imports antiguos */
+// Alias para compatibilidad
 export { getPostsMeta as getAllPosts };
