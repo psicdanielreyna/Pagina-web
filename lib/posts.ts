@@ -1,90 +1,109 @@
-import fs from "fs";
-import path from "path";
+// lib/posts.ts
+import fs from "node:fs";
+import fsp from "node:fs/promises";
+import path from "node:path";
 import matter from "gray-matter";
-import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";
 
-// Tipos
-export interface PostMeta {
+export type PostMeta = {
   slug: string;
   title: string;
-  date: string;
+  date: string;            // YYYY-MM-DD o ISO
   description?: string;
   image?: string | null;
-}
+};
 
-export interface PostData {
+export type PostData = {
   meta: PostMeta;
-  content: string; // Contenido en HTML limpio
+  content: string;         // HTML seguro (sanitizado)
+};
+
+// Carpeta donde viven los .md
+const POSTS_DIR = path.join(process.cwd(), "content", "blog");
+
+// Helpers
+function mdFile(slug: string) {
+  return path.join(POSTS_DIR, `${slug}.md`);
 }
 
-const postsDirectory = path.join(process.cwd(), "content/posts");
+function fileToSlug(filename: string) {
+  return filename.replace(/\.md$/i, "");
+}
 
-// Lee todos los slugs
+/** Slugs síncronos: útil para generateStaticParams() */
 export function getAllSlugs(): string[] {
+  if (!fs.existsSync(POSTS_DIR)) return [];
   return fs
-    .readdirSync(postsDirectory)
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => file.replace(/\.md$/, ""));
+    .readdirSync(POSTS_DIR, { withFileTypes: true })
+    .filter((d) => d.isFile() && d.name.toLowerCase().endsWith(".md"))
+    .map((d) => fileToSlug(d.name));
 }
 
-// Obtiene metadata de un post
+/** Lee un post (MD) y regresa { content, data } */
+async function getPostContent(slug: string): Promise<{ content: string; data: any }> {
+  const full = mdFile(slug);
+  const raw = await fsp.readFile(full, "utf8");
+  const { content, data } = matter(raw);
+  return { content, data };
+}
+
+/** Deriva solo los metadatos de un slug */
 export function getPostMeta(slug: string): PostMeta | null {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
+  try {
+    const raw = fs.readFileSync(mdFile(slug), "utf8");
+    const { data } = matter(raw);
 
-  if (!fs.existsSync(fullPath)) return null;
-
-  const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { data } = matter(fileContents);
-
-  return {
-    slug,
-    title: data.title ?? "",
-    date: data.date ?? "",
-    description: data.description ?? "",
-    image: data.image ?? null,
-  };
+    const meta: PostMeta = {
+      slug,
+      title: data.title ?? "",
+      date: data.date ?? "",
+      description: data.description ?? "",
+      image: data.image ?? null,
+    };
+    return meta;
+  } catch {
+    return null;
+  }
 }
 
-// Obtiene metadata de todos los posts ordenados por fecha
+/** Lista de posts con metadata, ordenada desc por fecha */
 export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
-    .map((slug) => getPostMeta(slug))
-    .filter((meta): meta is PostMeta => meta !== null)
+    .map((s) => getPostMeta(s))
+    .filter(Boolean) as PostMeta[]
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-// Obtiene post completo con HTML renderizado
+/** Post completo con HTML sanitizado */
 export async function getPostHtml(slug: string): Promise<PostData | null> {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
+  try {
+    const { content, data } = await getPostContent(slug);
 
-  if (!fs.existsSync(fullPath)) return null;
+    const meta: PostMeta = {
+      slug,
+      title: data.title ?? "",
+      date: data.date ?? "",
+      description: data.description ?? "",
+      image: data.image ?? null,
+    };
 
-  const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { data, content } = matter(fileContents);
+    // Si en el CMS pegas HTML, lo limpiamos.
+    // (Si algún día conviertes Markdown->HTML, reemplaza `content` por el HTML renderizado)
+    const clean = sanitizeHtml(content, {
+      allowedAttributes: { "*": ["class", "id", "style"] },
+      transformTags: {
+        a: (tagName: string, attribs: any) => ({
+          tagName,
+          attribs: { rel: "noopener noreferrer", ...attribs },
+        }),
+      },
+    });
 
-  // Markdown -> HTML
-  const rawHtml = marked(content);
-
-  // Sanitizar HTML
-  const clean = sanitizeHtml(rawHtml, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
-    allowedAttributes: {
-      ...sanitizeHtml.defaults.allowedAttributes,
-      img: ["src", "alt"],
-    },
-  });
-
-  const meta: PostMeta = {
-    slug,
-    title: data.title ?? "",
-    date: data.date ?? "",
-    description: data.description ?? "",
-    image: data.image ?? null,
-  };
-
-  return { meta, content: clean };
+    return { meta, content: clean };
+  } catch {
+    return null;
+  }
 }
 
-// Alias por compatibilidad
+/** Alias por compatibilidad con imports antiguos */
 export { getPostsMeta as getAllPosts };
