@@ -1,60 +1,52 @@
 // app/blog/page.tsx
 import Link from "next/link";
-import Image from "next/image";
 import { getPostsMeta } from "@/lib/posts";
 
 export const metadata = {
   title: "Blog | Daniel Reyna",
-  description: "Entradas del blog de psicología y bienestar",
+  description: "Reflexiones, artículos y recursos de psicología.",
 };
 
-export default function BlogPage() {
-  const posts = getPostsMeta();
+export default async function BlogPage() {
+  const posts = await getPostsMeta();
+
+  if (!posts || posts.length === 0) {
+    return (
+      <section className="max-w-3xl mx-auto px-4 py-12">
+        <h1 className="text-3xl font-bold mb-6">Blog</h1>
+        <p className="text-neutral-600">No hay artículos todavía.</p>
+      </section>
+    );
+  }
 
   return (
-    <section className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-extrabold mb-6">Blog</h1>
-
-      <div className="space-y-6">
+    <section className="max-w-3xl mx-auto px-4 py-12">
+      <h1 className="text-3xl font-bold mb-6">Blog</h1>
+      <div className="space-y-8">
         {posts.map((post) => (
-          <article
-            key={post.slug}
-            className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
-          >
-            {post.image && (
-              <Link href={`/blog/${post.slug}`} className="block">
-                <div className="relative mb-4 overflow-hidden rounded-lg aspect-[16/9]">
-                  <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 800px"
-                    priority={false}
-                  />
-                </div>
+          <article key={post.slug} className="border-b pb-6">
+            <h2 className="text-2xl font-semibold mb-2">
+              <Link
+                href={`/blog/${post.slug}`}
+                className="hover:text-blue-600 transition"
+              >
+                {post.title}
               </Link>
-            )}
-
-            <h2 className="text-xl font-bold leading-tight">
-              <Link href={`/blog/${post.slug}`}>{post.title}</Link>
             </h2>
-
-            <p className="mt-1 text-xs text-gray-500">
-              {new Date(post.date).toUTCString()}
+            <p className="text-sm text-neutral-500">
+              {new Date(post.date).toLocaleDateString("es-MX", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </p>
-
-            {post.description && (
-              <p className="mt-3 text-gray-700">
-                {post.description}
-              </p>
-            )}
-
+            <p className="mt-3 text-neutral-700">{post.description}</p>
             <Link
               href={`/blog/${post.slug}`}
-              className="mt-3 inline-block text-green-700 hover:underline"
+              className="text-blue-600 hover:underline mt-2 inline-block"
             >
-              Página del artículo…
+              Leer más →
             </Link>
           </article>
         ))}
