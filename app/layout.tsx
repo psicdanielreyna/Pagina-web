@@ -29,6 +29,20 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <script
+       dangerouslySetInnerHTML={{
+          __html: `
+        (function() {
+          try {
+            var t = localStorage.getItem('theme');
+            if (!t) { t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+            if (t === 'dark') document.documentElement.classList.add('dark');
+          } catch(e) {}
+        })();
+    `,
+    }}
+  />
+</head>
       </head>
       <body className={`${inter.className} bg-almond text-evergreen`}>
         <SiteHeader />
