@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
+import Header from "@/components/header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,13 +43,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} bg-almond text-evergreen dark:bg-evergreen dark:text-almond`}>
-        <SiteHeader />
-        {/* si tu SiteHeader ya incluye contenedor/padding, puedes dejar <main> solo con min-h */}
-        <main className="min-h-screen container px-4 py-8">
-          {children}
-        </main>
-        <Footer />
+     <body className="min-h-screen bg-background text-foreground">
+      <Header />
+      <main className="min-h-screen container mx-auto px-4 py-8">{children}</main>
+      {/* si decides regresar Footer, colócalo aquí */}
       </body>
     </html>
   );
