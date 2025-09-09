@@ -1,13 +1,20 @@
+// app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import ThemeToggle from "@/components/ThemeToggle";
+import SiteHeader from "@/components/SiteHeader";
+import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Daniel Reyna | Psicólogo",
-  description: "Psicología y bienestar: ansiedad, hábitos, relaciones y más.",
+  title: "Daniel Reyna — Psicólogo",
+  description: "Terapia clara y práctica para sentirte mejor.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -18,40 +25,30 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        {/* Previene FOUC */}
+        {/* Evita FOUC al decidir el tema antes de pintar */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-(function() {
+(function () {
   try {
     var t = localStorage.getItem('theme');
     if (!t) {
       t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     if (t === 'dark') document.documentElement.classList.add('dark');
-  } catch(e) {}
+  } catch (e) {}
 })();
-            `,
+`,
           }}
         />
       </head>
-      <body className={`${inter.className} min-h-screen`}>
-        {/* Header */}
-        <header className="w-full flex justify-between items-center p-4 border-b border-current">
-          <div className="font-bold text-lg">☕ Daniel Reyna</div>
-          <div className="flex items-center gap-3">
-            {/* Íconos sociales aquí */}
-            <ThemeToggle />
-          </div>
-        </header>
-
-        {/* Contenido principal */}
-        <main className="container px-4 py-8">{children}</main>
-
-        {/* Footer */}
-        <footer className="w-full text-center py-6 border-t border-current text-sm">
-          © {new Date().getFullYear()} Daniel Reyna. Todos los derechos reservados.
-        </footer>
+      <body className={`${inter.className} bg-almond text-evergreen dark:bg-evergreen dark:text-almond`}>
+        <SiteHeader />
+        {/* si tu SiteHeader ya incluye contenedor/padding, puedes dejar <main> solo con min-h */}
+        <main className="min-h-screen container px-4 py-8">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );
