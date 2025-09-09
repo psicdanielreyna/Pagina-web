@@ -43,63 +43,60 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </section>
 
         {/* --- Footer --- */}
-        <footer className="bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-10 grid gap-8 md:grid-cols-3">
-            {/* Marca */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/logo.png"
-                  alt="Daniel Reyna — Psicólogo"
-                  width={40}
-                  height={40}
-                  className="h-10 w-10"
-                />
-                <span className="font-semibold">Daniel Reyna — Psicólogo</span>
+        (
+          <footer className="border-t bg-white">
+            <div className="container mx-auto max-w-6xl px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+              
+              {/* Logo y descripción */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <img src="/logo.png" alt="Daniel Reyna – Psicólogo" className="h-8 w-auto" />
+                </div>
+                <p className="text-sm text-gray-600">
+                  Terapia clara y práctica. Herramientas simples para sentirte mejor en tu día a día.
+                </p>
+                <div className="flex gap-4 mt-4">
+                  <Link href="https://instagram.com/psic.danielreyna" target="_blank" aria-label="Instagram">
+                    <Instagram className="h-5 w-5 hover:text-emerald-700 transition-colors" />
+                  </Link>
+                  <Link href="https://facebook.com/psic.danielreyna" target="_blank" aria-label="Facebook">
+                    <Facebook className="h-5 w-5 hover:text-emerald-700 transition-colors" />
+                  </Link>
+                  <Link href="https://youtube.com/@Psicdanielreyna" target="_blank" aria-label="YouTube">
+                    <Youtube className="h-5 w-5 hover:text-emerald-700 transition-colors" />
+                  </Link>
+                  <Link href="https://x.com/psicdanreyna" target="_blank" aria-label="X">
+                    <Twitter className="h-5 w-5 hover:text-emerald-700 transition-colors" />
+                  </Link>
+                </div>
               </div>
-              <p className="text-sm text-emerald-900/70">
-                Terapia clara y práctica. Herramientas simples para sentirte mejor en tu día a día.
-              </p>
-              <div className="flex items-center gap-3 text-emerald-900/70">
-                <a href="https://instagram.com/psic.danielreyna" target="_blank" rel="noreferrer" aria-label="Instagram">IG</a>
-                <a href="https://facebook.com/psic.danielreyna" target="_blank" rel="noreferrer" aria-label="Facebook">FB</a>
-                <a href="https://youtube.com/@Psicdanielreyna" target="_blank" rel="noreferrer" aria-label="YouTube">YT</a>
-                <a href="https://x.com/psicdanreyna" target="_blank" rel="noreferrer" aria-label="X">X</a>
+      
+              {/* Navegación */}
+              <div>
+                <h3 className="font-semibold mb-3">NAVEGACIÓN</h3>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li><Link href="/blog">Blog</Link></li>
+                  <li><Link href="/servicios">Servicios</Link></li>
+                  <li><Link href="/sobre-mi">Sobre mí</Link></li>
+                  <li><Link href="/contacto">Contacto</Link></li>
+                </ul>
               </div>
-            </div>
-
-            {/* Navegación */}
-            <div>
-              <h3 className="mb-3 font-semibold">Navegación</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/blog" className="hover:underline">Blog</Link></li>
-                <li><Link href="/servicios" className="hover:underline">Servicios</Link></li>
-                <li><Link href="/sobre-mi" className="hover:underline">Sobre mí</Link></li>
-                <li><Link href="/contacto" className="hover:underline">Contacto</Link></li>
-              </ul>
-            </div>
-
-            {/* Contacto */}
-            <div>
-              <h3 className="mb-3 font-semibold">Contacto</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a className="hover:underline" href="mailto:hola@danielreyna.mx">hola@danielreyna.mx</a></li>
-                <li>Monterrey, N.L. · México</li>
-                <li>Atención en línea</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t">
-            <div className="mx-auto max-w-6xl px-4 py-6 flex flex-col items-center justify-between gap-3 text-xs text-emerald-900/60 md:flex-row">
-              <p>© {new Date().getFullYear()} Daniel Reyna. Todos los derechos reservados.</p>
-              <div className="flex items-center gap-4">
-                <Link href="/aviso" className="hover:underline">Aviso de privacidad</Link>
-                <Link href="/terminos" className="hover:underline">Términos y condiciones</Link>
+      
+              {/* Contacto */}
+              <div>
+                <h3 className="font-semibold mb-3">CONTACTO</h3>
+                <p className="text-sm text-gray-700">danielreyna@danielreyna.mx</p>
+                <p className="text-sm text-gray-700">Monterrey, N.L. · México</p>
+                <p className="text-sm text-gray-700">Atención en línea</p>
               </div>
             </div>
-          </div>
-        </footer>
+      
+            <div className="border-t text-center py-4 text-xs text-gray-500">
+              © {new Date().getFullYear()} Daniel Reyna. Todos los derechos reservados.
+            </div>
+          </footer>
+        )
+      }
       </body>
     </html>
   );
