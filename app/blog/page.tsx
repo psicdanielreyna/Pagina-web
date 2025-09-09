@@ -1,92 +1,73 @@
-// app/blog/page.tsx
 import Link from "next/link";
 import Image from "next/image";
-import type { Metadata } from "next";
 import { getPostsMeta } from "@/lib/posts";
 
-export const metadata: Metadata = {
-  title: "Blog | Daniel Reyna",
-  description:
-    "Artículos de psicología y bienestar: ansiedad, hábitos, relaciones y más.",
+export const metadata = {
+  title: "Blog — Daniel Reyna",
+  description: "Notas, reflexiones y herramientas prácticas.",
 };
 
-function formatDate(iso?: string) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  return d.toLocaleDateString("es-MX", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  });
-}
-
-export default async function BlogPage() {
+export default function BlogIndexPage() {
   const posts = getPostsMeta();
 
   return (
-    <section className="mx-auto max-w-4xl px-6 sm:px-8 md:px-10">
-      <h1 className="mb-8 mt-10 text-4xl font-extrabold tracking-tight">Blog</h1>
+    <main className="container py-10">
+      <h1 className="text-3xl md:text-4xl font-semibold mb-6">Blog</h1>
 
-      {posts.length === 0 && (
-        <p className="text-neutral-500">No hay artículos todavía.</p>
-      )}
-
-      <div className="space-y-12">
-        {posts.map((post) => {
-          const href = `/blog/${post.slug}`;
-          const date = formatDate(post.date);
-
-          return (
-            <article key={post.slug} className="pb-12 border-b border-neutral-200">
-              {/* Título grande, estilo editorial */}
-              <h2 className="text-3xl sm:text-4xl font-extrabold leading-snug">
-                <Link href={href} className="hover:underline">
-                  {post.title}
-                </Link>
-              </h2>
-
-              {/* Fecha */}
-              {date && (
-                <div className="mt-2 text-sm text-neutral-500">{date}</div>
-              )}
-
-              {/* Imagen amplia (si existe) */}
+      <div className="space-y-8">
+        {posts.map((post) => (
+          <article key={post.slug} className="border-b pb-8">
+            {/* Cabecera compacta con imagen a la izquierda en desktop */}
+            <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-start">
               {post.image && (
-                <div className="mt-6">
-                  <Link href={href} aria-label={`Abrir ${post.title}`}>
-                    <Image
-                      src={post.image}
-                      alt={post.title}
-                      width={1600}
-                      height={900}
-                      sizes="(min-width: 1024px) 896px, (min-width: 640px) 600px, 90vw"
-                      className="w-full h-auto rounded-md"
-                      priority={false}
-                    />
-                  </Link>
+                <div className="md:shrink-0">
+                  <Image
+                    src={post.image}
+                    alt={post.title}
+                    width={320}
+                    height={200}
+                    sizes="(min-width: 1024px) 320px, 90vw"
+                    className="rounded-xl object-cover w-[320px] h-[200px] max-w-full"
+                  />
                 </div>
               )}
 
-              {/* Extracto */}
-              {post.description && (
-                <p className="mt-6 text-lg leading-relaxed text-neutral-800">
-                  {post.description}
-                </p>
-              )}
+              <div className="flex-1">
+                <h2 className="text-2xl md:text-[28px] font-semibold leading-snug">
+                  <Link href={`/blog/${post.slug}`} className="hover:underline">
+                    {post.title}
+                  </Link>
+                </h2>
 
-              {/* Link “Página del artículo…” al estilo simple */}
-              <div className="mt-4">
-                <Link
-                  href={href}
-                  className="text-emerald-700 hover:text-emerald-800 underline underline-offset-4"
-                >
-                  Página del artículo…
-                </Link>
+                {post.date && (
+                  <p className="text-sm opacity-70 mt-1">
+                    {new Date(post.date).toLocaleDateString("es-MX", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                )}
+
+                {post.description && (
+                  <p className="mt-3 text-base opacity-90">
+                    {post.description}
+                  </p>
+                )}
+
+                <div className="mt-4">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="inline-block text-sm font-medium underline underline-offset-4"
+                  >
+                    Página del artículo →
+                  </Link>
+                </div>
               </div>
-            </article>
-          );
-        })}
+            </div>
+          </article>
+        ))}
       </div>
-    </section>
+    </main>
   );
 }
