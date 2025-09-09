@@ -38,7 +38,7 @@ export default function Hero() {
         {/* Imagen más grande */}
         <div className="flex-1">
           <Image
-            src="/hero-image.jpg"
+            src="/hero.png"
             alt="Sesión de terapia"
             width={700}
             height={500}
