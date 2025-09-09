@@ -32,8 +32,8 @@ export default function RootLayout({
         </main>
 
         {/* Newsletter (una sola vez, antes del footer) */}
-        <section className="border-y bg-white/90 backdrop-blur-sm">
-          <div className="container mx-auto max-w-5xl px-4 py-8">
+        <section className="border-y bg-almond/60">
+          <div className="container mx-auto max-w-6xl px-4 py-12">
             <NewsletterForm />
           </div>
         </section>
