@@ -1,8 +1,6 @@
 // app/page.tsx
 import Hero from "@/components/Hero";
 import Recursos from "@/components/Recursos";
-import UltimoBlog from "@/components/UltimoBlog";
-import Newsletter from "@/components/Newsletter";
 import LatestBlog from "@/components/LatestBlog";
 
 export default function HomePage() {
@@ -11,7 +9,6 @@ export default function HomePage() {
       <Hero />
       <Recursos />
       <LatestBlog />
-      <Newsletter />   {/* <--- Newsletter abajo del blog */}
     </div>
   );
 }
