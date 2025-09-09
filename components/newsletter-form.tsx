@@ -27,7 +27,10 @@ export default function NewsletterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 justify-center">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col sm:flex-row gap-3 justify-center"
+    >
       <input
         type="email"
         placeholder="tu@email.com"
