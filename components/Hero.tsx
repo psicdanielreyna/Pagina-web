@@ -1,48 +1,48 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="relative bg-[#F6E9D9] py-16">
-      <div className="container mx-auto flex flex-col-reverse items-center justify-between gap-12 px-6 md:flex-row md:gap-8">
+    <section className="relative bg-[#F6E9D9]">
+      <div className="container mx-auto flex flex-col-reverse items-center gap-8 px-4 py-16 md:flex-row md:gap-12">
         {/* Texto */}
-        <div className="max-w-xl text-center md:text-left">
-          <h1 className="text-4xl font-extrabold tracking-tight text-emerald-900 sm:text-5xl">
+        <div className="flex-1 text-center md:text-left">
+          <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-[#043222] md:text-5xl">
             Psicología clara y práctica
           </h1>
-          <p className="mt-4 text-lg text-emerald-800">
+          <p className="mt-4 text-lg font-medium text-[#043222]">
             Pequeños cambios que transforman tu bienestar.
           </p>
-          <p className="mt-2 text-gray-700">
+          <p className="mt-2 text-base text-gray-700">
             Herramientas simples que puedes aplicar en tu día a día.
           </p>
 
-          {/* Botones */}
-          <div className="mt-6 flex flex-wrap justify-center gap-4 md:justify-start">
-            <a
+          <div className="mt-6 flex flex-col items-center gap-4 md:flex-row md:items-start">
+            <Link
               href="/agenda"
-              className="rounded-md bg-emerald-900 px-5 py-2.5 text-sm font-medium text-white shadow hover:bg-emerald-800"
+              className="rounded-md bg-[#043222] px-6 py-3 text-white shadow hover:bg-[#065c3b] transition"
             >
               Agenda una cita
-            </a>
-            <a
+            </Link>
+            <Link
               href="/tienda"
-              className="rounded-md border border-emerald-900 px-5 py-2.5 text-sm font-medium text-emerald-900 hover:bg-emerald-50"
+              className="rounded-md border border-[#043222] px-6 py-3 text-[#043222] hover:bg-[#043222] hover:text-white transition"
             >
               Ver recursos
-            </a>
+            </Link>
           </div>
         </div>
 
-        {/* Imagen */}
-        <div className="relative w-full max-w-md md:w-1/2">
+        {/* Imagen más grande */}
+        <div className="flex-1">
           <Image
-            src="/hero.png" // 👈 coloca tu imagen en /public/
+            src="/hero-image.jpg"
             alt="Sesión de terapia"
-            width={480}
-            height={320}
-            className="rounded-lg shadow-md"
+            width={700}
+            height={500}
+            className="rounded-lg shadow-lg object-cover w-full h-auto"
             priority
           />
         </div>
