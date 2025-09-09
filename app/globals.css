@@ -1,75 +1,55 @@
-/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Base (paleta) ===== */
-html,
-body {
-  @apply bg-almond text-evergreen;
+/* ===== Base (modo claro / oscuro con .dark en <html>) ===== */
+@layer base {
+  html {
+    @apply bg-almond text-evergreen;
+    color-scheme: light;
+  }
+  html.dark {
+    @apply bg-evergreen text-almond;
+    color-scheme: dark;
+  }
+  body { @apply min-h-screen; }
 }
 
-/* ===== Utilidades ===== */
+/* Utilidades que ya usabas */
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
-/* ===== Componentes comunes ===== */
-.btn-primary {
-  @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition;
-}
-.btn-secondary {
-  @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition;
-}
+/* Botones base (ejemplo) */
+.btn-primary { @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition; }
+.btn-secondary { @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition; }
+
+/* Contenedor */
 .container { @apply mx-auto max-w-6xl; }
 
-/* Sheet / Drawer (hamburguesa) */
+/* Drawer */
 [data-state="open"].fixed.inset-0.bg-black\/80 { opacity: 1; }
-div[data-side="left"].fixed { background: #fff; } /* Si quieres, cámbialo a #F6E9D9 */
+div[data-side="left"].fixed { background: #fff; }
+html.dark div[data-side="left"].fixed { background: #0b281f; } /* tono acorde en dark */
 div[data-side="left"].fixed .overflow-y-auto { overscroll-behavior: contain; }
 
 /* ===== Prosa (contenido del blog) ===== */
-.prose {
-  max-width: none;                 /* equivalente al antiguo max-w-none */
-  color: #043222;                  /* evergreen */
-  background-color: #F6E9D9;       /* almond */
-}
+.prose { @apply max-w-none; }
+.prose a { @apply underline; }
+.prose img { @apply rounded-xl; }
+.prose .text-center { text-align: center; }
 
-.prose :where(h1,h2,h3,h4) { color: #043222; }
-.prose a { text-decoration: underline; }
-.prose img { border-radius: 0.75rem; }
+/* Colores de tipografía por modo */
+.prose { color: theme(colors.evergreen); }
+html.dark .prose { color: theme(colors.almond); }
+html.dark .prose a { color: theme(colors.almond); }
 
-/* ===== BLOG: limitar ancho de imágenes/embeds ===== */
+/* Imágenes/iframes con ancho razonable */
 .post-content img {
-  display: block;
-  margin: 1.25rem auto;
-  width: 100%;
-  max-width: 960px;
-  height: auto;
-  border-radius: 0.75rem;
+  display: block; margin: 1.25rem auto; width: 100%; max-width: 960px; height: auto; border-radius: 0.75rem;
 }
 .post-content iframe,
 .post-content video {
-  display: block;
-  margin: 1.25rem auto;
-  max-width: 960px;
-  width: 100%;
-  border-radius: 0.5rem;
-
-  /* Asegura colores base (lo que ya tienes) */
-  html,
-  body {
-    @apply bg-almond text-evergreen;
-  }
-  
-  /* ...tus reglas existentes... */
-  
-  /* Prosa del blog */
-  .prose a { @apply underline; }
-  .prose img { @apply rounded-xl; }
-  
-  /* 👇 Hace efectivo el centrado dentro del contenido del post */
-  .prose .text-center { text-align: center; }
-  
+  display: block; margin: 1.25rem auto; max-width: 960px; width: 100%; border-radius: 0.5rem;
 }
