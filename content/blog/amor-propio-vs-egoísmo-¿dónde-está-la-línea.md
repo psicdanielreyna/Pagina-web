@@ -16,11 +16,7 @@ El amor propio es la capacidad de **reconocerte como alguien valioso** y actuar 
 * **Tomar decisiones alineadas a tus valores.**
 * **Tratarte con la misma compasión que tendrías hacia alguien querido.**
 
-
-
 En pocas palabras: el amor propio es **autocuidado consciente**, no arrogancia.
-
-
 
 # **¿Qué es el egoísmo?**
 
@@ -32,8 +28,6 @@ El egoísmo, en cambio, es poner siempre tus intereses por encima de los demás,
 
 El egoísmo no nace del cuidado, sino de la indiferencia hacia el otro.
 
-
-
 # **El punto de confusión**
 
 El problema es que a veces la gente confunde **poner límites** con ser **egoísta.**
@@ -42,11 +36,7 @@ El problema es que a veces la gente confunde **poner límites** con ser **egoís
 * **Terminar una relación que te daña no es egoísmo, es amor propio.**
 * **Dedicar tiempo a ti mismo para descansar no es egoísmo, es amor propio.**
 
-
-
 La diferencia está en la **intención**: el amor propio busca equilibrio; el egoísmo, solo conveniencia.
-
-
 
 # **Como identificar la diferencia**
 
@@ -55,11 +45,6 @@ Pregúntate:
 1. ¿**Estoy cuidando mi bienestar sin dañar al otro?** → Amor propio.
 2. **¿Estoy buscando solo mi beneficio, aunque afecte a alguien más?** → Egoísmo.
 3. **¿Mis decisiones nacen del respeto (a mí y a otros) o del miedo y la indiferencia?**
-
-
-
-
-
 
 El amor propio no es egoísmo. Al contrario, cuando te cuidas y te respetas, puedes relacionarte mejor con los demás. La clave está en el equilibrio: valorarte sin dejar de reconocer el valor del otro.
 
