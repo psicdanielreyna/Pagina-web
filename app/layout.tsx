@@ -1,20 +1,13 @@
-// app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import SiteHeader from "@/components/SiteHeader";
-import Footer from "@/components/Footer";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Daniel Reyna — Psicólogo",
-  description: "Terapia clara y práctica para sentirte mejor.",
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
+  title: "Daniel Reyna | Psicólogo",
+  description: "Psicología y bienestar: ansiedad, hábitos, relaciones y más.",
 };
 
 export default function RootLayout({
@@ -25,29 +18,40 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        {/* Favicon fallbacks */}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        {/* Previene FOUC */}
         <script
-       dangerouslySetInnerHTML={{
-          __html: `
-        (function() {
-          try {
-            var t = localStorage.getItem('theme');
-            if (!t) { t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
-            if (t === 'dark') document.documentElement.classList.add('dark');
-          } catch(e) {}
-        })();
-    `,
-    }}
-  />
-</head>
+          dangerouslySetInnerHTML={{
+            __html: `
+(function() {
+  try {
+    var t = localStorage.getItem('theme');
+    if (!t) {
+      t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    if (t === 'dark') document.documentElement.classList.add('dark');
+  } catch(e) {}
+})();
+            `,
+          }}
+        />
       </head>
-      <body className={`${inter.className} bg-almond text-evergreen`}>
-        <SiteHeader />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+      <body className={`${inter.className} min-h-screen`}>
+        {/* Header */}
+        <header className="w-full flex justify-between items-center p-4 border-b border-current">
+          <div className="font-bold text-lg">☕ Daniel Reyna</div>
+          <div className="flex items-center gap-3">
+            {/* Íconos sociales aquí */}
+            <ThemeToggle />
+          </div>
+        </header>
+
+        {/* Contenido principal */}
+        <main className="container px-4 py-8">{children}</main>
+
+        {/* Footer */}
+        <footer className="w-full text-center py-6 border-t border-current text-sm">
+          © {new Date().getFullYear()} Daniel Reyna. Todos los derechos reservados.
+        </footer>
       </body>
     </html>
   );
