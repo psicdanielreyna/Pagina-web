@@ -56,4 +56,20 @@ div[data-side="left"].fixed .overflow-y-auto { overscroll-behavior: contain; }
   max-width: 960px;
   width: 100%;
   border-radius: 0.5rem;
+
+  /* Asegura colores base (lo que ya tienes) */
+  html,
+  body {
+    @apply bg-almond text-evergreen;
+  }
+  
+  /* ...tus reglas existentes... */
+  
+  /* Prosa del blog */
+  .prose a { @apply underline; }
+  .prose img { @apply rounded-xl; }
+  
+  /* 👇 Hace efectivo el centrado dentro del contenido del post */
+  .prose .text-center { text-align: center; }
+  
 }
