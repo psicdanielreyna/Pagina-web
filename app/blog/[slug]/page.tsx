@@ -1,50 +1,89 @@
-import { notFound } from "next/navigation";
-import { getPostHtml } from "@/lib/posts";
+import type { Metadata } from "next";
+import Image from "next/image";
+import { getAllSlugs, getPostHtml } from "@/lib/posts";
 
-export default async function BlogPostPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+type Props = { params: { slug: string } };
+
+export async function generateStaticParams() {
+  const slugs = getAllSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = await getPostHtml(params.slug);
-  if (!data) notFound();
+  if (!data) return { title: "Artículo no encontrado" };
+
+  const { meta } = data;
+  return {
+    title: meta.title,
+    description: meta.description,
+    openGraph: {
+      title: meta.title,
+      description: meta.description,
+      images: meta.image ? [{ url: meta.image }] : [],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: meta.title,
+      description: meta.description,
+      images: meta.image ? [meta.image] : [],
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: Props) {
+  const data = await getPostHtml(params.slug);
+
+  if (!data) {
+    return (
+      <main className="container py-12">
+        <h1 className="text-2xl font-semibold">Artículo no encontrado</h1>
+        <p className="mt-2 text-sm opacity-70">Revisa la URL o vuelve al blog.</p>
+      </main>
+    );
+  }
 
   const { meta, content } = data;
 
-  // 👇 asegurar strings para la fecha
-  const d = new Date(meta.date ?? "");
-  const isValid = !Number.isNaN(d.getTime());
-  const dateISO = isValid ? d.toISOString() : "";
-  const dateLabel = isValid
-    ? d.toLocaleString("es-MX", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "UTC",
-      })
-    : meta.date || "";
-
   return (
-    <article className="prose mx-auto px-4 py-8">
-      <h1>{meta.title}</h1>
+    <main className="container max-w-4xl py-10">
+      <article className="space-y-6">
+        <header className="space-y-2">
+          <h1 className="text-3xl md:text-4xl font-semibold leading-tight">{meta.title}</h1>
+          {meta.date && (
+            <p className="text-sm opacity-70">
+              {new Date(meta.date).toLocaleDateString("es-MX", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          )}
+          {meta.description && <p className="text-base opacity-80">{meta.description}</p>}
+        </header>
 
-      <p className="text-sm text-neutral-500">
-        <time dateTime={dateISO}>{dateLabel}</time>
-      </p>
+        {/* Hero optimizado para LCP */}
+        {meta.image && (
+          <div className="my-4">
+            <Image
+              src={meta.image}
+              alt={meta.title}
+              width={1200}
+              height={800}
+              priority
+              sizes="(min-width: 1024px) 960px, 100vw"
+              className="rounded-xl w-full h-auto"
+            />
+          </div>
+        )}
 
-      {meta.image ? (
-        <img
-          src={meta.image}
-          alt={meta.title}
-          className="rounded-xl my-6 w-full h-auto"
+        {/* Contenido del post */}
+        <div
+          className="post-content prose prose-lg max-w-none"
+          dangerouslySetInnerHTML={{ __html: content }}
         />
-      ) : null}
-
-      <div dangerouslySetInnerHTML={{ __html: content }} />
-    </article>
+      </article>
+    </main>
   );
 }
