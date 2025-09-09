@@ -5,38 +5,60 @@ import sanitizeHtml from "sanitize-html";
 import { marked } from "marked";
 
 export interface PostMeta {
-  slug: string;
+  slug: string;       // slug normalizado (sin acentos/signos)
   title: string;
   date: string;
   description: string;
   image?: string | null;
 }
-
 export interface PostData {
   meta: PostMeta;
-  content: string; // HTML sanitizado
+  content: string;    // HTML sanitizado
 }
 
-// 👉 ajusta si tus archivos viven en content/blog
-const postsDirectory = path.join(process.cwd(), "content", "blog");
+const postsDir = path.join(process.cwd(), "content", "blog");
 
-// Slugs
+// Normaliza: quita acentos, elimina signos raros, pasa a kebab-case
+function normalizeSlug(input: string): string {
+  const noExt = input.replace(/\.md$/i, "");
+  return noExt
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")     // diacríticos
+    .replace(/[^a-zA-Z0-9\s-]/g, "")     // signos
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .toLowerCase();
+}
+
+// Devuelve un mapa { slugNormalizado -> nombreArchivoReal.md }
+function buildSlugMap(): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const file of fs.readdirSync(postsDir)) {
+    if (!file.endsWith(".md")) continue;
+    const norm = normalizeSlug(file);
+    map[norm] = file; // guardamos el nombre real
+  }
+  return map;
+}
+
 export function getAllSlugs(): string[] {
-  return fs
-    .readdirSync(postsDirectory)
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => f.replace(/\.md$/, ""));
+  const map = buildSlugMap();
+  return Object.keys(map);
 }
 
-// Meta de un post
 export function getPostMeta(slug: string): PostMeta | null {
   try {
-    const filePath = path.join(postsDirectory, `${slug}.md`);
+    const map = buildSlugMap();
+    const realFile = map[normalizeSlug(slug)];
+    if (!realFile) return null;
+
+    const filePath = path.join(postsDir, realFile);
     const raw = fs.readFileSync(filePath, "utf8");
     const { data } = matter(raw);
 
     return {
-      slug,
+      slug: normalizeSlug(slug),
       title: data.title ?? "",
       date: data.date ?? "",
       description: data.description ?? "",
@@ -47,47 +69,44 @@ export function getPostMeta(slug: string): PostMeta | null {
   }
 }
 
-// Lista de posts (ordenados desc por fecha)
 export function getPostsMeta(): PostMeta[] {
-  return getAllSlugs()
-    .map((s) => getPostMeta(s))
+  const map = buildSlugMap();
+  return Object.entries(map)
+    .map(([norm]) => getPostMeta(norm))
     .filter((m): m is PostMeta => m !== null)
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-// Post completo con HTML (Markdown -> HTML -> sanitize)
 export async function getPostHtml(slug: string): Promise<PostData | null> {
   try {
-    const filePath = path.join(postsDirectory, `${slug}.md`);
+    const map = buildSlugMap();
+    const realFile = map[normalizeSlug(slug)];
+    if (!realFile) return null;
+
+    const filePath = path.join(postsDir, realFile);
     const raw = fs.readFileSync(filePath, "utf8");
     const { data, content: md } = matter(raw);
 
-    // 1) Markdown -> HTML
     const html = marked.parse(md);
-
-    // 2) Sanitizar (permitimos headings, listas, enlaces, imágenes, etc.)
     const clean = sanitizeHtml(html as string, {
       allowedTags: [
-        "h1", "h2", "h3", "h4", "h5", "h6",
-        "p", "blockquote", "hr",
-        "ul", "ol", "li",
-        "strong", "em", "del", "code", "pre",
-        "a", "img", "br",
+        "h1","h2","h3","h4","h5","h6","p","blockquote","hr",
+        "ul","ol","li","strong","em","del","code","pre","a","img","br"
       ],
       allowedAttributes: {
-        a: ["href", "title", "target", "rel"],
-        img: ["src", "alt", "title", "width", "height"],
+        a: ["href","title","target","rel"],
+        img: ["src","alt","title","width","height"],
       },
       transformTags: {
-        a: (tagName, attribs) => ({
-          tagName,
-          attribs: { rel: "noopener noreferrer", target: "_blank", ...attribs },
+        a: (tag, attrs) => ({
+          tagName: "a",
+          attribs: { rel: "noopener noreferrer", target: "_blank", ...attrs },
         }),
       },
     });
 
     const meta: PostMeta = {
-      slug,
+      slug: normalizeSlug(slug),
       title: data.title ?? "",
       date: data.date ?? "",
       description: data.description ?? "",
@@ -100,5 +119,4 @@ export async function getPostHtml(slug: string): Promise<PostData | null> {
   }
 }
 
-// Alias (por compatibilidad)
 export { getPostsMeta as getAllPosts };
