@@ -1,18 +1,12 @@
+// app/blog/[slug]/page.tsx
+import { getPostHtml } from "@/lib/posts";
 import type { Metadata } from "next";
-import Image from "next/image";
-import { getAllSlugs, getPostHtml } from "@/lib/posts";
 
 type Props = { params: { slug: string } };
 
-export async function generateStaticParams() {
-  const slugs = getAllSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = await getPostHtml(params.slug);
-  if (!data) return { title: "Artículo no encontrado" };
-
+  if (!data) return {};
   const { meta } = data;
   return {
     title: meta.title,
@@ -21,69 +15,55 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: meta.title,
       description: meta.description,
       images: meta.image ? [{ url: meta.image }] : [],
-      type: "article",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: meta.title,
-      description: meta.description,
-      images: meta.image ? [meta.image] : [],
     },
   };
 }
 
+function formatDate(iso?: string) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleDateString("es-MX", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export default async function BlogPostPage({ params }: Props) {
   const data = await getPostHtml(params.slug);
-
-  if (!data) {
-    return (
-      <main className="container py-12">
-        <h1 className="text-2xl font-semibold">Artículo no encontrado</h1>
-        <p className="mt-2 text-sm opacity-70">Revisa la URL o vuelve al blog.</p>
-      </main>
-    );
-  }
+  if (!data) return <div className="container py-16">Artículo no encontrado.</div>;
 
   const { meta, content } = data;
 
   return (
-    <main className="container max-w-4xl py-10">
-      <article className="space-y-6">
-        <header className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-semibold leading-tight">{meta.title}</h1>
-          {meta.date && (
-            <p className="text-sm opacity-70">
-              {new Date(meta.date).toLocaleDateString("es-MX", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          )}
-          {meta.description && <p className="text-base opacity-80">{meta.description}</p>}
-        </header>
+    <article className="container py-10">
+      <header className="mb-6">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+          {meta.title}
+        </h1>
 
-        {/* Hero optimizado para LCP */}
-        {meta.image && (
-          <div className="my-4">
-            <Image
-              src={meta.image}
-              alt={meta.title}
-              width={1200}
-              height={800}
-              priority
-              sizes="(min-width: 1024px) 960px, 100vw"
-              className="rounded-xl w-full h-auto"
-            />
-          </div>
+        {meta.date && (
+          <p className="mt-2 text-sm text-evergreen/70">{formatDate(meta.date)}</p>
         )}
 
-        {/* Contenido del post */}
-        <div
-          className="post-content prose prose-lg max-w-none"
-          dangerouslySetInnerHTML={{ __html: content }}
+        {meta.description && (
+          <p className="mt-3 text-lg text-evergreen/80">{meta.description}</p>
+        )}
+      </header>
+
+      {meta.image && (
+        <img
+          src={meta.image}
+          alt={meta.title}
+          className="my-6 mx-auto rounded-xl w-full max-w-3xl"
         />
-      </article>
-    </main>
+      )}
+
+      {/* PROSE: tipografía bonita para el markdown */}
+      <div
+        className="prose prose-lg max-w-none post-content"
+        dangerouslySetInnerHTML={{ __html: content }}
+      />
+    </article>
   );
 }
