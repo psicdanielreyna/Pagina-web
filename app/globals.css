@@ -12,44 +12,90 @@
     @apply bg-evergreen text-almond;
     color-scheme: dark;
   }
-  body { @apply min-h-screen; }
+  body {
+    @apply min-h-screen;
+  }
 }
 
-/* Utilidades que ya usabas */
+/* ===== Utilidades ===== */
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
-/* Botones base (ejemplo) */
-.btn-primary { @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition; }
-.btn-secondary { @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition; }
+/* ===== Botones base ===== */
+.btn-primary {
+  @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition;
+}
+.btn-secondary {
+  @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition;
+}
 
-/* Contenedor */
-.container { @apply mx-auto max-w-6xl; }
+/* ===== Contenedor base ===== */
+.container {
+  @apply mx-auto max-w-6xl;
+}
 
-/* Drawer */
-[data-state="open"].fixed.inset-0.bg-black\/80 { opacity: 1; }
-div[data-side="left"].fixed { background: #fff; }
-html.dark div[data-side="left"].fixed { background: #0b281f; } /* tono acorde en dark */
-div[data-side="left"].fixed .overflow-y-auto { overscroll-behavior: contain; }
+/* ===== Sheet / Drawer (hamburguesa) ===== */
+[data-state="open"].fixed.inset-0.bg-black\/80 {
+  opacity: 1;
+}
+div[data-side="left"].fixed {
+  background: #fff;
+}
+html.dark div[data-side="left"].fixed {
+  background: #0b281f; /* tono oscuro */
+}
+div[data-side="left"].fixed .overflow-y-auto {
+  overscroll-behavior: contain;
+}
 
 /* ===== Prosa (contenido del blog) ===== */
-.prose { @apply max-w-none; }
-.prose a { @apply underline; }
-.prose img { @apply rounded-xl; }
-.prose .text-center { text-align: center; }
-
-/* Colores de tipografía por modo */
-.prose { color: theme(colors.evergreen); }
-html.dark .prose { color: theme(colors.almond); }
-html.dark .prose a { color: theme(colors.almond); }
-
-/* Imágenes/iframes con ancho razonable */
-.post-content img {
-  display: block; margin: 1.25rem auto; width: 100%; max-width: 960px; height: auto; border-radius: 0.75rem;
+.prose {
+  @apply max-w-none;
 }
+.prose a {
+  @apply underline;
+}
+.prose img {
+  @apply rounded-xl;
+}
+.prose .text-center {
+  text-align: center;
+}
+
+/* Colores tipográficos por modo */
+.prose {
+  color: theme(colors.evergreen);
+}
+html.dark .prose {
+  color: theme(colors.almond);
+}
+html.dark .prose a {
+  color: theme(colors.almond);
+}
+
+/* ===== BLOG: limitar ancho de imágenes ===== */
+.post-content img {
+  display: block;
+  margin: 1.25rem auto;
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  border-radius: 0.75rem;
+}
+
+/* iframes/videos */
 .post-content iframe,
 .post-content video {
-  display: block; margin: 1.25rem auto; max-width: 960px; width: 100%; border-radius: 0.5rem;
+  display: block;
+  margin: 1.25rem auto;
+  max-width: 960px;
+  width: 100%;
+  border-radius: 0.5rem;
 }
