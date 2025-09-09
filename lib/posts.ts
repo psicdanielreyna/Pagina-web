@@ -1,49 +1,37 @@
-// lib/posts.ts
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import sanitizeHtml from "sanitize-html";
+import { marked } from "marked";
 
 export interface PostMeta {
   slug: string;
   title: string;
-  date: string;          // ISO string en frontmatter
+  date: string;
   description: string;
   image?: string | null;
 }
 
 export interface PostData {
   meta: PostMeta;
-  content: string;       // HTML sanitizado
+  content: string; // HTML sanitizado
 }
 
-// ——— helpers ———
-function dirIfExists(...parts: string[]): string | null {
-  const p = path.join(process.cwd(), ...parts);
-  return fs.existsSync(p) ? p : null;
-}
+// 👉 ajusta si tus archivos viven en content/blog
+const postsDirectory = path.join(process.cwd(), "content", "blog");
 
-// Usar content/blog si existe; de lo contrario content/posts
-const postsDirectory =
-  dirIfExists("content", "blog") ??
-  dirIfExists("content", "posts") ??
-  path.join(process.cwd(), "content", "blog"); // default para el tipado
-
-// Slugs disponibles
+// Slugs
 export function getAllSlugs(): string[] {
-  if (!postsDirectory) return [];
   return fs
     .readdirSync(postsDirectory)
-    .filter((file) => file.endsWith(".md") || file.endsWith(".mdx"))
-    .map((file) => file.replace(/\.(md|mdx)$/, ""));
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => f.replace(/\.md$/, ""));
 }
 
 // Meta de un post
 export function getPostMeta(slug: string): PostMeta | null {
   try {
-    const mdPath = path.join(postsDirectory!, `${slug}.md`);
-    const mdxPath = path.join(postsDirectory!, `${slug}.mdx`);
-    const filePath = fs.existsSync(mdPath) ? mdPath : mdxPath;
+    const filePath = path.join(postsDirectory, `${slug}.md`);
     const raw = fs.readFileSync(filePath, "utf8");
     const { data } = matter(raw);
 
@@ -59,7 +47,7 @@ export function getPostMeta(slug: string): PostMeta | null {
   }
 }
 
-// Lista con meta ordenada (fecha desc)
+// Lista de posts (ordenados desc por fecha)
 export function getPostsMeta(): PostMeta[] {
   return getAllSlugs()
     .map((s) => getPostMeta(s))
@@ -67,17 +55,36 @@ export function getPostsMeta(): PostMeta[] {
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-// Post completo con HTML (para .md simple)
+// Post completo con HTML (Markdown -> HTML -> sanitize)
 export async function getPostHtml(slug: string): Promise<PostData | null> {
   try {
-    const mdPath = path.join(postsDirectory!, `${slug}.md`);
-    const mdxPath = path.join(postsDirectory!, `${slug}.mdx`);
+    const filePath = path.join(postsDirectory, `${slug}.md`);
+    const raw = fs.readFileSync(filePath, "utf8");
+    const { data, content: md } = matter(raw);
 
-    // Sólo procesamos a HTML los .md (no MDX). Si es .mdx, que lo renderice la página/MDX pipeline.
-    const isMdx = fs.existsSync(mdxPath) && !fs.existsSync(mdPath);
-    const srcPath = fs.existsSync(mdPath) ? mdPath : mdxPath;
-    const raw = fs.readFileSync(srcPath, "utf8");
-    const { data, content } = matter(raw);
+    // 1) Markdown -> HTML
+    const html = marked.parse(md);
+
+    // 2) Sanitizar (permitimos headings, listas, enlaces, imágenes, etc.)
+    const clean = sanitizeHtml(html as string, {
+      allowedTags: [
+        "h1", "h2", "h3", "h4", "h5", "h6",
+        "p", "blockquote", "hr",
+        "ul", "ol", "li",
+        "strong", "em", "del", "code", "pre",
+        "a", "img", "br",
+      ],
+      allowedAttributes: {
+        a: ["href", "title", "target", "rel"],
+        img: ["src", "alt", "title", "width", "height"],
+      },
+      transformTags: {
+        a: (tagName, attribs) => ({
+          tagName,
+          attribs: { rel: "noopener noreferrer", target: "_blank", ...attribs },
+        }),
+      },
+    });
 
     const meta: PostMeta = {
       slug,
@@ -87,21 +94,11 @@ export async function getPostHtml(slug: string): Promise<PostData | null> {
       image: data.image ?? null,
     };
 
-    const clean = isMdx
-      ? content // dejar el contenido MDX para que lo maneje el render MDX
-      : sanitizeHtml(content, {
-          allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
-          allowedAttributes: {
-            ...sanitizeHtml.defaults.allowedAttributes,
-            img: ["src", "alt"],
-          },
-        });
-
     return { meta, content: clean };
   } catch {
     return null;
   }
 }
 
-// Alias compat
+// Alias (por compatibilidad)
 export { getPostsMeta as getAllPosts };
