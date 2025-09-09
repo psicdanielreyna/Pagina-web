@@ -23,29 +23,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <head>
-        {/* Evita FOUC al decidir el tema antes de pintar */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
 (function () {
   try {
-    var t = localStorage.getItem('theme');
-    if (!t) {
-      t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    var h = (typeof window !== 'undefined') ? window.location.hash : '';
+    if (/#(invite_token|confirmation_token|recovery_token)=/.test(h)) {
+      window.location.replace('/admin/' + h);
     }
-    if (t === 'dark') document.documentElement.classList.add('dark');
-  } catch (e) {}
+  } catch (e) { /* no-op */ }
 })();
 `,
           }}
         />
       </head>
-     <body className="min-h-screen bg-background text-foreground">
-      <Header />
-      <main className="min-h-screen container mx-auto px-4 py-8">{children}</main>
-      {/* si decides regresar Footer, colócalo aquí */}
+      <body className={`${inter.className} bg-almond text-evergreen`}>
+        <SiteHeader />
+        <main className="min-h-screen">{children}</main>
+        <Footer />
       </body>
     </html>
   );
