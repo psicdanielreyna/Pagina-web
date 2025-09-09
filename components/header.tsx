@@ -6,25 +6,25 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-// Toggle de tema simple: alterna la clase `dark` en <html>
 function ThemeToggle() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [isDark, setIsDark] = useState(false);
 
-  if (!mounted) return null;
-
-  const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+  // Inicializa desde localStorage o estado actual del <html>
+  useEffect(() => {
+    const root = document.documentElement;
+    const saved = localStorage.getItem("dr-theme");
+    const initial = saved ? saved === "dark" : root.classList.contains("dark");
+    root.classList.toggle("dark", initial);
+    setIsDark(initial);
+  }, []);
 
   const toggle = () => {
-    const el = document.documentElement;
-    el.classList.toggle("dark");
-    localStorage.setItem("dr-theme", el.classList.contains("dark") ? "dark" : "light");
+    const root = document.documentElement;
+    const next = !isDark;
+    setIsDark(next);
+    root.classList.toggle("dark", next);
+    localStorage.setItem("dr-theme", next ? "dark" : "light");
   };
-
-  useEffect(() => {
-    const saved = localStorage.getItem("dr-theme");
-    if (saved === "dark") document.documentElement.classList.add("dark");
-  }, []);
 
   return (
     <button
@@ -75,7 +75,6 @@ export default function Header() {
 
                 <div className="my-2 h-px bg-muted" />
 
-                {/* Extras que querías mover del footer */}
                 <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                   <Link href="/legal" className="hover:underline">Aviso de privacidad</Link>
                   <Link href="/contacto" className="hover:underline">Contacto</Link>
