@@ -1,10 +1,8 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+// tailwind.config.ts o .js
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: ["./app/**/*.{ts,tsx,js,jsx,mdx}", "./components/**/*.{ts,tsx,js,jsx,mdx}", "./lib/**/*.{ts,tsx,js,jsx,mdx}"],
   theme: {
     extend: {
       colors: {
@@ -15,7 +13,8 @@ module.exports = {
         DEFAULT: {
           css: {
             color: "#043222",
-            a: { color: "#043222", "&:hover": { color: "#065f46" } },
+            a: { textDecoration: "underline" },
+            "h1,h2,h3,h4": { color: "#043222" },
           },
         },
       },
@@ -23,3 +22,5 @@ module.exports = {
   },
   plugins: [require("@tailwindcss/typography")],
 };
+
+export default config;

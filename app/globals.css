@@ -31,13 +31,14 @@ div[data-side="left"].fixed .overflow-y-auto { overscroll-behavior: contain; }
 
 /* ===== Prosa (contenido del blog) ===== */
 .prose {
-  /* Ojo: nada de `prose-neutral` */
-  @apply prose max-w-none;
-  color: #043222;               /* evergreen */
-  background-color: #F6E9D9;    /* almond cream */
+  max-width: none;                 /* equivalente al antiguo max-w-none */
+  color: #043222;                  /* evergreen */
+  background-color: #F6E9D9;       /* almond */
 }
-.prose a { @apply underline; }
-.prose img { @apply rounded-xl; }
+
+.prose :where(h1,h2,h3,h4) { color: #043222; }
+.prose a { text-decoration: underline; }
+.prose img { border-radius: 0.75rem; }
 
 /* ===== BLOG: limitar ancho de imágenes/embeds ===== */
 .post-content img {
