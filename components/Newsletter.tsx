@@ -1,127 +1,113 @@
-// components/Newsletter.tsx
 "use client";
 
 import { useState } from "react";
 
-type Status = "idle" | "loading" | "success" | "error";
+type Status =
+  | { state: "idle" }
+  | { state: "loading" }
+  | { state: "success"; message: string }
+  | { state: "error"; message: string };
 
-export default function Newsletter() {
-  const [state, setState] = useState<{
-    status: Status;
-    message: string;
-    email: string;
-  }>({
-    status: "idle",
-    message: "",
-    email: "",
-  });
+export default function NewsletterForm() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<Status>({ state: "idle" });
+  const [hp, setHp] = useState(""); // honeypot
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (state.status === "loading") return;
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const email = String(formData.get("email") || "").trim();
+    // Honeypot (bots suelen llenarlo)
+    if (hp) return;
 
-    // Validación rápida del email
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setState((s) => ({
-        ...s,
-        status: "error",
-        message: "Ingresa un correo válido.",
-      }));
+    // Validación simple
+    const trimmed = email.trim().toLowerCase();
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
+    if (!ok) {
+      setStatus({ state: "error", message: "Ingresa un correo válido." });
       return;
     }
 
-    setState((s) => ({ ...s, status: "loading", message: "" }));
+    setStatus({ state: "loading" });
 
     try {
-      const res = await fetch("/api/newsletter", {
+      const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: trimmed }),
       });
 
-      const data = await res.json().catch(() => ({}));
+      const data = (await res.json()) as { ok?: boolean; message?: string };
 
-      if (res.ok) {
-        // ✅ éxito: limpiamos el input y mostramos mensaje bonito
-        setState({
-          status: "success",
-          message: "¡Listo! Te llegará el próximo correo 😊",
-          email: "",
+      if (res.ok && data?.ok) {
+        setStatus({
+          state: "success",
+          message:
+            data.message ||
+            "¡Listo! Te agregué a la lista. Revisa tu bandeja (y spam/promociones).",
         });
-        form.reset();
-        return;
+        setEmail("");
+      } else {
+        setStatus({
+          state: "error",
+          message:
+            data?.message ||
+            "No pude suscribirte ahora mismo. Intenta de nuevo en un momento.",
+        });
       }
-
-      // ❌ error: mensaje especial si ya estaba suscrito
-      const msg =
-        /already exists|already subscribed|conflict/i.test(
-          data?.message || ""
-        )
-          ? "Ya estabas suscrito ✨"
-          : data?.message || "No se pudo suscribir.";
-      setState((s) => ({ ...s, status: "error", message: msg }));
-    } catch (_err) {
-      setState((s) => ({
-        ...s,
-        status: "error",
-        message: "No se pudo suscribir.",
-      }));
+    } catch {
+      setStatus({
+        state: "error",
+        message: "Error de conexión. Verifica tu red e intenta de nuevo.",
+      });
     }
   }
 
   return (
-    <section className="py-10 md:py-14">
-      <div className="container mx-auto px-4">
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8">
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            Newsletter
-          </h2>
-          <p className="mt-2 text-slate-600">
-            Consejos breves y herramientas que sí puedes aplicar.
-          </p>
+    <form
+      onSubmit={onSubmit}
+      className="w-full max-w-xl rounded-xl border bg-white/80 p-4 shadow-sm backdrop-blur"
+    >
+      <h3 className="mb-1 text-lg font-semibold">Suscríbete al newsletter</h3>
+      <p className="mb-4 text-sm text-gray-600">
+        Consejos breves y prácticos para sentirte mejor. Sin spam.
+      </p>
 
-          <form
-            onSubmit={onSubmit}
-            className="mt-6 flex flex-col gap-3 md:flex-row md:items-center"
-          >
-            <input
-              name="email"
-              type="email"
-              required
-              defaultValue={state.email}
-              placeholder="tu@email.com"
-              className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-slate-400 md:max-w-xl"
-            />
+      {/* Honeypot */}
+      <input
+        aria-hidden="true"
+        tabIndex={-1}
+        autoComplete="off"
+        className="hidden"
+        value={hp}
+        onChange={(e) => setHp(e.target.value)}
+        name="company"
+      />
 
-            <button
-              type="submit"
-              disabled={state.status === "loading"}
-              className="rounded-xl bg-green-700 px-5 py-3 font-medium text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {state.status === "loading" ? "Enviando..." : "Quiero recibirlo"}
-            </button>
-          </form>
-
-          <p
-            className={
-              "mt-2 text-sm " +
-              (state.status === "error"
-                ? "text-red-600"
-                : state.status === "success"
-                ? "text-green-700"
-                : "text-slate-500")
-            }
-            aria-live="polite"
-          >
-            {state.message ||
-              "*Cuando tengas tu backend listo, conectamos este formulario a tu endpoint real."}
-          </p>
-        </div>
+      <div className="flex gap-2 max-sm:flex-col">
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="tu@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="flex-1 rounded-lg border px-3 py-2 outline-none ring-0 focus:border-emerald-700"
+        />
+        <button
+          type="submit"
+          disabled={status.state === "loading"}
+          className="rounded-lg bg-emerald-800 px-4 py-2 font-medium text-white transition hover:opacity-90 disabled:opacity-60"
+        >
+          {status.state === "loading" ? "Enviando..." : "Suscribirme"}
+        </button>
       </div>
-    </section>
+
+      {status.state === "error" && (
+        <p className="mt-3 text-sm text-red-600">{status.message}</p>
+      )}
+      {status.state === "success" && (
+        <p className="mt-3 text-sm text-emerald-700">{status.message}</p>
+      )}
+    </form>
   );
 }
