@@ -14,7 +14,7 @@ export function PostCard({ post }: { post: CardPost }) {
 
   return (
     <article className="rounded-xl border shadow-sm bg-white/70 p-4 md:p-5">
-      <Link href={`/blog/${post.slug}`} className="block group">
+      <Link href={`/blog/${encodeURIComponent(post.slug)}`} className="block group">
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start">
           {cover && (
             <div className="w-full md:w-72 shrink-0">
