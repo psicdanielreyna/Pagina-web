@@ -1,10 +1,11 @@
 // app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
+import { usePathname } from "next/navigation";
 
-import SiteHeader from "@/components/SiteHeader"; // <- importante: default export
+import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
-import Newsletter from "@/components/Newsletter"; // o "@/components/NewsletterCard" si así se llama
+import Newsletter from "@/components/Newsletter";
 
 export const metadata: Metadata = {
   title: "Daniel Reyna — Psicólogo",
@@ -17,6 +18,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  // Solo mostrar newsletter en home y en /blog
+  const showNewsletter =
+    pathname === "/" || pathname.startsWith("/blog");
+
   return (
     <html lang="es">
       <body>
@@ -24,10 +31,13 @@ export default function RootLayout({
 
         <main className="min-h-[60vh]">{children}</main>
 
-        {/* Newsletter global (una sola vez, antes del footer) */}
-        <section className="container mx-auto max-w-5xl px-4 md:px-6 my-16">
-          <Newsletter />
-        </section>
+        {showNewsletter && (
+          <section className="flex justify-center my-16">
+            <div className="w-full max-w-lg px-4 md:px-6">
+              <Newsletter />
+            </div>
+          </section>
+        )}
 
         <Footer />
       </body>
