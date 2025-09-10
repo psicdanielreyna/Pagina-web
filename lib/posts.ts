@@ -10,10 +10,9 @@ import html from "remark-html";
 export type PostMeta = {
   slug: string;
   title: string;
-  excerpt: string;
-  date: string;    // ISO yyyy-mm-dd
-  cover?: string;
-  draft?: boolean;
+  date: string;          // ISO
+  excerpt?: string;
+  cover?: string;        // <— así se llama la imagen
 };
 
 const BLOG_DIRS = [
