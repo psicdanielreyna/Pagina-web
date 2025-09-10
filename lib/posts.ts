@@ -3,6 +3,19 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 
+// Para render de Markdown a HTML
+import { remark } from "remark";
+import html from "remark-html";
+
+export type PostMeta = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  date: string;    // ISO yyyy-mm-dd
+  cover?: string;
+  draft?: boolean;
+};
+
 const BLOG_DIRS = [
   path.join(process.cwd(), "content", "blog"),
   path.join(process.cwd(), "blog"),
@@ -10,15 +23,6 @@ const BLOG_DIRS = [
 ];
 
 const exts = [".md", ".mdx"];
-
-type RawPost = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  cover?: string;
-  draft?: boolean;
-};
 
 function readAllMarkdownFiles(): string[] {
   const files: string[] = [];
@@ -37,40 +41,84 @@ function readAllMarkdownFiles(): string[] {
   return files;
 }
 
-export function getAllPosts(): RawPost[] {
+function normalizeMeta(filePath: string): { meta: PostMeta; content: string } {
+  const raw = fs.readFileSync(filePath, "utf8");
+  const { data, content } = matter(raw);
+
+  const slug =
+    (data.slug as string) ??
+    path.basename(filePath).replace(/\.mdx?$/i, "").toLowerCase();
+
+  const cover =
+    (data.cover as string) ??
+    (data.image as string) ??
+    (data.thumbnail as string) ??
+    (data.featured_image as string) ??
+    undefined;
+
+  const firstLine = (content || "")
+    .split("\n")
+    .map((l) => l.trim())
+    .find(Boolean);
+
+  const excerpt =
+    (data.excerpt as string) ??
+    (firstLine ? (firstLine.length > 170 ? firstLine.slice(0, 170) + "…" : firstLine) : "");
+
+  const isoDate = data.date
+    ? new Date(data.date as string).toISOString().slice(0, 10)
+    : "1970-01-01";
+
+  const meta: PostMeta = {
+    slug,
+    title: (data.title as string) ?? slug,
+    excerpt,
+    date: isoDate,
+    cover,
+    draft: Boolean(data.draft),
+  };
+
+  return { meta, content };
+}
+
+/** Lista de posts (sin borradores), ordenados por fecha DESC */
+export function getAllPosts(): PostMeta[] {
   const files = readAllMarkdownFiles();
-
-  const posts: RawPost[] = files.map((file) => {
-    const raw = fs.readFileSync(file, "utf8");
-    const { data, content } = matter(raw);
-
-    // mapeo tolerante de portada
-    const cover =
-      data.cover || data.image || data.thumbnail || data.featured_image || undefined;
-
-    // slug desde filename
-    const slug = path
-      .basename(file)
-      .replace(/\.mdx?$/i, "")
-      .toLowerCase();
-
-    // excerpt fallback
-    const excerpt =
-      data.excerpt ||
-      (content || "").split("\n").find((l) => l.trim()).slice(0, 170) + "…";
-
-    return {
-      slug: data.slug || slug,
-      title: data.title || slug,
-      excerpt,
-      date: data.date ? new Date(data.date).toISOString().slice(0, 10) : "1970-01-01",
-      cover,
-      draft: Boolean(data.draft),
-    };
-  });
-
-  // filtra borradores y ordena por fecha desc
-  return posts
+  return files
+    .map((f) => normalizeMeta(f).meta)
     .filter((p) => !p.draft)
     .sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
+/** Compatibilidad con componentes existentes */
+export function getPostsMeta(): PostMeta[] {
+  return getAllPosts();
+}
+
+/** Devuelve meta + contenido crudo de un slug */
+export function getPostBySlug(slug: string): { meta: PostMeta; content: string } | null {
+  for (const dir of BLOG_DIRS) {
+    if (!fs.existsSync(dir)) continue;
+    for (const ext of exts) {
+      const candidate = path.join(dir, `${slug}${ext}`);
+      if (fs.existsSync(candidate)) {
+        return normalizeMeta(candidate);
+      }
+    }
+  }
+  return null;
+}
+
+/** Renderiza el markdown a HTML para un slug concreto */
+export async function getPostHtml(slug: string): Promise<{
+  meta: PostMeta;
+  html: string;
+}> {
+  const found = getPostBySlug(slug);
+  if (!found) throw new Error(`Post not found: ${slug}`);
+
+  const processed = await remark().use(html).process(found.content);
+  const htmlString = processed.toString();
+
+  return { meta: found.meta, html: htmlString };
 }
