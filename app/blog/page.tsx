@@ -1,17 +1,36 @@
 // app/blog/page.tsx
-import { getAllPosts } from "@/lib/posts";
-import { PostCard } from "@/components/PostCard";
+import { getPostsMeta } from "@/lib/posts";
+import { PostCard, type CardPost } from "@/components/PostCard";
 
-export default function BlogPage() {
-  const posts = getAllPosts(); // ya hace sort + filtra borradores
+export const metadata = {
+  title: "Blog",
+  description: "Artículos sobre salud mental y herramientas prácticas.",
+};
+
+export default async function BlogIndexPage() {
+  const posts = await getPostsMeta();
+
+  // Normalizamos PostMeta → CardPost
+  const cards: CardPost[] = posts.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    excerpt: p.description ?? "",   // usamos la description del frontmatter
+    date: p.date ?? "",
+    cover: (p as any).image ?? null, // PostMeta.image → cover
+  }));
+
   return (
-    <section className="max-w-6xl mx-auto px-4 md:px-8 py-12 space-y-8">
-      <h1 className="text-3xl md:text-4xl font-extrabold text-evergreen">Blog</h1>
-      <div className="space-y-6">
-        {posts.map((p) => (
-          <PostCard key={p.slug} post={p} />
+    <main className="container mx-auto max-w-6xl px-4 py-10">
+      <h1 className="text-3xl md:text-4xl font-extrabold text-evergreen mb-6">
+        Blog
+      </h1>
+
+      {/* Lista de posts */}
+      <section className="space-y-6">
+        {cards.map((post) => (
+          <PostCard key={post.slug} post={post} />
         ))}
-      </div>
-    </section>
+      </section>
+    </main>
   );
 }
