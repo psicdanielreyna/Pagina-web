@@ -1,3 +1,4 @@
+// components/SiteHeader.tsx
 "use client";
 
 import Link from "next/link";
@@ -21,10 +22,10 @@ const socials = [
 
 export default function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-white shadow-sm">
-      <div className="container mx-auto max-w-6xl flex items-center justify-between px-4 py-3">
-        {/* Hamburguesa */}
-        <div className="flex items-center">
+    <header className="sticky top-0 z-[60] w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-3 md:h-16 md:px-4">
+        {/* Izquierda: hamburguesa */}
+        <div className="flex w-10 items-center justify-start md:w-12">
           <Sheet>
             <SheetTrigger
               aria-label="Abrir menú"
@@ -33,9 +34,8 @@ export default function SiteHeader() {
               <MenuIcon className="h-6 w-6" />
             </SheetTrigger>
 
-            {/* z mayor que el header y fondo sólido */}
-            <SheetContent side="left" className="z-50 w-[320px] max-w-[85vw] p-0 bg-white shadow-xl">
-              <div className="flex items-center justify-between px-4 py-3 border-b bg-white">
+            <SheetContent side="left" className="w-[320px] max-w-[85vw] p-0">
+              <div className="flex items-center justify-between border-b bg-white px-4 py-3">
                 <SheetTitle className="text-base font-medium">Menú</SheetTitle>
                 <SheetClose aria-label="Cerrar" className="rounded-md p-2 hover:bg-gray-100">
                   <XIcon className="h-5 w-5" />
@@ -72,33 +72,39 @@ export default function SiteHeader() {
           </Sheet>
         </div>
 
-        {/* Marca centrada */}
-        <Link href="/" aria-label="Ir al inicio" className="absolute left-1/2 -translate-x-1/2 select-none">
+        {/* Centro: logo perfectamente centrado */}
+        <Link
+          href="/"
+          aria-label="Ir al inicio"
+          className="absolute left-1/2 -translate-x-1/2 select-none"
+        >
           <Image
             src="/logo.png"
-            alt="Daniel Reyna – Psicólogo"
-            width={220}
+            alt="Daniel Reyna — Psicólogo"
+            width={140}
             height={40}
-            className="h-8 w-auto md:h-9"
+            className="h-7 w-auto md:h-8"
             priority
           />
         </Link>
 
-        {/* Redes a la derecha */}
-        <div className="ml-auto flex items-center gap-5 pr-1">
-          {socials.map(({ name, href, icon: Icon }) => (
-            <a
-              key={`top-${name}`}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={name}
-              className="inline-flex items-center justify-center rounded-md p-1.5 hover:bg-gray-100"
-              title={name}
-            >
-              <Icon className="h-5 w-5" />
-            </a>
-          ))}
+        {/* Derecha: redes (ocultas en móvil, visibles desde md) */}
+        <div className="flex w-10 items-center justify-end md:w-auto md:gap-5">
+          <div className="hidden md:flex items-center gap-5">
+            {socials.map(({ name, href, icon: Icon }) => (
+              <a
+                key={`top-${name}`}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={name}
+                className="inline-flex items-center justify-center rounded-md p-1.5 hover:bg-gray-100"
+                title={name}
+              >
+                <Icon className="h-5 w-5 text-[#043222]" />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </header>
