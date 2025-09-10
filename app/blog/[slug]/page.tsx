@@ -1,87 +1,55 @@
-// app/blog/[slug]/page.tsx
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllPostsMeta, getPostHtml } from "@/lib/posts";
+import { getAllPostsMeta, getPostBySlug } from "@/lib/posts";
+import { normalizeSlug } from "@/lib/slug";
+import { MDXRemote } from "next-mdx-remote/rsc"; // o tu renderer actual
 
 type Props = { params: { slug: string } };
 
-// Para SSG: define todas las rutas de posts
 export async function generateStaticParams() {
   const posts = await getAllPostsMeta();
-  return posts.map((p) => ({ slug: p.slug }));
+  return posts.map(p => ({ slug: p.slug })); // ya son ASCII-safe
 }
 
-// SEO por página
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = await getPostHtml(params.slug);
-  if (!data) return { title: "Artículo no encontrado" };
-
-  const { meta } = data;
-  const title = meta.title || params.slug;
-  const description = meta.excerpt || "Artículo del blog";
-  const cover = meta.cover || undefined;
-
+  const post = await getPostBySlug(params.slug);
+  if (!post) return {};
   return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: cover ? [{ url: cover }] : undefined,
-      type: "article",
-    },
-    twitter: {
-      card: cover ? "summary_large_image" : "summary",
-      title,
-      description,
-      images: cover ? [cover] : undefined,
-    },
+    title: post.meta.title,
+    description: post.meta.excerpt,
+    openGraph: { title: post.meta.title, description: post.meta.excerpt },
   };
 }
 
 export default async function BlogPostPage({ params }: Props) {
-  const data = await getPostHtml(params.slug);
-  if (!data) notFound();
-
-  const { meta, contentHtml } = data;
+  const post = await getPostBySlug(normalizeSlug(params.slug));
+  if (!post) return notFound();
 
   return (
-    <article className="post-content">
-      {/* Cabecera del post */}
-      <header className="container mx-auto max-w-3xl px-4 md:px-6 pt-10 md:pt-14">
-        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-evergreen">
-          {meta.title}
-        </h1>
+    <main className="container mx-auto max-w-3xl px-4 md:px-6 py-10">
+      <h1 className="text-3xl md:text-4xl font-extrabold text-evergreen">{post.meta.title}</h1>
+      {post.meta.date && (
+        <p className="mt-2 text-gray-600">
+          {new Date(post.meta.date).toLocaleDateString("es-MX", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </p>
+      )}
+      {post.meta.cover && (
+        <img
+          src={post.meta.cover}
+          alt=""
+          className="mt-6 rounded-2xl shadow-sm ring-1 ring-black/5"
+          loading="lazy"
+        />
+      )}
 
-        {meta.date ? (
-          <p className="mt-3 text-sm text-gray-600">
-            {new Date(meta.date).toLocaleDateString("es-MX", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
-        ) : null}
-      </header>
-
-      {/* Imagen de portada (opcional) */}
-      {meta.cover ? (
-        <div className="container mx-auto max-w-4xl px-4 md:px-6 mt-6">
-          {/* Usa <img> para evitar problemas si la imagen es remota sin configurar next/image */}
-          <img
-            src={meta.cover}
-            alt={meta.title}
-            className="w-full h-auto rounded-xl"
-            loading="lazy"
-          />
-        </div>
-      ) : null}
-
-      {/* Contenido HTML del post */}
-      <section className="container mx-auto max-w-3xl px-4 md:px-6 mt-8 mb-16 prose">
-        {/* contentHtml viene ya convertido desde markdown a HTML */}
-        <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
-      </section>
-    </article>
+      <article className="prose prose-lg mt-8">
+        {/* Renderiza tu MDX/HTML aquí */}
+        <MDXRemote source={post.content} />
+      </article>
+    </main>
   );
 }
