@@ -1,55 +1,86 @@
+// app/blog/[slug]/page.tsx
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllPostsMeta, getPostBySlug } from "@/lib/posts";
-import { normalizeSlug } from "@/lib/slug";
-import { MDXRemote } from "next-mdx-remote/rsc"; // o tu renderer actual
 
 type Props = { params: { slug: string } };
 
-export async function generateStaticParams() {
-  const posts = await getAllPostsMeta();
-  return posts.map(p => ({ slug: p.slug })); // ya son ASCII-safe
+// Pre-render de rutas estáticas del blog
+export function generateStaticParams() {
+  const posts = getAllPostsMeta();
+  return posts.map((p) => ({ slug: p.slug }));
 }
 
+// SEO dinámico por post
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug);
-  if (!post) return {};
+  const slug = decodeURIComponent(params.slug);
+  const data = await getPostBySlug(slug);
+  if (!data) return { title: "Artículo no encontrado" };
+
+  const { meta } = data;
+
   return {
-    title: post.meta.title,
-    description: post.meta.excerpt,
-    openGraph: { title: post.meta.title, description: post.meta.excerpt },
+    title: meta.title,
+    description: meta.excerpt ?? undefined,
+    openGraph: {
+      title: meta.title,
+      description: meta.excerpt ?? undefined,
+      images: meta.cover ? [{ url: meta.cover }] : undefined,
+      type: "article",
+    },
+    twitter: {
+      card: meta.cover ? "summary_large_image" : "summary",
+      title: meta.title,
+      description: meta.excerpt ?? undefined,
+      images: meta.cover ? [meta.cover] : undefined,
+    },
   };
 }
 
 export default async function BlogPostPage({ params }: Props) {
-  const post = await getPostBySlug(normalizeSlug(params.slug));
-  if (!post) return notFound();
+  const slug = decodeURIComponent(params.slug); // <- importante para acentos/espacios
+  const data = await getPostBySlug(slug);
+  if (!data) return notFound();
+
+  const { meta, content } = data;
+
+  const formattedDate =
+    meta.date &&
+    new Date(meta.date).toLocaleDateString("es-MX", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
   return (
-    <main className="container mx-auto max-w-3xl px-4 md:px-6 py-10">
-      <h1 className="text-3xl md:text-4xl font-extrabold text-evergreen">{post.meta.title}</h1>
-      {post.meta.date && (
-        <p className="mt-2 text-gray-600">
-          {new Date(post.meta.date).toLocaleDateString("es-MX", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
-      )}
-      {post.meta.cover && (
-        <img
-          src={post.meta.cover}
-          alt=""
-          className="mt-6 rounded-2xl shadow-sm ring-1 ring-black/5"
-          loading="lazy"
-        />
+    <article className="container mx-auto max-w-3xl px-4 md:px-6 py-10">
+      <header className="mb-8">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-evergreen">
+          {meta.title}
+        </h1>
+        {formattedDate && (
+          <p className="mt-2 text-sm text-gray-600">{formattedDate}</p>
+        )}
+      </header>
+
+      {meta.cover && (
+        <div className="mb-8">
+          {/* Puedes migrar a next/image si quieres */}
+          <img
+            src={meta.cover}
+            alt={meta.title}
+            className="w-full rounded-2xl shadow-sm"
+            loading="lazy"
+          />
+        </div>
       )}
 
-      <article className="prose prose-lg mt-8">
-        {/* Renderiza tu MDX/HTML aquí */}
-        <MDXRemote source={post.content} />
-      </article>
-    </main>
+      <div
+        className="prose prose-lg prose-emerald max-w-none
+                   prose-headings:text-evergreen prose-a:text-emerald-700
+                   prose-img:rounded-xl"
+        dangerouslySetInnerHTML={{ __html: content }}
+      />
+    </article>
   );
 }
