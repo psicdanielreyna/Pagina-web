@@ -1,86 +1,42 @@
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Base (modo claro / oscuro con .dark en <html>) ===== */
-@layer base {
-  html {
-    @apply bg-almond text-evergreen;
-    color-scheme: light;
-  }
-  html.dark {
-    @apply bg-evergreen text-almond;
-    color-scheme: dark;
-  }
-  body {
-    @apply min-h-screen;
-  }
+/* ===== Base ===== */
+html, body {
+  @apply bg-almond text-evergreen;
 }
 
-/* ===== Utilidades ===== */
+/* Contenedor utilitario (si lo usas fuera del layout) */
+.container { @apply mx-auto max-w-6xl; }
+
+/* Quitar scrollbar cuando el drawer está abierto */
+html:has([data-state="open"]) { overflow: hidden; }
+
+/* Asegurar capas correctas del Sheet (shadcn) y header */
+[data-state="open"].fixed.inset-0 { z-index: 90; } /* overlay */
+div[data-side="left"].fixed { z-index: 100; background: #fff; } /* panel */
+.site-header { z-index: 30; } /* header por debajo del overlay */
+
+/* No-scrollbar util */
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
-/* ===== Botones base ===== */
-.btn-primary {
-  @apply px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 shadow-sm transition;
-}
-.btn-secondary {
-  @apply px-4 py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition;
-}
+/* Botones “base” por si los necesitas en HTML suelto */
+.btn-primary { @apply inline-flex items-center justify-center rounded-lg bg-evergreen px-4 py-2 font-medium text-white shadow-sm transition hover:opacity-90; }
+.btn-secondary { @apply inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 font-medium text-evergreen ring-1 ring-black/10 transition hover:bg-gray-50; }
 
-/* ===== Contenedor base ===== */
-.container {
-  @apply mx-auto max-w-6xl;
-}
+/* Prosa (markdown) – sin @apply a `.prose` para evitar bucles */
+.prose a { @apply underline; }
+.prose img { @apply rounded-xl; }
+.prose h1, .prose h2, .prose h3 { @apply font-semibold; }
+.prose ul { @apply list-disc pl-6; }
+.prose ol { @apply list-decimal pl-6; }
 
-/* ===== Sheet / Drawer (hamburguesa) ===== */
-[data-state="open"].fixed.inset-0.bg-black\/80 {
-  opacity: 1;
-}
-div[data-side="left"].fixed {
-  background: #fff;
-}
-html.dark div[data-side="left"].fixed {
-  background: #0b281f; /* tono oscuro */
-}
-div[data-side="left"].fixed .overflow-y-auto {
-  overscroll-behavior: contain;
-}
-
-/* ===== Prosa (contenido del blog) ===== */
-.prose {
-  @apply max-w-none;
-}
-.prose a {
-  @apply underline;
-}
-.prose img {
-  @apply rounded-xl;
-}
-.prose .text-center {
-  text-align: center;
-}
-
-/* Colores tipográficos por modo */
-.prose {
-  color: theme(colors.evergreen);
-}
-html.dark .prose {
-  color: theme(colors.almond);
-}
-html.dark .prose a {
-  color: theme(colors.almond);
-}
-
-/* ===== BLOG: limitar ancho de imágenes ===== */
+/* Imágenes dentro de contenido de post */
 .post-content img {
   display: block;
   margin: 1.25rem auto;
@@ -89,8 +45,6 @@ html.dark .prose a {
   height: auto;
   border-radius: 0.75rem;
 }
-
-/* iframes/videos */
 .post-content iframe,
 .post-content video {
   display: block;
@@ -98,17 +52,4 @@ html.dark .prose a {
   max-width: 960px;
   width: 100%;
   border-radius: 0.5rem;
-
-  /* Drawer/Sheet por encima del header y sin scroll de fondo */
-html:has([data-state="open"]) { overflow: hidden; }
-
-/* El overlay de shadcn (bg-black/80) queda por encima del header */
-[data-state="open"].fixed.inset-0 { z-index: 90; }
-
-/* La “cortina” (panel) del lado izquierdo aún más arriba */
-div[data-side="left"].fixed { z-index: 100; background: #fff; }
-
-/* Aseguro header debajo del overlay */
-.site-header { z-index: 30; }
-  
 }
