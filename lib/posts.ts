@@ -1,10 +1,9 @@
 // lib/posts.ts
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs from "fs";
+import path from "path";
 import matter from "gray-matter";
-import { slugify, normalizeSlug } from "./slug";
-
-const POSTS_DIR = path.join(process.cwd(), "content", "blog");
+import { remark } from "remark";
+import html from "remark-html";
 
 export type PostMeta = {
   slug: string;
@@ -19,58 +18,75 @@ export type PostData = {
   content: string;
 };
 
-function fileSlug(file: string) {
-  const base = file.replace(/\.mdx?$/i, "");
-  return slugify(base);
-}
+const postsDirectory = path.join(process.cwd(), "content/blog");
 
-export async function getAllPostsMeta(): Promise<PostMeta[]> {
-  const files = await fs.readdir(POSTS_DIR);
-  const metas: PostMeta[] = [];
+// 🔹 Normaliza portadas (cover o image) y corrige rutas
+function resolveCover(data: any): string | null {
+  const raw = data?.cover ?? data?.image ?? null;
+  if (!raw) return null;
 
-  for (const file of files.filter(f => /\.mdx?$/i.test(f))) {
-    const full = path.join(POSTS_DIR, file);
-    const raw = await fs.readFile(full, "utf8");
-    const { data } = matter(raw);
+  let url = String(raw).trim().replace(/^['"]|['"]$/g, "");
 
-    // Prioriza slug del frontmatter; si no, el nombre del archivo
-    const rawSlug: string = (data.slug as string) ?? fileSlug(file);
-    const slug = slugify(rawSlug);
+  if (url.startsWith("./")) url = url.slice(1);
 
-    metas.push({
-      slug,
-      title: String(data.title ?? slug),
-      date: data.date ? String(data.date) : undefined,
-      excerpt: data.excerpt ? String(data.excerpt) : undefined,
-      cover: data.cover ? String(data.cover) : null,
-    });
+  if (url.startsWith("content/")) {
+    url = url.replace(/^content\/blog\//, "/images/");
   }
 
-  // más recientes primero si hay fecha
-  metas.sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
-  return metas;
+  if (!/^https?:\/\//.test(url) && !url.startsWith("/")) {
+    url = "/" + url;
+  }
+
+  return url;
 }
 
-export async function getPostBySlug(slugInput: string): Promise<PostData | null> {
-  const target = normalizeSlug(slugInput);
-  const files = await fs.readdir(POSTS_DIR);
+// 🔹 Devuelve metadata de todos los posts
+export function getAllPostsMeta(): PostMeta[] {
+  const fileNames = fs.readdirSync(postsDirectory);
 
-  for (const file of files.filter(f => /\.mdx?$/i.test(f))) {
-    const full = path.join(POSTS_DIR, file);
-    const raw = await fs.readFile(full, "utf8");
-    const parsed = matter(raw);
+  const metas = fileNames
+    .filter((file) => file.endsWith(".md") || file.endsWith(".mdx"))
+    .map((fileName) => {
+      const slug = fileName.replace(/\.mdx?$/, "");
+      const fullPath = path.join(postsDirectory, fileName);
+      const fileContents = fs.readFileSync(fullPath, "utf8");
+      const { data } = matter(fileContents);
 
-    const fmSlug = parsed.data.slug ? slugify(String(parsed.data.slug)) : fileSlug(file);
-    if (fmSlug === target) {
-      const meta: PostMeta = {
-        slug: fmSlug,
-        title: String(parsed.data.title ?? fmSlug),
-        date: parsed.data.date ? String(parsed.data.date) : undefined,
-        excerpt: parsed.data.excerpt ? String(parsed.data.excerpt) : undefined,
-        cover: parsed.data.cover ? String(parsed.data.cover) : null,
+      const cover = resolveCover(data);
+
+      return {
+        slug,
+        title: String(data.title ?? slug),
+        date: data.date ? String(data.date) : undefined,
+        excerpt: data.excerpt ? String(data.excerpt) : undefined,
+        cover,
       };
-      return { meta, content: parsed.content };
-    }
-  }
-  return null;
+    });
+
+  // Ordena por fecha descendente
+  return metas.sort((a, b) =>
+    a.date && b.date ? (a.date < b.date ? 1 : -1) : 0
+  );
+}
+
+// 🔹 Devuelve un post individual (contenido + meta)
+export async function getPostBySlug(slug: string): Promise<PostData | null> {
+  const fullPath = path.join(postsDirectory, `${slug}.mdx`);
+  if (!fs.existsSync(fullPath)) return null;
+
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const parsed = matter(fileContents);
+
+  const processedContent = await remark().use(html).process(parsed.content);
+  const content = processedContent.toString();
+
+  const meta: PostMeta = {
+    slug,
+    title: String(parsed.data.title ?? slug),
+    date: parsed.data.date ? String(parsed.data.date) : undefined,
+    excerpt: parsed.data.excerpt ? String(parsed.data.excerpt) : undefined,
+    cover: resolveCover(parsed.data),
+  };
+
+  return { meta, content };
 }
