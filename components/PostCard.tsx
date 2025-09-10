@@ -2,17 +2,16 @@
 import Link from "next/link";
 import Image from "next/image";
 
+// components/PostCard.tsx (cabecera del tipo)
 export type CardPost = {
   slug: string;
   title: string;
-  excerpt: string;
   date: string;
-  // Aceptamos cover nullable y también image por compatibilidad
-  cover?: string | null;
-  image?: string | null;
+  excerpt?: string;
+  cover?: string;
 };
 
-export function PostCard({ post }: { post: CardPost }) {
+export function PostCard({ post }: { post: CardPost }) { /* ...igual que lo tienes... */ }
   const cover = post.cover ?? post.image ?? null;
 
   return (
