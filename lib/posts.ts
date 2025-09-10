@@ -32,35 +32,37 @@ export type PostData = {
 };
 
 export function getAllPostsMeta(): PostMeta[] {
-  const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith(".md") || f.endsWith(".mdx"));
-
-  const metas = files.map((filename) => {
-    const full = path.join(POSTS_DIR, filename);
-    const raw = fs.readFileSync(full, "utf-8");
-    const { data } = matter(raw);
-
-    const title: string = data.title ?? path.basename(filename, path.extname(filename));
-    const fromFrontmatter: string | undefined = data.slug;
-    const computedSlug = slugify(fromFrontmatter ?? title);
-
-    const meta: PostMeta = {
-      slug: computedSlug,
-      title,
-      excerpt: data.excerpt ?? data.description ?? undefined,
-      date: data.date ?? undefined,
-      cover: data.cover ?? data.image ?? null,
-      draft: Boolean(data.draft),
-    };
+  // ...dentro del map de getAllPostsMeta()
+  const rawDate = data.date; // puede ser string, Date, etc.
+  let date: string | undefined = undefined;
+  if (rawDate) {
+    const d = new Date(rawDate as any);
+    if (!Number.isNaN(d.getTime())) {
+      // usa solo la parte YYYY-MM-DD para consistencia
+      date = d.toISOString().slice(0, 10);
+    }
+  }
+  
+  const meta: PostMeta = {
+    slug: computedSlug,
+    title,
+    excerpt: data.excerpt ?? data.description ?? undefined,
+    date, // <-- ya es string o undefined
+    cover: data.cover ?? data.image ?? null,
+    draft: Boolean(data.draft),
+  };
 
     return meta;
   })
   // opcional: filtra borradores
   .filter(m => !m.draft)
   // ordena por fecha desc si hay fecha
-  .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
-
-  return metas;
-}
+ // ordena por fecha (más reciente primero), tolerante a undefined
+  .sort((a, b) => {
+    const ta = a.date ? new Date(a.date).getTime() : 0;
+    const tb = b.date ? new Date(b.date).getTime() : 0;
+    return tb - ta;
+  });
 
 export function getPostBySlug(slug: string): PostData | null {
   // intentamos localizar por frontmatter.slug o por título normalizado
