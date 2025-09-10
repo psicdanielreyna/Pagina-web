@@ -5,33 +5,30 @@ export type CardPost = {
   slug: string;
   title: string;
   excerpt: string;
-  date: string;
-  cover?: string;
+  date?: string;
+  cover?: string | null;
 };
 
 export function PostCard({ post }: { post: CardPost }) {
-  const cover = post.cover ?? undefined;
-
   return (
     <article className="rounded-xl border shadow-sm bg-white/70 p-4 md:p-5">
       <Link href={`/blog/${encodeURIComponent(post.slug)}`} className="block group">
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start">
-          {cover && (
+          {post.cover && (
             <div className="w-full md:w-72 shrink-0">
               <img
-                src={cover}
+                src={post.cover}
                 alt=""
                 className="w-full h-48 md:h-44 object-cover rounded-xl"
                 loading="lazy"
               />
             </div>
           )}
-
           <div className="flex-1">
             <h2 className="text-2xl md:text-3xl font-extrabold text-evergreen group-hover:underline">
               {post.title}
             </h2>
-            {post.date ? (
+            {post.date && (
               <p className="mt-1 text-sm text-gray-500">
                 {new Date(post.date).toLocaleDateString("es-MX", {
                   year: "numeric",
@@ -39,8 +36,8 @@ export function PostCard({ post }: { post: CardPost }) {
                   day: "numeric",
                 })}
               </p>
-            ) : null}
-            {post.excerpt ? <p className="mt-3 text-gray-800">{post.excerpt}</p> : null}
+            )}
+            <p className="mt-3 text-gray-800">{post.excerpt}</p>
             <span className="mt-3 inline-block underline">Página del artículo…</span>
           </div>
         </div>
