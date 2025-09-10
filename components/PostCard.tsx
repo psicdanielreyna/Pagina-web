@@ -1,18 +1,16 @@
-// components/PostCard.tsx
 import Link from "next/link";
-import Image from "next/image";
 
-// components/PostCard.tsx (cabecera del tipo)
 export type CardPost = {
   slug: string;
   title: string;
-  date: string;
+  date?: string;
   excerpt?: string;
-  cover?: string;
+  cover?: string | null;
+  image?: string | null; // por si el parser trae "image"
 };
 
-export function PostCard({ post }: { post: CardPost }) { /* ...igual que lo tienes... */ }
-  const cover = post.cover ?? post.image ?? null;
+export function PostCard({ post }: { post: CardPost }) {
+  const cover = post.cover ?? post.image ?? undefined;
 
   return (
     <article className="rounded-xl border shadow-sm bg-white/70 p-4 md:p-5">
@@ -27,16 +25,6 @@ export function PostCard({ post }: { post: CardPost }) { /* ...igual que lo tien
                 className="w-full h-48 md:h-44 object-cover rounded-xl"
                 loading="lazy"
               />
-              {/* 
-              <Image
-                src={cover}
-                alt=""
-                width={900}
-                height={600}
-                className="w-full h-48 md:h-44 object-cover rounded-xl"
-                priority={false}
-              />
-              */}
             </div>
           )}
 
@@ -44,6 +32,7 @@ export function PostCard({ post }: { post: CardPost }) { /* ...igual que lo tien
             <h2 className="text-2xl md:text-3xl font-extrabold text-evergreen group-hover:underline">
               {post.title}
             </h2>
+
             {post.date ? (
               <p className="mt-1 text-sm text-gray-500">
                 {new Date(post.date).toLocaleDateString("es-MX", {
@@ -53,8 +42,14 @@ export function PostCard({ post }: { post: CardPost }) { /* ...igual que lo tien
                 })}
               </p>
             ) : null}
-            <p className="mt-3 text-gray-800">{post.excerpt}</p>
-            <span className="mt-3 inline-block underline">Página del artículo…</span>
+
+            {post.excerpt && (
+              <p className="mt-3 text-gray-800">{post.excerpt}</p>
+            )}
+
+            <span className="mt-3 inline-block underline">
+              Página del artículo…
+            </span>
           </div>
         </div>
       </Link>
