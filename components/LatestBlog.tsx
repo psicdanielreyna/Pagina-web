@@ -6,11 +6,10 @@ export default async function LatestBlog() {
   const posts = await getAllPostsMeta();
   if (!posts || posts.length === 0) return null;
 
-  // Post destacado (el más reciente) y otros 3 a la derecha
   const [featured, ...rest] = posts;
   const others = rest.slice(0, 3);
 
-  const coverFeatured = featured.cover ?? featured.image ?? undefined;
+  const coverFeatured = featured.cover ?? undefined;
 
   return (
     <section className="container mx-auto max-w-6xl px-4 md:px-6 mt-12">
@@ -47,7 +46,7 @@ export default async function LatestBlog() {
         {/* Lista lateral */}
         <div className="space-y-4">
           {others.map((p) => {
-            const cover = p.cover ?? p.image ?? undefined;
+            const cover = p.cover ?? undefined;
             return (
               <article key={p.slug} className="rounded-xl bg-white/60 shadow-sm ring-1 ring-black/5 p-4">
                 <Link href={`/blog/${p.slug}`} className="block group">
