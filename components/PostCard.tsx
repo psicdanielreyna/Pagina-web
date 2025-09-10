@@ -2,47 +2,59 @@
 import Link from "next/link";
 import Image from "next/image";
 
-type CardPost = {
+export type CardPost = {
   slug: string;
   title: string;
+  excerpt: string;
   date: string;
-  excerpt?: string;   // <- ahora es opcional
-  cover?: string;
+  // Aceptamos cover nullable y también image por compatibilidad
+  cover?: string | null;
+  image?: string | null;
 };
 
 export function PostCard({ post }: { post: CardPost }) {
+  const cover = post.cover ?? post.image ?? null;
+
   return (
     <article className="rounded-xl border shadow-sm bg-white/70 p-4 md:p-5">
       <Link href={`/blog/${post.slug}`} className="block group">
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start">
-          {post.cover && (
+          {cover && (
             <div className="w-full md:w-72 shrink-0">
+              {/* Puedes migrar a next/image cuando quieras */}
+              <img
+                src={cover}
+                alt=""
+                className="w-full h-48 md:h-44 object-cover rounded-xl"
+                loading="lazy"
+              />
+              {/* 
               <Image
-                src={post.cover}
+                src={cover}
                 alt=""
                 width={900}
                 height={600}
                 className="w-full h-48 md:h-44 object-cover rounded-xl"
                 priority={false}
               />
+              */}
             </div>
           )}
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1">
             <h2 className="text-2xl md:text-3xl font-extrabold text-evergreen group-hover:underline">
               {post.title}
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
-              {new Date(post.date).toLocaleDateString("es-MX", {
-                day: "2-digit", month: "short", year: "numeric",
-              })}
-            </p>
-
-            {/* Solo si hay excerpt */}
-            {post.excerpt && (
-              <p className="mt-3 text-gray-800 line-clamp-3">{post.excerpt}</p>
-            )}
-
+            {post.date ? (
+              <p className="mt-1 text-sm text-gray-500">
+                {new Date(post.date).toLocaleDateString("es-MX", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            ) : null}
+            <p className="mt-3 text-gray-800">{post.excerpt}</p>
             <span className="mt-3 inline-block underline">Página del artículo…</span>
           </div>
         </div>
