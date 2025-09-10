@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 // Usa los nombres que sí exporta tu lib:
-import { getAllPostsMeta, getPostBySlug } from "@/lib/posts";
+import { getAllPostsMeta, getPostHtml } from "@/lib/posts";
 
 type Props = { params: { slug: string } };
 
@@ -11,7 +11,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = await getPostBySlug(params.slug);
+  const data = await getPostHtml(params.slug);
   if (!data) return { title: "Artículo no encontrado" };
   const { meta } = data;
   return {
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({ params }: Props) {
-  const data = await getPostBySlug(params.slug);
+  const data = await getPostHtml(params.slug);
   if (!data) return notFound();
 
   const { meta, html } = data;
