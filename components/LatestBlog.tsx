@@ -1,7 +1,7 @@
 // components/LatestBlog.tsx
 import Link from "next/link";
 import Image from "next/image";
-import { getPostsMeta } from "@/lib/posts";
+import { getAllPostsMeta } from "@/lib/posts";
 
 export default async function LatestBlog() {
   const posts = await getPostsMeta();
