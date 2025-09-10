@@ -98,4 +98,17 @@ html.dark .prose a {
   max-width: 960px;
   width: 100%;
   border-radius: 0.5rem;
+
+  /* Drawer/Sheet por encima del header y sin scroll de fondo */
+html:has([data-state="open"]) { overflow: hidden; }
+
+/* El overlay de shadcn (bg-black/80) queda por encima del header */
+[data-state="open"].fixed.inset-0 { z-index: 90; }
+
+/* La “cortina” (panel) del lado izquierdo aún más arriba */
+div[data-side="left"].fixed { z-index: 100; background: #fff; }
+
+/* Aseguro header debajo del overlay */
+.site-header { z-index: 30; }
+  
 }
