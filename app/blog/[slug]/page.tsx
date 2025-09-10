@@ -1,86 +1,71 @@
 // app/blog/[slug]/page.tsx
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllPostsMeta, getPostBySlug } from "@/lib/posts";
+import { getAllPostsMeta, getPostBySlug, slugify } from "@/lib/posts";
 
 type Props = { params: { slug: string } };
 
-// Pre-render de rutas estáticas del blog
-export function generateStaticParams() {
-  const posts = getAllPostsMeta();
-  return posts.map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  // preconstruye rutas con slugs SIN acentos
+  const metas = getAllPostsMeta();
+  return metas.map((m) => ({ slug: m.slug }));
 }
 
-// SEO dinámico por post
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slug = decodeURIComponent(params.slug);
-  const data = await getPostBySlug(slug);
-  if (!data) return { title: "Artículo no encontrado" };
+  const incoming = decodeURIComponent(params.slug);
+  // por si llega con tildes, normaliza para buscar
+  const normalized = slugify(incoming);
+  const post = getPostBySlug(normalized);
 
-  const { meta } = data;
+  if (!post) return {};
+  const { meta } = post;
 
   return {
     title: meta.title,
-    description: meta.excerpt ?? undefined,
+    description: meta.excerpt,
     openGraph: {
       title: meta.title,
-      description: meta.excerpt ?? undefined,
+      description: meta.excerpt,
       images: meta.cover ? [{ url: meta.cover }] : undefined,
       type: "article",
-    },
-    twitter: {
-      card: meta.cover ? "summary_large_image" : "summary",
-      title: meta.title,
-      description: meta.excerpt ?? undefined,
-      images: meta.cover ? [meta.cover] : undefined,
     },
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
-  const slug = decodeURIComponent(params.slug); // <- importante para acentos/espacios
-  const data = await getPostBySlug(slug);
-  if (!data) return notFound();
+export default function PostPage({ params }: Props) {
+  const incoming = decodeURIComponent(params.slug);
+  const normalized = slugify(incoming);
+  const post = getPostBySlug(normalized);
 
-  const { meta, content } = data;
+  if (!post) return notFound();
 
-  const formattedDate =
-    meta.date &&
-    new Date(meta.date).toLocaleDateString("es-MX", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  const { meta, content } = post;
 
   return (
-    <article className="container mx-auto max-w-3xl px-4 md:px-6 py-10">
-      <header className="mb-8">
-        <h1 className="text-3xl md:text-5xl font-extrabold text-evergreen">
-          {meta.title}
-        </h1>
-        {formattedDate && (
-          <p className="mt-2 text-sm text-gray-600">{formattedDate}</p>
+    <main className="container mx-auto max-w-3xl px-4 md:px-6 py-10">
+      <article className="prose prose-lg max-w-none">
+        <h1 className="!mb-2 text-evergreen">{meta.title}</h1>
+        {meta.date && (
+          <p className="text-sm text-gray-500 !mt-0">
+            {new Date(meta.date).toLocaleDateString("es-MX", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
         )}
-      </header>
-
-      {meta.cover && (
-        <div className="mb-8">
-          {/* Puedes migrar a next/image si quieres */}
+        {meta.cover && (
           <img
             src={meta.cover}
-            alt={meta.title}
-            className="w-full rounded-2xl shadow-sm"
+            alt=""
+            className="rounded-xl shadow-sm my-6 w-full h-auto"
             loading="lazy"
           />
-        </div>
-      )}
+        )}
 
-      <div
-        className="prose prose-lg prose-emerald max-w-none
-                   prose-headings:text-evergreen prose-a:text-emerald-700
-                   prose-img:rounded-xl"
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
-    </article>
+        {/* Render básico del Markdown: si usas MDX o un renderer, reemplázalo */}
+        <div dangerouslySetInnerHTML={{ __html: content }} />
+      </article>
+    </main>
   );
 }
