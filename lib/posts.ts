@@ -1,123 +1,150 @@
-// lib/posts.ts
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import sanitizeHtml from "sanitize-html";
 
-// Para render de Markdown a HTML
-import { remark } from "remark";
-import html from "remark-html";
-
-export type PostMeta = {
+export interface PostMeta {
   slug: string;
   title: string;
-  date: string;          // ISO
-  excerpt?: string;
-  cover?: string;        // <— así se llama la imagen
-};
-
-const BLOG_DIRS = [
-  path.join(process.cwd(), "content", "blog"),
-  path.join(process.cwd(), "blog"),
-  path.join(process.cwd(), "posts"),
-];
-
-const exts = [".md", ".mdx"];
-
-function readAllMarkdownFiles(): string[] {
-  const files: string[] = [];
-  for (const dir of BLOG_DIRS) {
-    if (!fs.existsSync(dir)) continue;
-    const walk = (d: string) => {
-      for (const entry of fs.readdirSync(d)) {
-        const full = path.join(d, entry);
-        const stat = fs.statSync(full);
-        if (stat.isDirectory()) walk(full);
-        else if (exts.includes(path.extname(full))) files.push(full);
-      }
-    };
-    walk(dir);
-  }
-  return files;
+  date: string;            // ISO string
+  description?: string;    // opcional (por si no lo pones en el frontmatter)
+  excerpt?: string;        // opcional (para listados)
+  image?: string | null;   // sigue aceptando image
+  cover?: string | null;   // alias alterno
+  draft?: boolean;         // 👈 ahora existe en el tipo
 }
 
-function normalizeMeta(filePath: string): { meta: PostMeta; content: string } {
-  const raw = fs.readFileSync(filePath, "utf8");
-  const { data, content } = matter(raw);
-
-  const slug =
-    (data.slug as string) ??
-    path.basename(filePath).replace(/\.mdx?$/i, "").toLowerCase();
-
-  const cover =
-    (data.cover as string) ??
-    (data.image as string) ??
-    (data.thumbnail as string) ??
-    (data.featured_image as string) ??
-    undefined;
-
-  const firstLine = (content || "")
-    .split("\n")
-    .map((l) => l.trim())
-    .find(Boolean);
-
-  const excerpt =
-    (data.excerpt as string) ??
-    (firstLine ? (firstLine.length > 170 ? firstLine.slice(0, 170) + "…" : firstLine) : "");
-
-  const isoDate = data.date
-    ? new Date(data.date as string).toISOString().slice(0, 10)
-    : "1970-01-01";
-
-  const meta: PostMeta = {
-    slug,
-    title: (data.title as string) ?? slug,
-    excerpt,
-    date: isoDate,
-    cover,
-    draft: Boolean(data.draft),
-  };
-
-  return { meta, content };
-}
-
-/** Lista de posts (sin borradores), ordenados por fecha DESC */
-export function getAllPosts(): PostMeta[] {
-  const files = readAllMarkdownFiles();
-  return files
-    .map((f) => normalizeMeta(f).meta)
-    .filter((p) => !p.draft)
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
-}
-
-/** Compatibilidad con componentes existentes */
-export function getPostsMeta(): PostMeta[] {
-  return getAllPosts();
-}
-
-/** Devuelve meta + contenido crudo de un slug */
-export function getPostBySlug(slug: string): { meta: PostMeta; content: string } | null {
-  for (const dir of BLOG_DIRS) {
-    if (!fs.existsSync(dir)) continue;
-    for (const ext of exts) {
-      const candidate = path.join(dir, `${slug}${ext}`);
-      if (fs.existsSync(candidate)) {
-        return normalizeMeta(candidate);
-      }
-    }
-  }
-  return null;
-}
-
-/** Renderiza el markdown a HTML para un slug concreto */
-export async function getPostHtml(slug: string): Promise<{
+export interface PostData {
   meta: PostMeta;
-  html: string;
-}> {
-  const found = getPostBySlug(slug);
-  if (!found) throw new Error(`Post not found: ${slug}`);
-
-  const processed = await remark().use(html).process(found.content);
-  const htmlString = processed.toString();
-
-  return { meta: found.meta, html: htmlString };
+  content: string;
 }
+
+const postsDirectory = path.join(process.cwd(), "content", "posts");
+
+export function getAllSlugs(): string[] {
+  return fs
+    .readdirSync(postsDirectory)
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => file.replace(/\.md$/, ""));
+}
+
+export function getPostMeta(slug: string): PostMeta | null {
+  try {
+    const filePath = path.join(postsDirectory, `${slug}.md`);
+    const fileContents = fs.readFileSync(filePath, "utf8");
+    const { data, content } = matter(fileContents);
+
+    const isoDate =
+      typeof data.date === "string"
+        ? data.date
+        : data.date instanceof Date
+        ? data.date.toISOString()
+        : "";
+
+    const description: string | undefined =
+      (typeof data.description === "string" && data.description) || undefined;
+
+    const cover =
+      (typeof data.cover === "string" && data.cover) ||
+      (typeof data.image === "string" && data.image) ||
+      null;
+
+    // Si no hay description, genera un pequeño excerpt del contenido
+    const contentText =
+      typeof content === "string"
+        ? content.replace(/[#>*_`~\-!$begin:math:display$$end:math:display$$begin:math:text$$end:math:text$]/g, "").trim()
+        : "";
+    const excerpt =
+      description ||
+      (contentText ? contentText.slice(0, 180).trim() + (contentText.length > 180 ? "…" : "") : undefined);
+
+    return {
+      slug,
+      title: data.title ?? "",
+      date: isoDate,
+      description,
+      excerpt,
+      image: cover, // mantenemos ambos por compatibilidad
+      cover,
+      draft: Boolean(data.draft),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function getPostsMeta(): PostMeta[] {
+  const list = getAllSlugs()
+    .map((s) => getPostMeta(s))
+    .filter((m): m is PostMeta => m !== null);
+
+  // Oculta borradores en producción
+  const visible =
+    process.env.NODE_ENV === "production"
+      ? list.filter((m) => !m.draft)
+      : list;
+
+  return visible.sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
+export async function getPostHtml(slug: string): Promise<PostData | null> {
+  try {
+    const filePath = path.join(postsDirectory, `${slug}.md`);
+    const fileContents = fs.readFileSync(filePath, "utf8");
+    const { data, content } = matter(fileContents);
+
+    const isoDate =
+      typeof data.date === "string"
+        ? data.date
+        : data.date instanceof Date
+        ? data.date.toISOString()
+        : "";
+
+    const description: string | undefined =
+      (typeof data.description === "string" && data.description) || undefined;
+
+    const cover =
+      (typeof data.cover === "string" && data.cover) ||
+      (typeof data.image === "string" && data.image) ||
+      null;
+
+    const clean = sanitizeHtml(content, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "iframe", "video", "source"]),
+      allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        img: ["src", "alt", "title", "width", "height", "loading", "decoding"],
+        iframe: ["src", "width", "height", "allow", "allowfullscreen", "title"],
+        video: ["src", "width", "height", "controls", "poster"],
+        source: ["src", "type"],
+      },
+      // permite embeds básicos (YouTube, etc.)
+      allowedSchemesByTag: {
+        iframe: ["https", "http"],
+      },
+    });
+
+    const meta: PostMeta = {
+      slug,
+      title: data.title ?? "",
+      date: isoDate,
+      description,
+      // también generamos excerpt aquí por si lo necesitas en el detalle
+      excerpt:
+        description ||
+        (typeof content === "string"
+          ? content.replace(/[#>*_`~\-!\[\]\(\)]/g, "").trim().slice(0, 180) +
+            (content.length > 180 ? "…" : "")
+          : undefined),
+      image: cover,
+      cover,
+      draft: Boolean(data.draft),
+    };
+
+    return { meta, content: clean };
+  } catch {
+    return null;
+  }
+}
+
+// Alias por compatibilidad
+export { getPostsMeta as getAllPosts };
