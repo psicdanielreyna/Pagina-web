@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { getPostsMeta } from "@/lib/posts";
+import { PostCard } from "@/components/PostCard";
 
 export const metadata: Metadata = {
   title: "Blog | Daniel Reyna",
@@ -32,11 +33,9 @@ export default async function BlogPage() {
         <p className="text-lg opacity-70">No hay artículos todavía.</p>
       ) : (
         <ul className="space-y-12">
-          {posts.map((p) => (
-            <li
-              key={p.slug}
-              className="flex items-start gap-6 border-b border-black/10 pb-10"
-            >
+          {posts.map((post) => (
+            <PostCard key={post.slug} post={post} />
+              ))}
               {p.image ? (
                 <Image
                   src={p.image}
