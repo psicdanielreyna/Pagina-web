@@ -29,18 +29,17 @@ export default async function BlogPage() {
       </header>
 
       <section className="space-y-6">
+        // app/blog/page.tsx (donde pintas la lista)
         {posts.map((p) => (
           <PostCard
             key={p.slug}
-            post={
-              {
-                slug: p.slug,
-                title: p.title,
-                excerpt: p.excerpt ?? "",       // fallback
-                date: p.date ?? "",              // <<< AQUÍ el fix importante
-                cover: p.cover ?? undefined,
-              } satisfies CardPost
-            }
+            post={{
+              slug: p.slug,
+              title: p.title,
+              excerpt: p.excerpt ?? "",
+              date: p.date,
+              cover: p.cover ?? undefined,
+            }}
           />
         ))}
       </section>
