@@ -1,47 +1,61 @@
-// components/PostCard.tsx
 import Link from "next/link";
+import Image from "next/image";
+import type { PostMeta } from "@/lib/posts";
 
-export type CardPost = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  date?: string;
-  cover?: string | null;
-};
-
-export function PostCard({ post }: { post: CardPost }) {
+export default function PostCard({ meta }: { meta: PostMeta }) {
   return (
-    <article className="rounded-xl border shadow-sm bg-white/70 p-4 md:p-5">
-      <Link href={`/blog/${encodeURIComponent(post.slug)}`} className="block group">
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start">
-          {post.cover && (
-            <div className="w-full md:w-72 shrink-0">
-              <img
-                src={post.cover}
-                alt=""
-                className="w-full h-48 md:h-44 object-cover rounded-xl"
-                loading="lazy"
-              />
+    <article className="rounded-lg border bg-white shadow-sm dark:bg-zinc-900 dark:border-zinc-800 overflow-hidden">
+      {meta.cover && (
+        <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+          <Image
+            src={meta.cover}
+            alt={meta.title ?? "Imagen del post"}
+            fill
+            sizes="(min-width: 1024px) 768px, 100vw"
+            className="object-contain" // 👈 muestra la foto completa
+            priority={false}
+          />
+        </div>
+      )}
+
+      <div className="p-5 space-y-3">
+        <h2 className="text-xl font-semibold">
+          <Link href={`/blog/${meta.slug}`} className="hover:underline">
+            {meta.title}
+          </Link>
+        </h2>
+
+        {meta.excerpt && (
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            {meta.excerpt}
+          </p>
+        )}
+
+        <div className="flex items-center justify-between text-xs text-zinc-500">
+          <span>
+            {meta.date
+              ? new Date(meta.date).toLocaleDateString("es-MX", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : "Sin fecha"}
+          </span>
+
+          {meta.tags && meta.tags.length > 0 && (
+            <div className="flex gap-2">
+              {meta.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5"
+                >
+                  #{tag}
+                </span>
+              ))}
             </div>
           )}
-          <div className="flex-1">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-evergreen group-hover:underline">
-              {post.title}
-            </h2>
-            {post.date && (
-              <p className="mt-1 text-sm text-gray-500">
-                {new Date(post.date).toLocaleDateString("es-MX", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            )}
-            <p className="mt-3 text-gray-800">{post.excerpt}</p>
-            <span className="mt-3 inline-block underline">Página del artículo…</span>
-          </div>
         </div>
-      </Link>
+      </div>
     </article>
   );
 }

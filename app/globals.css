@@ -52,4 +52,13 @@ div[data-side="left"].fixed { z-index: 100; background: #fff; } /* panel */
   max-width: 960px;
   width: 100%;
   border-radius: 0.5rem;
+:root{
+  --nl-bg: #F5F7FA;           /* franja clara del banner */
+  --nl-accent: #14532d;       /* verde botón */
+  --nl-accent-contrast: #fff; /* texto botón */
+}
+.dark:root{
+  --nl-bg: #0b0f14;
+}
+
 }

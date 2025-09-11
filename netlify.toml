@@ -2,5 +2,38 @@
   command = "npm run build"
   publish = ".next"
 
+[build.environment]
+  NODE_VERSION = "18"
+  NEXT_TELEMETRY_DISABLED = "1"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Redirect por slugs con acento → sin acento
+[[redirects]]
+  from = "/blog/ansiedad-y-emoción"
+  to = "/blog/ansiedad-y-emocion"
+  status = 301
+  force = true
+
+# Headers de seguridad (top-level, no anidado)
+[[headers]]
+  for = "/*"
+  [headers.values]
+  X-Frame-Options = "SAMEORIGIN"
+  X-Content-Type-Options = "nosniff"
+  Referrer-Policy = "strict-origin-when-cross-origin"
+  Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# Cache estático para assets
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+  Cache-Control = "public, max-age=31536000, immutable"
+
+# Canonical redirect si usas apex vs www
+[[redirects]]
+  from = "https://www.danielreyna.com/*"
+  to = "https://danielreyna.com/:splat"
+  status = 301
+  force = true

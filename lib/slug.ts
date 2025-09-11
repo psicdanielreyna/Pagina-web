@@ -1,15 +1,11 @@
-// lib/slug.ts
-export function slugify(input: string): string {
+// Normaliza acentos, espacios y mayúsculas
+export function slugify(input: string) {
   return input
-    .normalize("NFD")                 // separa acentos
-    .replace(/[\u0300-\u036f]/g, "")  // elimina diacríticos
+    .normalize('NFD')                // separa acentos
+    .replace(/[\u0300-\u036f]/g, '') // quita acentos
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")      // cualquier no-alfa-num -> guion
-    .replace(/^-+|-+$/g, "");         // recorta guiones laterales
-}
-
-export function normalizeSlug(s: string) {
-  // por si recibimos una URL ya con acentos o espacios
-  try { s = decodeURIComponent(s); } catch {}
-  return slugify(s);
+    .replace(/[^a-z0-9\s-]/g, '')    // quita símbolos raros
+    .trim()
+    .replace(/\s+/g, '-')            // espacios → guiones
+    .replace(/-+/g, '-');            // colapsa guiones
 }
