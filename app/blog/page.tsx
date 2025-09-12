@@ -1,24 +1,27 @@
 // app/blog/page.tsx
 import { getAllPostsMeta } from "@/lib/posts";
-// Si tu componente es export default:
 import PostCard from "@/components/PostCard";
-// Si tu PostCard es export nombrado, usa:
-// import { PostCard } from "@/components/PostCard";
+
 export const metadata = {
   title: "Blog",
-  description: "Artículos claros y prácticos sobre salud mental, hábitos y bienestar.",
+  description:
+    "Artículos claros y prácticos sobre salud mental, hábitos y bienestar.",
 };
 
 type BlogSearchParams = { q?: string; page?: string };
 
-export default async function BlogPage({ searchParams }: { searchParams?: BlogSearchParams }) {
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams?: BlogSearchParams;
+}) {
   const q = (searchParams?.q ?? "").toString().toLowerCase();
   const page = Number(searchParams?.page ?? 1);
   const PAGE_SIZE = 10;
 
   const posts = (await getAllPostsMeta()).filter((p) => {
     const byTitle = p.title?.toLowerCase().includes(q);
-    const byTags = p.tags?.join(" ").toLowerCase().includes(q);
+    const byTags = (p.tags ?? []).join(" ").toLowerCase().includes(q);
     return !q || byTitle || byTags;
   });
 
@@ -46,14 +49,20 @@ export default async function BlogPage({ searchParams }: { searchParams?: BlogSe
 
       <div className="mt-8 flex items-center justify-between">
         {page > 1 ? (
-          <a className="underline" href={`/blog?page=${page - 1}&q=${encodeURIComponent(q)}`}>
+          <a
+            className="underline"
+            href={`/blog?page=${page - 1}&q=${encodeURIComponent(q)}`}
+          >
             ← Anterior
           </a>
         ) : (
           <span />
         )}
         {page * PAGE_SIZE < total ? (
-          <a className="underline" href={`/blog?page=${page + 1}&q=${encodeURIComponent(q)}`}>
+          <a
+            className="underline"
+            href={`/blog?page=${page + 1}&q=${encodeURIComponent(q)}`}
+          >
             Siguiente →
           </a>
         ) : (
