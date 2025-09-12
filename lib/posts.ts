@@ -4,27 +4,24 @@ import path from "path";
 import matter from "gray-matter";
 import removeMd from "remove-markdown";
 
-const postsDirectory = path.join(process.cwd(), "content");
-
-// --- Tipado ---
 export type PostMeta = {
   slug: string;
   title?: string;
-  date?: string;       // siempre string normalizada
+  date?: string;            // ISO YYYY-MM-DD
   cover?: string | null;
   excerpt?: string;
   tags?: string[];
 };
 
-// --- Helpers ---
+// --- helpers ---
 function slugify(input: string) {
   return input
     ?.normalize("NFD")
-    ?.replace(/[\u0300-\u036f]/g, "") // quita acentos
+    ?.replace(/[\u0300-\u036f]/g, "")
     ?.toLowerCase()
-    ?.replace(/[^a-z0-9\s-]/g, "")    // quita símbolos raros
+    ?.replace(/[^a-z0-9\s-]/g, "")
     ?.trim()
-    ?.replace(/\s+/g, "-")            // espacios → guiones
+    ?.replace(/\s+/g, "-")
     ?.replace(/-+/g, "-");
 }
 
@@ -35,7 +32,6 @@ function toPlainExcerpt(input: string, maxLen = 160): string {
   return plain.length > maxLen ? plain.slice(0, maxLen) + "…" : plain;
 }
 
-// Normaliza cualquier fecha a string ISO o undefined
 function normalizeDate(input: unknown): string | undefined {
   if (!input) return undefined;
   const d = input instanceof Date ? input : new Date(String(input));
@@ -43,23 +39,45 @@ function normalizeDate(input: unknown): string | undefined {
   return d.toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
-// Lee solo .md/.mdx en un directorio
-function listMarkdownFiles(dir: string) {
-  const entries = fs.readdirSync(dir);
-  return entries.filter((f) => f.endsWith(".md") || f.endsWith(".mdx"));
+// --- filesystem ---
+const CANDIDATE_DIRS = [
+  "content",
+  "content/blog",
+  "posts",
+  "app/blog/content",
+].map((p) => path.join(process.cwd(), p));
+
+function listMarkdownFilesRecursive(root: string): string[] {
+  if (!fs.existsSync(root)) return [];
+  const out: string[] = [];
+  const stack: string[] = [root];
+  while (stack.length) {
+    const dir = stack.pop()!;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const abs = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(abs);
+      } else if (entry.isFile() && (abs.endsWith(".md") || abs.endsWith(".mdx"))) {
+        out.push(abs);
+      }
+    }
+  }
+  return out;
 }
 
-// --- Core ---
+function findAllMarkdownFiles(): string[] {
+  return CANDIDATE_DIRS.flatMap((d) => listMarkdownFilesRecursive(d));
+}
+
+// --- core ---
 export function getAllPostsMeta(): PostMeta[] {
-  const mdFiles = listMarkdownFiles(postsDirectory);
+  const files = findAllMarkdownFiles();
 
-  const posts: PostMeta[] = mdFiles.map((fileName) => {
-    const fullPath = path.join(postsDirectory, fileName);
-    const fileContents = fs.readFileSync(fullPath, "utf8");
+  const posts: PostMeta[] = files.map((absPath) => {
+    const fileContents = fs.readFileSync(absPath, "utf8");
     const { data, content } = matter(fileContents);
-
-    const computedSlug =
-      data?.slug ? slugify(String(data.slug)) : slugify(fileName.replace(/\.mdx?$/, ""));
+    const base = path.basename(absPath).replace(/\.mdx?$/, "");
+    const computedSlug = data?.slug ? slugify(String(data.slug)) : slugify(base);
 
     return {
       slug: computedSlug,
@@ -71,7 +89,7 @@ export function getAllPostsMeta(): PostMeta[] {
     };
   });
 
-  // ordena por fecha descendente
+  // ordenar por fecha (recientes primero)
   return posts.sort((a, b) => {
     const ta = a.date ? new Date(a.date).getTime() : 0;
     const tb = b.date ? new Date(b.date).getTime() : 0;
@@ -83,34 +101,32 @@ export function getAllSlugs(): string[] {
   return getAllPostsMeta().map((p) => p.slug);
 }
 
-export function getPostBySlug(slug: string): { meta: PostMeta; content: string } | null {
-  const mdFiles = listMarkdownFiles(postsDirectory);
+export function getPostBySlug(
+  slug: string
+): { meta: PostMeta; content: string } | null {
+  const files = findAllMarkdownFiles();
 
-  // buscar por nombre de archivo
-  for (const fileName of mdFiles) {
-    const nameSlug = slugify(fileName.replace(/\.mdx?$/, ""));
-    if (nameSlug === slug) {
-      const fullPath = path.join(postsDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, "utf8");
+  // 1) por nombre de archivo
+  for (const absPath of files) {
+    const baseSlug = slugify(path.basename(absPath).replace(/\.mdx?$/, ""));
+    if (baseSlug === slug) {
+      const fileContents = fs.readFileSync(absPath, "utf8");
       const { data, content } = matter(fileContents);
-
       const meta: PostMeta = {
-        slug: slugify(data?.slug ?? nameSlug),
+        slug: slugify(data?.slug ?? baseSlug),
         title: data?.title ?? slug,
         date: normalizeDate(data?.date),
         cover: data?.cover ?? null,
         tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
         excerpt: toPlainExcerpt(data?.excerpt || content),
       };
-
       return { meta, content };
     }
   }
 
-  // buscar por frontmatter.slug
-  for (const fileName of mdFiles) {
-    const fullPath = path.join(postsDirectory, fileName);
-    const fileContents = fs.readFileSync(fullPath, "utf8");
+  // 2) por frontmatter.slug
+  for (const absPath of files) {
+    const fileContents = fs.readFileSync(absPath, "utf8");
     const { data, content } = matter(fileContents);
     const fmSlug = data?.slug ? slugify(String(data.slug)) : null;
     if (fmSlug && fmSlug === slug) {
