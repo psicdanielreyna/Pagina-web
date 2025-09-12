@@ -4,25 +4,21 @@ import PostCard from "@/components/PostCard";
 
 export const metadata = {
   title: "Blog",
-  description:
-    "Artículos claros y prácticos sobre salud mental, hábitos y bienestar.",
+  description: "Artículos claros y prácticos sobre salud mental, hábitos y bienestar.",
 };
 
 type BlogSearchParams = { q?: string; page?: string };
 
-export default async function BlogPage({
-  searchParams,
-}: {
-  searchParams?: BlogSearchParams;
-}) {
-  const q = (searchParams?.q ?? "").toString().toLowerCase();
+export default async function BlogPage({ searchParams }: { searchParams?: BlogSearchParams }) {
+  const q = (searchParams?.q ?? "").toString().toLowerCase().trim();
   const page = Number(searchParams?.page ?? 1);
   const PAGE_SIZE = 10;
 
   const posts = (await getAllPostsMeta()).filter((p) => {
-    const byTitle = p.title?.toLowerCase().includes(q);
-    const byTags = (p.tags ?? []).join(" ").toLowerCase().includes(q);
-    return !q || byTitle || byTags;
+    if (!q) return true;
+    const byTitle = (p.title ?? "").toLowerCase().includes(q);
+    const byTags = ((p.tags ?? []).join(" ").toLowerCase()).includes(q);
+    return byTitle || byTags;
   });
 
   const total = posts.length;
@@ -39,30 +35,28 @@ export default async function BlogPage({
         />
       </form>
 
-      <ul className="space-y-8">
-        {slice.map((meta) => (
-          <li key={meta.slug}>
-            <PostCard meta={meta} />
-          </li>
-        ))}
-      </ul>
+      {slice.length === 0 ? (
+        <p className="text-zinc-600">No se encontraron artículos.</p>
+      ) : (
+        <ul className="space-y-8">
+          {slice.map((meta) => (
+            <li key={meta.slug}>
+              <PostCard meta={meta} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div className="mt-8 flex items-center justify-between">
         {page > 1 ? (
-          <a
-            className="underline"
-            href={`/blog?page=${page - 1}&q=${encodeURIComponent(q)}`}
-          >
+          <a className="underline" href={`/blog?page=${page - 1}&q=${encodeURIComponent(q)}`}>
             ← Anterior
           </a>
         ) : (
           <span />
         )}
         {page * PAGE_SIZE < total ? (
-          <a
-            className="underline"
-            href={`/blog?page=${page + 1}&q=${encodeURIComponent(q)}`}
-          >
+          <a className="underline" href={`/blog?page=${page + 1}&q=${encodeURIComponent(q)}`}>
             Siguiente →
           </a>
         ) : (
