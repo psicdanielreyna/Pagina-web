@@ -8,7 +8,9 @@ const SITE =
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPostsMeta();
+
   const items = posts
+    .slice()
     .sort((a, b) => {
       const ta = a.date ? new Date(a.date).getTime() : 0;
       const tb = b.date ? new Date(b.date).getTime() : 0;
