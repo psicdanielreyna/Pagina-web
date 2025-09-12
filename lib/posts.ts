@@ -6,17 +6,18 @@ import removeMd from "remove-markdown";
 
 const postsDirectory = path.join(process.cwd(), "content");
 
+// --- Tipado ---
 export type PostMeta = {
   slug: string;
   title?: string;
-  date?: string;           // string | undefined
+  date?: string;       // siempre string normalizada
   cover?: string | null;
-  excerpt?: string;        // siempre texto plano
+  excerpt?: string;
   tags?: string[];
 };
 
-// --- helpers ---
-export function slugify(input: string) {
+// --- Helpers ---
+function slugify(input: string) {
   return input
     ?.normalize("NFD")
     ?.replace(/[\u0300-\u036f]/g, "") // quita acentos
@@ -29,19 +30,26 @@ export function slugify(input: string) {
 
 function toPlainExcerpt(input: string, maxLen = 160): string {
   if (!input) return "";
-  // quita HTML y Markdown
   const noHtml = input.replace(/<[^>]+>/g, "");
   const plain = removeMd(noHtml);
   return plain.length > maxLen ? plain.slice(0, maxLen) + "…" : plain;
 }
 
-// Lee solo .md/.mdx (ignora directorios)
+// Normaliza cualquier fecha a string ISO o undefined
+function normalizeDate(input: unknown): string | undefined {
+  if (!input) return undefined;
+  const d = input instanceof Date ? input : new Date(String(input));
+  if (Number.isNaN(d.getTime())) return undefined;
+  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+// Lee solo .md/.mdx en un directorio
 function listMarkdownFiles(dir: string) {
   const entries = fs.readdirSync(dir);
   return entries.filter((f) => f.endsWith(".md") || f.endsWith(".mdx"));
 }
 
-// --- core ---
+// --- Core ---
 export function getAllPostsMeta(): PostMeta[] {
   const mdFiles = listMarkdownFiles(postsDirectory);
 
@@ -56,18 +64,18 @@ export function getAllPostsMeta(): PostMeta[] {
     return {
       slug: computedSlug,
       title: data?.title ?? computedSlug,
-      date: data?.date ?? undefined,
+      date: normalizeDate(data?.date),
       cover: data?.cover ?? null,
       tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
       excerpt: toPlainExcerpt(data?.excerpt || content),
     };
   });
 
-  // ordena por fecha descendente (si existe)
+  // ordena por fecha descendente
   return posts.sort((a, b) => {
-    const ad = a.date ?? "";
-    const bd = b.date ?? "";
-    return bd.localeCompare(ad, "es", { numeric: true });
+    const ta = a.date ? new Date(a.date).getTime() : 0;
+    const tb = b.date ? new Date(b.date).getTime() : 0;
+    return tb - ta;
   });
 }
 
@@ -75,9 +83,10 @@ export function getAllSlugs(): string[] {
   return getAllPostsMeta().map((p) => p.slug);
 }
 
-export function getPostBySlug(slug: string): { meta: PostMeta; content: string } {
+export function getPostBySlug(slug: string): { meta: PostMeta; content: string } | null {
   const mdFiles = listMarkdownFiles(postsDirectory);
-  // buscar archivo cuyo slug normalizado coincida
+
+  // buscar por nombre de archivo
   for (const fileName of mdFiles) {
     const nameSlug = slugify(fileName.replace(/\.mdx?$/, ""));
     if (nameSlug === slug) {
@@ -88,7 +97,7 @@ export function getPostBySlug(slug: string): { meta: PostMeta; content: string }
       const meta: PostMeta = {
         slug: slugify(data?.slug ?? nameSlug),
         title: data?.title ?? slug,
-        date: data?.date ?? undefined,
+        date: normalizeDate(data?.date),
         cover: data?.cover ?? null,
         tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
         excerpt: toPlainExcerpt(data?.excerpt || content),
@@ -98,9 +107,8 @@ export function getPostBySlug(slug: string): { meta: PostMeta; content: string }
     }
   }
 
-  // Si no se encontró por nombre de archivo, intenta por frontmatter.slug
-  const all = listMarkdownFiles(postsDirectory);
-  for (const fileName of all) {
+  // buscar por frontmatter.slug
+  for (const fileName of mdFiles) {
     const fullPath = path.join(postsDirectory, fileName);
     const fileContents = fs.readFileSync(fullPath, "utf8");
     const { data, content } = matter(fileContents);
@@ -109,7 +117,7 @@ export function getPostBySlug(slug: string): { meta: PostMeta; content: string }
       const meta: PostMeta = {
         slug: fmSlug,
         title: data?.title ?? fmSlug,
-        date: data?.date ?? undefined,
+        date: normalizeDate(data?.date),
         cover: data?.cover ?? null,
         tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
         excerpt: toPlainExcerpt(data?.excerpt || content),
@@ -118,5 +126,5 @@ export function getPostBySlug(slug: string): { meta: PostMeta; content: string }
     }
   }
 
-  throw new Error(`Post not found for slug: ${slug}`);
+  return null;
 }

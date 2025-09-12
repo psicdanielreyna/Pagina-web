@@ -1,18 +1,27 @@
+// app/sitemap.ts
+import type { MetadataRoute } from "next";
 import { getAllPostsMeta } from "@/lib/posts";
 
-export default async function sitemap() {
-  const base = "https://tudominio.com";
+const SITE =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ||
+  "https://danielreyna.com";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPostsMeta();
-  const blogUrls = posts.map(p => ({
-    url: `${base}/blog/${p.slug}`,
-    lastModified: p.date ?? new Date().toISOString(),
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  const items = posts
+    .sort((a, b) => {
+      const ta = a.date ? new Date(a.date).getTime() : 0;
+      const tb = b.date ? new Date(b.date).getTime() : 0;
+      return tb - ta;
+    })
+    .map((p) => ({
+      url: `${SITE}/blog/${p.slug}`,
+      lastModified: p.date ? new Date(p.date) : new Date(),
+    }));
 
   return [
-    { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/blog`, changeFrequency: "weekly", priority: 0.8 },
-    ...blogUrls,
+    { url: `${SITE}/`, lastModified: new Date() },
+    { url: `${SITE}/blog`, lastModified: new Date() },
+    ...items,
   ];
 }
