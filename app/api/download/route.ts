@@ -1,37 +1,56 @@
-import { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
+// app/api/download/route.ts
+import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 import path from "path";
-import fs from "fs/promises";
+import fs from "fs";
 
 const DL_SECRET = process.env.DOWNLOAD_TOKEN_SECRET!;
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
-    // valida token
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
+
     if (!token) {
-      return new Response(JSON.stringify({ ok: false, error: "Token faltante" }), { status: 401 });
+      return NextResponse.json(
+        { ok: false, error: "Token requerido" },
+        { status: 400 }
+      );
     }
 
-    await jwtVerify(token, new TextEncoder().encode(DL_SECRET));
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, DL_SECRET);
+    } catch {
+      return NextResponse.json(
+        { ok: false, error: "Token inválido o expirado" },
+        { status: 401 }
+      );
+    }
 
-    // lee el PDF
-    const filePath = path.join(process.cwd(), "public", "downloads", "mini-guia-anti-estres.pdf");
-    const file = await fs.readFile(filePath);
+    // Ruta absoluta al PDF
+    const filePath = path.join(process.cwd(), "public", "downloads", "mini-guia.pdf");
+    if (!fs.existsSync(filePath)) {
+      return NextResponse.json(
+        { ok: false, error: "Archivo no encontrado" },
+        { status: 404 }
+      );
+    }
 
-    // ⚡ fix: envolver el Buffer en un Uint8Array
-    return new Response(new Uint8Array(file), {
+    const fileBuffer = fs.readFileSync(filePath);
+
+    return new NextResponse(fileBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="mini-guia-anti-estres.pdf"',
-        "X-Robots-Tag": "noindex, nofollow",
-        "Cache-Control": "no-store",
+        "Content-Disposition": 'attachment; filename="mini-guia.pdf"',
       },
     });
   } catch (err: any) {
-    console.error("[download] error:", err?.message || err);
-    return new Response(JSON.stringify({ ok: false, error: "Token inválido o expirado" }), { status: 401 });
+    console.error("[download] error:", err);
+    return NextResponse.json(
+      { ok: false, error: "Error interno" },
+      { status: 500 }
+    );
   }
 }
