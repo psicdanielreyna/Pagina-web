@@ -7,21 +7,41 @@ type Props = {
 };
 
 export default function Newsletter({ variant = "banner" }: Props) {
-  const [status, setStatus] = useState<"idle" | "ok" | "err">("idle");
+  const [status, setStatus] = useState<"idle" | "ok" | "err" | "already">("idle");
   const [pending, setPending] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setPending(true);
     setStatus("idle");
+
     const fd = new FormData(e.currentTarget);
     // honeypot
-    if (fd.get("company")) return;
+    if (fd.get("company")) {
+      setPending(false);
+      return;
+    }
 
-    const res = await fetch("/api/subscribe", { method: "POST", body: fd });
-    setPending(false);
-    setStatus(res.ok ? "ok" : "err");
-    if (res.ok) (e.currentTarget as HTMLFormElement).reset();
+    try {
+      const res = await fetch("/api/subscribe", { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok) {
+        if (data?.alreadySubscribed) {
+          setStatus("already");
+        } else {
+          setStatus("ok");
+          (e.currentTarget as HTMLFormElement).reset();
+        }
+      } else {
+        setStatus("err");
+      }
+    } catch (err) {
+      console.error("Error al suscribirse:", err);
+      setStatus("err");
+    } finally {
+      setPending(false);
+    }
   }
 
   const isBanner = variant === "banner";
@@ -34,8 +54,6 @@ export default function Newsletter({ variant = "banner" }: Props) {
         // fondo suave tipo “franja”
         "bg-[color:var(--nl-bg,#F5F7FA)]",
       ].join(" ")}
-      // puedes ajustar el color con CSS custom property en globals.css:
-      // :root{ --nl-bg: #F3F6F4; --nl-accent: #155E3F; --nl-accent-contrast: #fff; }
     >
       <div className="mx-auto max-w-5xl px-4">
         {/* Encabezado */}
@@ -52,11 +70,10 @@ export default function Newsletter({ variant = "banner" }: Props) {
             No te pierdas lo mejor para cuidar tu mente cada semana
           </h2>
           <p className={isBanner ? "mt-2 text-zinc-600" : "mt-1 text-zinc-600"}>
-            Consejos breves y prácticos. Sin spam. Puedes darte de baja cuando
-            quieras.
-            <p className="inline-flex items-center gap-2 rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-900 ring-1 ring-yellow-200">
-  🎁 Descarga gratis: Mini guía anti-estrés
-</p>
+            Consejos breves y prácticos. Sin spam. Puedes darte de baja cuando quieras.
+            <span className="ml-2 inline-flex items-center gap-2 rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-900 ring-1 ring-yellow-200">
+              🎁 Mini guía anti-estrés
+            </span>
           </p>
         </div>
 
@@ -116,6 +133,11 @@ export default function Newsletter({ variant = "banner" }: Props) {
         {status === "ok" && (
           <p className="mt-3 text-sm text-green-700">
             ¡Listo! Revisa tu bandeja (y Spam/Promociones).
+          </p>
+        )}
+        {status === "already" && (
+          <p className="mt-3 text-sm text-amber-700">
+            ¡Ya estabas suscrito! Te escribiré pronto ✉️
           </p>
         )}
         {status === "err" && (
