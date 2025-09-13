@@ -2,122 +2,133 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const API_KEY = process.env.RESEND_API_KEY!;
 const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID!;
-const FROM_EMAIL = process.env.FROM_EMAIL!; // p.ej. "danielreyna@danielreyna.com"
+const FROM_EMAIL = process.env.FROM_EMAIL!; // ej: daniel@danielreyna.com
 const DL_SECRET = process.env.DOWNLOAD_TOKEN_SECRET!;
 
 const resend = new Resend(API_KEY);
 
 function isEmail(v: unknown) {
-  return typeof v === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  return typeof v === "string" && /^\S+@\S+\.\S+$/.test(v);
+}
+function sha1(s: string) {
+  return crypto.createHash("sha1").update(s).digest("hex");
 }
 
-// pequeña ayuda para reintentos (p. ej. 429)
-async function withRetry<T>(fn: () => Promise<T>, retries = 2, baseMs = 500): Promise<T> {
-  let attempt = 0;
-  while (true) {
+// --- helper: retry exponencial sólo para 429 ---
+async function sendWithBackoff(fn: () => Promise<any>, tries = 3) {
+  let lastErr: any;
+  for (let i = 0; i < tries; i++) {
     try {
       return await fn();
     } catch (err: any) {
-      const status = err?.status || err?.response?.status;
-      if (attempt >= retries || (status && status !== 429)) throw err;
-      const wait = baseMs * Math.pow(2, attempt); // 500ms, 1000ms...
-      await new Promise((r) => setTimeout(r, wait));
-      attempt++;
+      const code = err?.statusCode ?? err?.response?.status;
+      if (code !== 429) throw err;
+      // 429 -> espera 1s, 2s, 4s …
+      const ms = 1000 * Math.pow(2, i);
+      await new Promise((r) => setTimeout(r, ms));
+      lastErr = err;
     }
   }
+  throw lastErr;
 }
 
 export async function POST(req: Request) {
   try {
-    // 1) Lee body (form o json)
+    // 1) lee email (form o json)
     let email = "";
-    const contentType = req.headers.get("content-type") || "";
-    if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
-      const fd = await req.formData();
-      email = String(fd.get("email") || "").trim().toLowerCase();
-      // honeypot
-      if (fd.get("company")) return NextResponse.json({ ok: true }, { status: 200 });
+    const ctype = req.headers.get("content-type") || "";
+    if (ctype.includes("application/json")) {
+      const data = await req.json();
+      email = (data?.email || "").toString().trim().toLowerCase();
     } else {
-      const body = await req.json().catch(() => ({}));
-      email = String(body?.email || "").trim().toLowerCase();
+      const form = await req.formData();
+      email = (form.get("email") || "").toString().trim().toLowerCase();
     }
-
     if (!isEmail(email)) {
       return NextResponse.json({ ok: false, error: "email inválido" }, { status: 400 });
     }
 
-    // 2) ¿ya existe en la audiencia? (no uses 'limit', ya no está en el tipo)
-    let already = false;
-    try {
-      const list = await withRetry(
-        () => resend.contacts.list({ audienceId: AUDIENCE_ID }),
-        1
-      );
-      const items: any[] = (list as any)?.data?.items ?? [];
-      already = Array.isArray(items) && items.some((c: any) => (c.email || "").toLowerCase() === email);
-    } catch (e) {
-      console.warn("[subscribe] no se pudo verificar existencia en audience:", e);
-    }
+   // 2) ¿Ya existe en la audiencia?
+let already = false;
+if (AUDIENCE_ID) {
+  try {
+    let items: any[] = [];
+    let cursor: string | undefined = undefined;
 
-    // 3) si ya estaba, no reenvíes bienvenida
+    do {
+      const resp: any = await resend.contacts.list(
+        ({ audienceId: AUDIENCE_ID, ...(cursor ? { after: cursor } : {}) } as any)
+      );
+
+      const page = resp?.data?.items ?? resp?.items ?? [];
+      items.push(...page);
+
+      // distintas versiones del SDK exponen paginación en lugares diferentes
+      cursor = resp?.data?.pagination?.next ?? resp?.pagination?.next ?? undefined;
+    } while (cursor && items.length < 2000); // seguridad: corta en 2000
+
+    already = items.some(
+      (c: any) => (c.email || "").toLowerCase() === email
+    );
+  } catch (e) {
+    console.warn("[subscribe] fallo al listar audiencia:", e);
+  }
+}
+
     if (already) {
+      // no mandamos bienvenida otra vez
       return NextResponse.json({ ok: true, alreadySubscribed: true }, { status: 200 });
     }
 
-    // 4) crea/actualiza contacto
-    await withRetry(
-      () =>
-        resend.contacts.create({
-          audienceId: AUDIENCE_ID,
-          email,
-          unsubscribed: false,
-        }),
-      1
-    );
+    // 3) crea/actualiza contacto (idempotente por email del lado de Resend)
+    await resend.contacts.create({
+      audienceId: AUDIENCE_ID as any,
+      email,
+      unsubscribed: false,
+    });
 
-    // 5) genera token y link de descarga
-    const token = jwt.sign({ email }, DL_SECRET, { expiresIn: "7d" }); // válido 7 días
+    // 4) genera link de descarga firmado (7 días)
+    const token = jwt.sign({ email }, DL_SECRET, { expiresIn: "7d" });
     const downloadUrl = `https://danielreyna.com/api/download?token=${token}`;
 
-    // 6) envía email de bienvenida con el link
-    await withRetry(
-      () =>
-        resend.emails.send({
-          from: FROM_EMAIL,
-          to: email,
-          subject: "¡Bienvenido al newsletter! 🎁 Tu mini guía",
-          text: [
-            "Gracias por suscribirte 🙌",
-            "",
-            "Aquí tienes tu mini guía anti-estrés:",
-            downloadUrl,
-            "",
-            "Si no fuiste tú, ignora este mensaje.",
-            "",
-            "Abrazo,",
-            "Daniel",
-          ].join("\n"),
-          html: `
-            <div style="font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#111">
-              <h1 style="margin:0 0 12px">¡Bienvenido al newsletter! 🎉</h1>
-              <p>Gracias por suscribirte. Aquí tienes tu mini guía anti-estrés:</p>
-              <p>
-                <a href="${downloadUrl}" style="display:inline-block;background:#14532d;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">
-                  Descargar mini guía (PDF)
-                </a>
-              </p>
-              <p style="color:#555">El enlace expira en 7 días.</p>
+    // 5) manda bienvenida con idempotencia + backoff
+    const refId = `welcome-${sha1(email)}`; // evita duplicados si se dispara doble
+    let deferred = false;
+    try {
+      await sendWithBackoff(
+        () =>
+          resend.emails.send({
+            from: FROM_EMAIL,
+            to: email,
+            subject: "¡Gracias por suscribirte!",
+            // puedes usar 'react' si tienes un componente; aquí voy con 'html'
+            html: `
+              <p>¡Bienvenido al newsletter!</p>
+              <p>Te suscribiste correctamente. Aquí tienes tu mini guía:</p>
+              <p><a href="${downloadUrl}">Descargar mini guía anti-estrés (PDF)</a></p>
               <p>Abrazo,<br/>Daniel</p>
-            </div>
-          `,
-        }),
-      2
-    );
+            `,
+            headers: { "X-Entity-Ref-ID": refId },
+            tags: [{ name: "type", value: "welcome" }],
+          }),
+        3
+      );
+    } catch (err: any) {
+      const code = err?.statusCode ?? err?.response?.status;
+      if (code === 429) {
+        // te aviso para que el cliente muestre un mensaje amable
+        deferred = true;
+        console.warn("[subscribe] Resend 429; email diferido");
+      } else {
+        throw err;
+      }
+    }
 
-    return NextResponse.json({ ok: true, alreadySubscribed: false }, { status: 200 });
+    return NextResponse.json({ ok: true, alreadySubscribed: false, deferred }, { status: 200 });
   } catch (err: any) {
     console.error("[subscribe] error:", err?.message || err);
     return NextResponse.json({ ok: false, error: "No se pudo procesar la suscripción" }, { status: 500 });
