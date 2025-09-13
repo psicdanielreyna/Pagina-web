@@ -1,51 +1,37 @@
 // app/api/download/route.ts
-import { NextRequest } from 'next/server'
-import { DOWNLOADS } from '@/lib/downloads'
-import fs from 'node:fs/promises'
-import path from 'node:path'
-import { verifyToken } from '@/lib/tokens'
+export const runtime = "nodejs";
 
-// usamos fs, así que forzamos runtime Node
-export const runtime = 'nodejs'
+import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
+import fs from "fs/promises";
+import path from "path";
 
-export async function GET(req: NextRequest) {
-  const id = req.nextUrl.searchParams.get('id') || ''
-  const pin = req.nextUrl.searchParams.get('pin') || ''
-  const token = req.nextUrl.searchParams.get('token') || ''
-  const required = process.env.DOWNLOAD_PIN || ''
+const DL_SECRET = process.env.DOWNLOAD_TOKEN_SECRET || "";
 
-  if (!id || !DOWNLOADS[id]) {
-    return new Response('Not found', { status: 404 })
-  }
-
-  // 1) Si trae token firmado (email tras compra), lo validamos
-  if (token) {
-    const data = verifyToken(token)
-    if (!data || data.id !== id) {
-      return new Response('Unauthorized', { status: 401 })
-    }
-  } else {
-    // 2) Si no hay token, requerimos PIN manual
-    if (!required || pin !== required) {
-      return new Response('Unauthorized', { status: 401 })
-    }
-  }
-
-  const fileMeta = DOWNLOADS[id]
-  const filePath = path.join(process.cwd(), fileMeta.path)
-
+export async function GET(req: Request) {
   try {
-    const buf = await fs.readFile(filePath)             // Buffer
-    const body = new Uint8Array(buf)                    // ✅ BodyInit válido
+    const { searchParams } = new URL(req.url);
+    const token = searchParams.get("token") || "";
+    if (!token) return NextResponse.json({ ok: false }, { status: 400 });
 
-    return new Response(body, {
+    // verifica token
+    const secret = new TextEncoder().encode(DL_SECRET);
+    await jwtVerify(token, secret);
+
+    // sirve el PDF como attachment
+    const filePath = path.join(process.cwd(), "public", "downloads", "mini-guia-anti-estres.pdf");
+    const file = await fs.readFile(filePath);
+
+    return new NextResponse(new Uint8Array(file), {
+      status: 200,
       headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${fileMeta.filename}"`,
-        'Cache-Control': 'no-store',
+        "Content-Type": "application/pdf",
+        "Content-Disposition": 'attachment; filename="mini-guia-anti-estres.pdf"',
+        "X-Robots-Tag": "noindex, nofollow",
       },
-    })
-  } catch (e) {
-    return new Response('File missing', { status: 500 })
+    });
+  } catch (err: any) {
+    const msg = err?.code === "ERR_JWS_SIGNATURE_VERIFICATION_FAILED" ? "Token inválido" : "Error";
+    return NextResponse.json({ ok: false, error: msg }, { status: 401 });
   }
 }
