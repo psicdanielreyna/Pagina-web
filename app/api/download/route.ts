@@ -1,56 +1,38 @@
 // app/api/download/route.ts
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import path from "path";
-import fs from "fs";
+import { jwtVerify } from "jose";
+import path from "node:path";
+import fs from "node:fs/promises";
 
 const DL_SECRET = process.env.DOWNLOAD_TOKEN_SECRET!;
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const token = searchParams.get("token");
-
+    const url = new URL(req.url);
+    const token = url.searchParams.get("token") || "";
     if (!token) {
-      return NextResponse.json(
-        { ok: false, error: "Token requerido" },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: "Falta token" }, { status: 400 });
     }
 
-    let decoded: any;
-    try {
-      decoded = jwt.verify(token, DL_SECRET);
-    } catch {
-      return NextResponse.json(
-        { ok: false, error: "Token inválido o expirado" },
-        { status: 401 }
-      );
-    }
+    // valida token
+    await jwtVerify(token, new TextEncoder().encode(DL_SECRET));
 
-    // Ruta absoluta al PDF
-    const filePath = path.join(process.cwd(), "public", "downloads", "mini-guia.pdf");
-    if (!fs.existsSync(filePath)) {
-      return NextResponse.json(
-        { ok: false, error: "Archivo no encontrado" },
-        { status: 404 }
-      );
-    }
+    // lee el PDF y lo sirve como attachment
+    const filePath = path.join(process.cwd(), "public", "downloads", "mini-guia-anti-estres.pdf");
+    const file = await fs.readFile(filePath);
 
-    const fileBuffer = fs.readFileSync(filePath);
-
-    return new NextResponse(fileBuffer, {
+    // Convertimos el Buffer a Uint8Array
+    return new Response(new Uint8Array(file), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="mini-guia.pdf"',
+        "Content-Disposition": 'attachment; filename="mini-guia-anti-estres.pdf"',
+        "X-Robots-Tag": "noindex, nofollow",
+        "Cache-Control": "no-store",
       },
     });
   } catch (err: any) {
-    console.error("[download] error:", err);
-    return NextResponse.json(
-      { ok: false, error: "Error interno" },
-      { status: 500 }
-    );
+    console.error("[download] error:", err?.message || err);
+    return NextResponse.json({ ok: false, error: "Token inválido o expirado" }, { status: 401 });
   }
 }
