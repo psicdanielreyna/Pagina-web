@@ -2,25 +2,20 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const AUDIENCE_ID  = process.env.RESEND_AUDIENCE_ID!;
-const FROM_EMAIL   = process.env.FROM_EMAIL!;
-const RESEND_KEY   = process.env.RESEND_API_KEY!;
+const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
+const FROM_EMAIL  = process.env.FROM_EMAIL;
+const API_KEY     = process.env.RESEND_API_KEY;
 
-function ok(data: Record<string, unknown> = {}) {
-  return NextResponse.json({ ok: true, ...data }, { status: 200 });
+function ok(data: Record<string, unknown> = {}, status = 200) {
+  return NextResponse.json({ ok: true, ...data }, { status });
 }
-function bad(error: string, code = 400) {
-  return NextResponse.json({ ok: false, error }, { status: code });
-}
-
-// Normaliza email
-function normEmail(v: string | null) {
-  return (v ?? "").trim().toLowerCase();
+function bad(error: string, status = 400) {
+  return NextResponse.json({ ok: false, error }, { status });
 }
 
 export async function POST(req: Request) {
   try {
-    // admite formData o JSON
+    // formData o JSON
     const form = await req.formData().catch(async () => {
       const json = await req.json().catch(() => ({}));
       const fd = new FormData();
@@ -31,65 +26,47 @@ export async function POST(req: Request) {
     // honeypot
     if (form.get("company")) return ok({ skipped: true });
 
-    const email = normEmail(form.get("email") as string | null);
+    const email = (form.get("email") as string | null)?.trim().toLowerCase() ?? "";
     if (!email) return bad("Email requerido");
 
-    // Si no hay API key, no truenes el build en previews/local
-    if (!RESEND_KEY) {
+    // Sin API key -> responder mock para no romper previews/local
+    if (!API_KEY) {
       console.warn("[subscribe] RESEND_API_KEY no definido. Respuesta mock.");
       return ok({ mocked: true });
     }
 
-    // ---------- 1) DEDUP por email en Audience ----------
+    const resend = new Resend(API_KEY);
+
     let already = false;
 
+    // 1) Intentar crear el contacto; si ya existe, Resend lanza 409 (conflict)
     if (AUDIENCE_ID) {
-      // Busca por email usando la API HTTP (evita problemas de tipos del SDK)
-      const searchRes = await fetch(
-        `https://api.resend.com/contacts?audience_id=${encodeURIComponent(
-          AUDIENCE_ID
-        )}&email=${encodeURIComponent(email)}`,
-        { headers: { Authorization: `Bearer ${RESEND_KEY}` } }
-      );
-
-      if (searchRes.ok) {
-        const data = (await searchRes.json()) as { data?: Array<{ id: string; email: string }> };
-        already = Boolean(data?.data?.length);
-      }
-
-      // Si no existe, lo creamos (idempotente: si llegara a existir, Resend responde 409)
-      if (!already) {
-        const createRes = await fetch("https://api.resend.com/contacts", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${RESEND_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            audience_id: AUDIENCE_ID,
-            email,
-            unsubscribed: false,
-          }),
+      try {
+        await resend.contacts.create({
+          audienceId: AUDIENCE_ID,
+          email,
+          unsubscribed: false,
         });
+      } catch (err: any) {
+        const status = err?.statusCode ?? err?.code ?? err?.name;
+        const msg = String(err?.message || "");
+        const isConflict =
+          status === 409 || status === "conflict" || /409|already exists/i.test(msg);
 
-        if (createRes.status === 409) {
-          // Ya existe
-          already = true;
-        } else if (!createRes.ok) {
-          const err = await createRes.text().catch(() => "");
-          console.error("[subscribe] create contact error:", err || createRes.statusText);
-          // No bloqueamos la UX si falla el alta; continuamos sin enviar bienvenida
-          already = true;
+        if (isConflict) {
+          already = true; // ya estaba en la audiencia
+        } else {
+          console.error("[subscribe] create contact error:", status, msg);
+          // Si falló por otra causa real, avisa
+          return bad("No se pudo registrar el correo", 500);
         }
       }
     }
 
-    // ---------- 2) Enviar bienvenida SOLO si no estaba ya suscrito ----------
+    // 2) Enviar bienvenida SOLO si no estaba ya suscrito
     if (!already && FROM_EMAIL) {
-      const resend = new Resend(RESEND_KEY);
-
       await resend.emails.send({
-        from: FROM_EMAIL, // tu remitente verificado en Resend
+        from: FROM_EMAIL,
         to: email,
         subject: "¡Gracias por suscribirte!",
         html: `
