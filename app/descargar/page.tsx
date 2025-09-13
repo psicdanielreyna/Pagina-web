@@ -1,68 +1,64 @@
-'use client'
+// app/descargar/page.tsx
+import type { Metadata } from "next";
+import Link from "next/link";
+import { jwtVerify } from "jose";
 
-import { Suspense, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+export const metadata: Metadata = {
+  title: "Descargar mini guía",
+  robots: { index: false, follow: false }, // noindex
+};
 
-// evita prerender/SSG de esta ruta
-export const dynamic = 'force-dynamic'
-
-function DownloadForm() {
-  const sp = useSearchParams()
-  const id = sp.get('id') || ''
-  const [pin, setPin] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const handleDownload = async () => {
-    setLoading(true); setError(null)
-    const url = `/api/download?id=${encodeURIComponent(id)}&pin=${encodeURIComponent(pin)}`
-    const res = await fetch(url)
-    if (!res.ok) {
-      setLoading(false)
-      setError(res.status === 401 ? 'PIN incorrecto' : 'No se pudo descargar')
-      return
-    }
-    const blob = await res.blob()
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `${id}.pdf`
-    a.click()
-    URL.revokeObjectURL(a.href)
-    setLoading(false)
+async function verify(token: string | null) {
+  if (!token) return false;
+  try {
+    const secret = new TextEncoder().encode(process.env.DOWNLOAD_TOKEN_SECRET || "");
+    await jwtVerify(token, secret);
+    return true;
+  } catch {
+    return false;
   }
-
-  if (!id) return <p className="text-sm text-muted-foreground">Falta el parámetro <code>id</code>.</p>
-
-  return (
-    <>
-      <div className="flex gap-2">
-        <Input
-          placeholder="PIN"
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-        />
-        <Button onClick={handleDownload} disabled={loading || !pin}>
-          {loading ? 'Descargando…' : 'Descargar'}
-        </Button>
-      </div>
-      {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
-    </>
-  )
 }
 
-export default function DescargarPage() {
+export default async function DescargarPage({
+  searchParams,
+}: {
+  searchParams: { token?: string };
+}) {
+  const token = searchParams?.token || null;
+  const ok = await verify(token);
+
   return (
-    <div className="container py-16 max-w-md">
-      <h1 className="text-2xl font-semibold mb-2">Descargar recurso</h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        Ingresa tu PIN para descargar el archivo.
-      </p>
-      {/* el hook va dentro de Suspense */}
-      <Suspense fallback={<p className="text-sm text-muted-foreground">Cargando…</p>}>
-        <DownloadForm />
-      </Suspense>
-    </div>
-  )
+    <main className="mx-auto max-w-2xl px-4 py-16">
+      {ok ? (
+        <>
+          <h1 className="text-3xl font-bold mb-3">¡Listo! 🎁</h1>
+          <p className="text-zinc-600 mb-6">
+            Gracias por suscribirte. Da clic abajo para descargar tu mini guía anti-estrés.
+          </p>
+          <a
+            className="inline-flex items-center rounded-md bg-green-700 px-4 py-2 font-medium text-white hover:bg-green-800"
+            href={`/api/download?token=${encodeURIComponent(token!)}`}
+          >
+            Descargar mini guía
+          </a>
+          <p className="mt-6 text-sm text-zinc-500">
+            ¿Problemas con el enlace? Responde al correo de bienvenida y te ayudo.
+          </p>
+        </>
+      ) : (
+        <>
+          <h1 className="text-2xl font-bold mb-3">Enlace no válido o caducado</h1>
+          <p className="text-zinc-600 mb-6">
+            Vuelve a suscribirte al newsletter para generar un enlace nuevo.
+          </p>
+          <Link
+            className="inline-flex items-center rounded-md border px-4 py-2 font-medium hover:bg-zinc-50"
+            href="/#newsletter"
+          >
+            Ir al newsletter
+          </Link>
+        </>
+      )}
+    </main>
+  );
 }

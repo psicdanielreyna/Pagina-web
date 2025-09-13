@@ -37,3 +37,14 @@
   to = "https://danielreyna.com/:splat"
   status = 301
   force = true
+
+  # Evitar indexado de la página y el endpoint de descarga
+[[headers]]
+  for = "/descargar*"
+  [headers.values]
+  X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/downloads/*"
+  [headers.values]
+  X-Robots-Tag = "noindex, nofollow"
