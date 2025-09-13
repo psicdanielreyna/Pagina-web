@@ -2,43 +2,38 @@
 import { useState } from "react";
 
 type Props = {
-  // “banner” = grande como en robertomtz | “card” = compacto (mobile)
   variant?: "banner" | "card";
 };
 
 export default function Newsletter({ variant = "banner" }: Props) {
-  const [status, setStatus] = useState<"idle" | "ok" | "err" | "already">("idle");
   const [pending, setPending] = useState(false);
+  const [msg, setMsg] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setPending(true);
-    setStatus("idle");
-
+    setMsg("");
     const fd = new FormData(e.currentTarget);
-    // honeypot
-    if (fd.get("company")) {
-      setPending(false);
-      return;
-    }
+    if (fd.get("company")) return; // honeypot
 
     try {
       const res = await fetch("/api/subscribe", { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
 
-      if (res.ok) {
-        if (data?.alreadySubscribed) {
-          setStatus("already");
+      if (data?.alreadySubscribed) {
+        setMsg("¡Ya estabas suscrito! Te escribiré pronto ✉️");
+      } else if (data?.ok) {
+        if (data?.emailed === false) {
+          setMsg("Te suscribiste. Si no ves el correo, espera unos minutos o revisa Spam/Promociones.");
         } else {
-          setStatus("ok");
-          (e.currentTarget as HTMLFormElement).reset();
+          setMsg("¡Listo! Revisa tu bandeja (y Spam/Promociones).");
         }
+        (e.currentTarget as HTMLFormElement).reset();
       } else {
-        setStatus("err");
+        setMsg("Algo salió mal. Intenta de nuevo en unos segundos.");
       }
-    } catch (err) {
-      console.error("Error al suscribirse:", err);
-      setStatus("err");
+    } catch {
+      setMsg("Algo salió mal. Intenta de nuevo en unos segundos.");
     } finally {
       setPending(false);
     }
@@ -51,12 +46,10 @@ export default function Newsletter({ variant = "banner" }: Props) {
       className={[
         "w-full",
         isBanner ? "py-14 sm:py-16" : "py-8",
-        // fondo suave tipo “franja”
         "bg-[color:var(--nl-bg,#F5F7FA)]",
       ].join(" ")}
     >
       <div className="mx-auto max-w-5xl px-4">
-        {/* Encabezado */}
         <div className={isBanner ? "mb-8" : "mb-5"}>
           <p className="inline-block rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-zinc-600 ring-1 ring-zinc-200">
             Newsletter semanal
@@ -77,7 +70,6 @@ export default function Newsletter({ variant = "banner" }: Props) {
           </p>
         </div>
 
-        {/* Tarjeta con input */}
         <div
           className={[
             "rounded-2xl bg-white p-4 sm:p-6 shadow-sm ring-1 ring-zinc-200",
@@ -121,7 +113,6 @@ export default function Newsletter({ variant = "banner" }: Props) {
             </button>
           </form>
 
-          {/* Beneficio / nota al lado en desktop */}
           {isBanner && (
             <div className="mt-3 text-sm text-zinc-500 sm:mt-0">
               🔒 Prometido: cero spam. Solo contenido útil.
@@ -129,20 +120,14 @@ export default function Newsletter({ variant = "banner" }: Props) {
           )}
         </div>
 
-        {/* Estados */}
-        {status === "ok" && (
-          <p className="mt-3 text-sm text-green-700">
-            ¡Listo! Revisa tu bandeja (y Spam/Promociones).
-          </p>
-        )}
-        {status === "already" && (
-          <p className="mt-3 text-sm text-amber-700">
-            ¡Ya estabas suscrito! Te escribiré pronto ✉️
-          </p>
-        )}
-        {status === "err" && (
-          <p className="mt-3 text-sm text-red-700">
-            Algo salió mal. Intenta de nuevo en unos segundos.
+        {msg && (
+          <p
+            className={[
+              "mt-3 text-sm",
+              /mal|error/i.test(msg) ? "text-red-700" : "text-green-700",
+            ].join(" ")}
+          >
+            {msg}
           </p>
         )}
       </div>

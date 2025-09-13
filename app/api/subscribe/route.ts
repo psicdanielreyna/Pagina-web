@@ -3,108 +3,118 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { SignJWT } from "jose";
 
-const API_KEY      = process.env.RESEND_API_KEY!;
-const AUDIENCE_ID  = process.env.RESEND_AUDIENCE_ID || "";
-const FROM_EMAIL   = process.env.FROM_EMAIL || "";     // p.ej. "Daniel Reyna <danielreyna@danielreyna.com>"
-const DL_SECRET    = process.env.DOWNLOAD_TOKEN_SECRET || "";
-const SITE_URL     = process.env.NEXT_PUBLIC_SITE_URL || "https://danielreyna.com";
+const API_KEY = process.env.RESEND_API_KEY!;
+const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID!;
+const FROM_EMAIL = process.env.FROM_EMAIL!; // ej: danielreyna@danielreyna.com
+const DL_SECRET = process.env.DOWNLOAD_TOKEN_SECRET!;
+
+const resend = new Resend(API_KEY);
+
+function isEmail(v: unknown) {
+  return typeof v === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
 
 export async function POST(req: Request) {
   try {
-    const form = await req.formData().catch(async () => {
-      const json = await req.json().catch(() => ({}));
-      const fd = new FormData();
-      Object.entries(json as Record<string,string>).forEach(([k,v])=>fd.append(k,v));
-      return fd;
-    });
+    // 1) Lee body (form o json)
+    let email = "";
+    let form: FormData | null = null;
 
-    const email = (form.get("email") as string | null)?.trim().toLowerCase() || "";
-    if (form.get("company")) return NextResponse.json({ ok: true }, { status: 200 }); // honeypot
-    if (!email) return NextResponse.json({ ok:false, error:"Email requerido" }, { status: 400 });
-
-    // Si no hay API key no truena el build: respondemos mock.
-    if (!API_KEY) {
-      console.warn("[subscribe] RESEND_API_KEY no definido. Respuesta mock.");
-      return NextResponse.json({ ok: true, mocked: true }, { status: 200 });
+    try {
+      form = await req.formData();
+      email = ((form.get("email") as string) || "").trim().toLowerCase();
+    } catch {
+      const json = await req.json().catch(() => ({} as any));
+      email = (json?.email || "").trim().toLowerCase();
     }
 
-    const resend = new Resend(API_KEY);
+    // honeypot
+    if (form?.get("company")) {
+      return NextResponse.json({ ok: true, honey: true }, { status: 200 });
+    }
 
-    // --- DEDUP: ¿ya existe este email en la audiencia? ---
-let alreadySubscribed = false;
-if (AUDIENCE_ID) {
-  try {
-    // usamos "as any" para evitar error de TS porque el SDK no tipa "limit"
-    const list = await (resend.contacts.list as any)({
-      audienceId: AUDIENCE_ID,
-      limit: 1000, // revisa hasta 1000 registros
-    });
+    if (!isEmail(email)) {
+      return NextResponse.json({ ok: false, error: "Email inválido" }, { status: 400 });
+    }
 
-    const items: any[] = (list as any)?.data ?? (list as any)?.items ?? [];
-    alreadySubscribed = Array.isArray(items) &&
-      items.some((c: any) => (c.email || "").toLowerCase() === email.toLowerCase());
-  } catch (e) {
-    console.warn("[subscribe] No se pudo verificar existencia en audience:", e);
-  }
-}
+    // 2) ¿Ya está en la audiencia? (dedupe)
+    let alreadySubscribed = false;
+    try {
+      // Algunas versiones del SDK no permiten filtrar por email; listamos y buscamos.
+      // Quitamos `limit` para evitar el error de tipos.
+      const list = await resend.contacts.list({ audienceId: AUDIENCE_ID } as any);
+      const items: any[] =
+        (list as any)?.data?.items ??
+        (list as any)?.data ??
+        (list as any)?.items ??
+        [];
+      alreadySubscribed =
+        Array.isArray(items) &&
+        items.some((c: any) => (c?.email || "").toLowerCase() === email);
+    } catch (e) {
+      console.warn("[subscribe] no se pudo verificar existencia en audience:", e);
+    }
 
-// si ya está suscrito → devolver sin enviar welcome otra vez
-if (alreadySubscribed) {
-  return NextResponse.json({ ok: true, alreadySubscribed: true }, { status: 200 });
-}
-
-    // Si ya está, regresamos 200 y NO enviamos bienvenida otra vez.
     if (alreadySubscribed) {
       return NextResponse.json({ ok: true, alreadySubscribed: true }, { status: 200 });
     }
 
-    // -------- Alta / actualización en audiencia (idempotente) --------
-    if (AUDIENCE_ID) {
-      await resend.contacts.create({
-        audienceId: AUDIENCE_ID,
-        email,
-        unsubscribed: false,
+    // 3) Crea contacto (idempotente)
+    await resend.contacts.create({
+      audienceId: AUDIENCE_ID,
+      email,
+      unsubscribed: false,
+    });
+
+    // 4) Genera token (firmado con jose)
+    const secret = new TextEncoder().encode(DL_SECRET);
+    const token = await new SignJWT({ email })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("24h")
+      .sign(secret);
+
+    const url = new URL("/descargar", "https://danielreyna.com");
+    url.searchParams.set("t", token);
+
+    // 5) Envía bienvenida
+    try {
+      await resend.emails.send({
+        from: FROM_EMAIL,
+        to: email,
+        subject: "¡Bienvenido al newsletter!",
+        html: `
+          <p>Te suscribiste correctamente. Muy pronto recibirás contenido exclusivo.</p>
+          <p>🎁 Aquí tienes tu mini guía anti-estrés:</p>
+          <p><a href="${url.toString()}" target="_blank" rel="noopener">Descargar PDF</a></p>
+          <p>Abrazo,<br/>Daniel</p>
+        `,
       });
-    }
 
-    // -------- Token + link de descarga --------
-    let downloadUrl = `${SITE_URL}/descargar`; // fallback
-    if (DL_SECRET) {
-      const token = await new SignJWT({ email })
-        .setProtectedHeader({ alg: "HS256" })
-        .setExpirationTime("2h")
-        .sign(new TextEncoder().encode(DL_SECRET));
-      downloadUrl = `${SITE_URL}/descargar?token=${encodeURIComponent(token)}`;
-    }
-
-    // -------- Correo de bienvenida (no bloqueante) --------
-    let emailSent = false;
-    if (FROM_EMAIL) {
-      try {
-        await resend.emails.send({
-          from: FROM_EMAIL,      // debe ser dominio verificado
-          to: email,
-          subject: "¡Gracias por suscribirte!",
-          html: `
-            <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
-              <h2>¡Bienvenid@!</h2>
-              <p>Gracias por unirte al newsletter.</p>
-              <p><a href="${downloadUrl}" style="display:inline-block;padding:10px 14px;border-radius:8px;background:#14532d;color:#fff;text-decoration:none">Descargar mini guía anti-estrés (PDF)</a></p>
-              <p>Abrazo,<br/>Daniel</p>
-            </div>
-          `,
-        });
-        emailSent = true;
-      } catch (e:any) {
-        console.error("[subscribe] fallo al enviar email:", e?.name, e?.message, e?.statusCode, e?.response?.data);
-        // No rompemos la UX si falla el envío: devolvemos ok igualmente.
+      return NextResponse.json(
+        { ok: true, alreadySubscribed: false, emailed: true },
+        { status: 200 }
+      );
+    } catch (err: any) {
+      const code = err?.statusCode || err?.status || err?.code;
+      console.error("[subscribe] send email error:", code, err?.message || err);
+      // Si Resend limita (429), no rompemos la UX
+      if (Number(code) === 429) {
+        return NextResponse.json(
+          { ok: true, alreadySubscribed: false, emailed: false, reason: "rate_limited" },
+          { status: 200 }
+        );
       }
+      return NextResponse.json(
+        { ok: true, alreadySubscribed: false, emailed: false, reason: "send_failed" },
+        { status: 200 }
+      );
     }
-
-    return NextResponse.json({ ok: true, alreadySubscribed: false, emailSent }, { status: 200 });
-  } catch (err:any) {
-    console.error("[subscribe] error inesperado:", err?.message || err);
-    return NextResponse.json({ ok:false, error:"No se pudo procesar la suscripción" }, { status: 500 });
+  } catch (err: any) {
+    console.error("[subscribe] fatal error:", err);
+    return NextResponse.json(
+      { ok: false, error: err?.message || "No se pudo procesar la suscripción" },
+      { status: 500 }
+    );
   }
 }
 
