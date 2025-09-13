@@ -1,30 +1,38 @@
 // app/api/subscribe/route.ts
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { SignJWT } from "jose";
 
-// ---- ENV ----
-const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID || "";
-const FROM_EMAIL   = process.env.FROM_EMAIL || "";          // ej: 'Daniel Reyna <danielreyna@danielreyna.com>'
-const API_KEY      = process.env.RESEND_API_KEY || "";
-const DL_SECRET    = process.env.DOWNLOAD_TOKEN_SECRET || ""; // openssl rand -base64 32
+const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
+const FROM_EMAIL  = process.env.FROM_EMAIL;          // p.ej. "Daniel Reyna <danielreyna@danielreyna.com>"
+const API_KEY     = process.env.RESEND_API_KEY;
 
-// Helpers
-async function createDownloadToken(email: string, expiresInDays = 7) {
-  if (!DL_SECRET) throw new Error("DOWNLOAD_TOKEN_SECRET missing");
-  const secret = new TextEncoder().encode(DL_SECRET);
-  const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * expiresInDays; // segundos
-  const token = await new SignJWT({ email })
-    .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-    .setIssuedAt()
-    .setExpirationTime(exp)
-    .sign(secret);
-  return token;
+/** Intenta saber si YA existe el contacto en la Audience (compat con distintas versiones del SDK) */
+async function contactExistsByEmail(resend: Resend, audienceId: string, email: string): Promise<boolean> {
+  // 1) Algunos SDKs exponen contacts.get({ audienceId, email })
+  try {
+    // @ts-ignore: método opcional según versión del SDK
+    const resp: any = await (resend as any).contacts.get?.({ audienceId, email });
+    if (resp?.data) return true;
+  } catch {
+    // ignoramos (p.ej. 404 = no encontrado)
+  }
+
+  // 2) Fallback: listar y buscar por email
+  try {
+    const list: any = await resend.contacts.list({ audienceId });
+    if (Array.isArray(list?.data)) {
+      const found = list.data.some((c: any) => c?.email?.toLowerCase() === email.toLowerCase());
+      return !!found;
+    }
+  } catch {
+    // en caso de error asumimos que no existe para no bloquear suscripción
+  }
+  return false;
 }
 
 export async function POST(req: Request) {
   try {
-    // Soporta formData o JSON
+    // Acepta formData o JSON
     const form = await req.formData().catch(async () => {
       const json = await req.json().catch(() => ({}));
       const fd = new FormData();
@@ -33,26 +41,30 @@ export async function POST(req: Request) {
     });
 
     const email = (form.get("email") as string | null)?.trim().toLowerCase() ?? "";
-    // Honeypot
+    // honeypot
     if (form.get("company")) return NextResponse.json({ ok: true }, { status: 200 });
-    if (!email) return NextResponse.json({ ok: false, error: "Email requerido" }, { status: 400 });
 
-    // Construye URL absoluta del sitio (prod o preview/local)
-    const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
+    if (!email) {
+      return NextResponse.json({ ok: false, error: "Email requerido" }, { status: 400 });
+    }
 
-    // Genera token de descarga (7 días)
-    const token = await createDownloadToken(email, 7);
-    const downloadUrl = `${origin}/descargar?token=${encodeURIComponent(token)}`;
-
-    // Si no hay API key, no truenes el build: responde mock
+    // Si no hay API key, responde OK mock (no truena build)
     if (!API_KEY) {
       console.warn("[subscribe] RESEND_API_KEY no definido. Respuesta mock.");
-      return NextResponse.json({ ok: true, mocked: true, downloadUrl }, { status: 200 });
+      return NextResponse.json({ ok: true, mocked: true }, { status: 200 });
     }
 
     const resend = new Resend(API_KEY);
 
-    // 1) Agrega/actualiza contacto en Audience (idempotente)
+    // ---- DEDUP: si ya existe en la audiencia, NO reenviar bienvenida
+    if (AUDIENCE_ID) {
+      const exists = await contactExistsByEmail(resend, AUDIENCE_ID, email);
+      if (exists) {
+        return NextResponse.json({ ok: true, alreadySubscribed: true }, { status: 200 });
+      }
+    }
+
+    // 1) Crear/asegurar contacto (idempotente)
     if (AUDIENCE_ID) {
       await resend.contacts.create({
         audienceId: AUDIENCE_ID,
@@ -61,43 +73,26 @@ export async function POST(req: Request) {
       });
     }
 
-    // 2) Email de bienvenida con link de descarga
+    // 2) Enviar bienvenida (solo primera vez)
     if (FROM_EMAIL) {
       await resend.emails.send({
         from: FROM_EMAIL,
         to: email,
-        subject: "¡Bienvenido! Aquí está tu mini guía anti-estrés",
-        text: `¡Gracias por suscribirte!
-        
-Descarga tu mini guía aquí (válido por 7 días):
-${downloadUrl}
-
-Si no fuiste tú, ignora este correo.
-Abrazo,
-Daniel`,
+        subject: "¡Gracias por suscribirte!",
         html: `
-          <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height:1.5">
-            <h2 style="margin:0 0 8px">¡Gracias por suscribirte!</h2>
-            <p>Como lo prometido es deuda, aquí está tu mini guía anti-estrés (el enlace vence en 7 días):</p>
-            <p>
-              <a href="${downloadUrl}" 
-                 style="display:inline-block;padding:12px 18px;border-radius:8px;background:#14532d;color:#fff;text-decoration:none;font-weight:600">
-                Descargar mini guía
-              </a>
-            </p>
-            <p style="color:#475569;font-size:14px">Si el botón no funciona, copia y pega este enlace:<br/>
-              <span style="word-break:break-all">${downloadUrl}</span>
-            </p>
-            <p>Abrazo,<br/>Daniel</p>
+          <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height:1.5;">
+            <h2 style="margin:0 0 8px;">¡Bienvenido al newsletter!</h2>
+            <p style="margin:0 0 16px;">Te suscribiste correctamente. Muy pronto recibirás contenido exclusivo.</p>
+            <p style="margin:0">Abrazo,<br/>Daniel</p>
           </div>
         `,
       });
     }
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return NextResponse.json({ ok: true, alreadySubscribed: false }, { status: 200 });
   } catch (err: any) {
     console.error("[subscribe] error:", err?.message || err);
-    return NextResponse.json({ ok: false, error: "No se pudo enviar/guardar" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "No se pudo procesar la suscripción" }, { status: 500 });
   }
 }
 
