@@ -6,30 +6,6 @@ const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
 const FROM_EMAIL  = process.env.FROM_EMAIL;          // p.ej. "Daniel Reyna <danielreyna@danielreyna.com>"
 const API_KEY     = process.env.RESEND_API_KEY;
 
-/** Intenta saber si YA existe el contacto en la Audience (compat con distintas versiones del SDK) */
-async function contactExistsByEmail(resend: Resend, audienceId: string, email: string): Promise<boolean> {
-  // 1) Algunos SDKs exponen contacts.get({ audienceId, email })
-  try {
-    // @ts-ignore: método opcional según versión del SDK
-    const resp: any = await (resend as any).contacts.get?.({ audienceId, email });
-    if (resp?.data) return true;
-  } catch {
-    // ignoramos (p.ej. 404 = no encontrado)
-  }
-
-  // 2) Fallback: listar y buscar por email
-  try {
-    const list: any = await resend.contacts.list({ audienceId });
-    if (Array.isArray(list?.data)) {
-      const found = list.data.some((c: any) => c?.email?.toLowerCase() === email.toLowerCase());
-      return !!found;
-    }
-  } catch {
-    // en caso de error asumimos que no existe para no bloquear suscripción
-  }
-  return false;
-}
-
 export async function POST(req: Request) {
   try {
     // Acepta formData o JSON
@@ -48,7 +24,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Email requerido" }, { status: 400 });
     }
 
-    // Si no hay API key, responde OK mock (no truena build)
+    // Sin API key → no bloquear (mock para desarrollo)
     if (!API_KEY) {
       console.warn("[subscribe] RESEND_API_KEY no definido. Respuesta mock.");
       return NextResponse.json({ ok: true, mocked: true }, { status: 200 });
@@ -56,25 +32,34 @@ export async function POST(req: Request) {
 
     const resend = new Resend(API_KEY);
 
-    // ---- DEDUP: si ya existe en la audiencia, NO reenviar bienvenida
+    // ---- Alta idempotente + dedupe por 409 conflict
+    let created = false;
     if (AUDIENCE_ID) {
-      const exists = await contactExistsByEmail(resend, AUDIENCE_ID, email);
-      if (exists) {
-        return NextResponse.json({ ok: true, alreadySubscribed: true }, { status: 200 });
+      try {
+        const res = await resend.contacts.create({
+          audienceId: AUDIENCE_ID,
+          email,
+          unsubscribed: false,
+        });
+        // Si llega aquí sin throw, lo consideramos creado
+        created = true;
+        console.log("[subscribe] contact created:", res?.data?.id ?? "(no id)");
+      } catch (e: any) {
+        const code = e?.statusCode ?? e?.code ?? e?.status;
+        const msg  = String(e?.message || "");
+        // Resend suele regresar 409 cuando el contacto ya existe
+        if (code === 409 || /exist/i.test(msg)) {
+          console.log("[subscribe] contact already existed (dedupe ok)");
+          created = false;
+        } else {
+          console.error("[subscribe] create contact error:", code, msg);
+          throw e; // error real, salimos
+        }
       }
     }
 
-    // 1) Crear/asegurar contacto (idempotente)
-    if (AUDIENCE_ID) {
-      await resend.contacts.create({
-        audienceId: AUDIENCE_ID,
-        email,
-        unsubscribed: false,
-      });
-    }
-
-    // 2) Enviar bienvenida (solo primera vez)
-    if (FROM_EMAIL) {
+    // ---- Enviar bienvenida SOLO si es la primera vez (created === true)
+    if (created && FROM_EMAIL) {
       await resend.emails.send({
         from: FROM_EMAIL,
         to: email,
@@ -87,12 +72,19 @@ export async function POST(req: Request) {
           </div>
         `,
       });
+      console.log("[subscribe] welcome email sent");
     }
 
-    return NextResponse.json({ ok: true, alreadySubscribed: false }, { status: 200 });
+    return NextResponse.json(
+      { ok: true, alreadySubscribed: !created },
+      { status: 200 }
+    );
   } catch (err: any) {
     console.error("[subscribe] error:", err?.message || err);
-    return NextResponse.json({ ok: false, error: "No se pudo procesar la suscripción" }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: "No se pudo procesar la suscripción" },
+      { status: 500 }
+    );
   }
 }
 
