@@ -1,48 +1,93 @@
-// components/ui/HeroAbout.tsx
-import Image from "next/image";
+// app/sobre-mi/page.tsx
+import type { Metadata } from "next";
+import HeroAbout from "@/components/ui/HeroAbout";
+import Link from "next/link";
 
-type Props = {
-  title: string;
-  subtitle?: string;
-  imageSrc: string;           // /images/sobre-mi-hero.jpg
-  imageAlt?: string;
+export const metadata: Metadata = {
+  title: "Sobre mí",
+  description:
+    "Psicólogo clínico cognitivo-conductual. Acompaño a adolescentes y adultos en México con enfoque claro y práctico.",
 };
 
-export default function HeroAbout({ title, subtitle, imageSrc, imageAlt = "" }: Props) {
+export default function SobreMiPage() {
   return (
-    <section className="relative w-full">
-      {/* Imagen full-width y alto responsivo */}
-      <div className="relative h-[42vh] sm:h-[55vh] lg:h-[72vh] w-full overflow-hidden">
-        <Image
-          src={imageSrc}
-          alt={imageAlt}
-          fill
-          priority
-          sizes="100vw"
-          // Ajusta el foco según tu foto: object-center, object-[50%_35%], etc.
-          className="object-cover"
-        />
+    <main>
+      <HeroAbout
+        title="Conóceme"
+        subtitle="Psicólogo clínico TCC. Herramientas prácticas para sentirte mejor en tu día a día."
+        imageSrc="/images/sobre-mi-hero.jpg"
+        imageAlt="Daniel Reyna"
+      />
 
-        {/* Capa de oscurecido sutil para mejorar contraste del texto */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/10" />
+      <section className="mx-auto grid max-w-5xl grid-cols-1 gap-10 px-4 py-12 md:grid-cols-3 md:py-16">
+        <article className="prose prose-zinc mx-auto md:col-span-2">
+          <h2>Hola, soy Daniel Reyna</h2>
+          <p>
+            Soy <strong>psicólogo clínico cognitivo-conductual</strong>, especializado en
+            terapia breve TCC. Acompaño a <strong>adolescentes y adultos</strong> en México para
+            trabajar temas de ansiedad, depresión, duelo, estrés y autoestima — con sesiones{" "}
+            <strong>en línea y presenciales</strong>.
+          </p>
+          <p>
+            Mi enfoque es claro y práctico: herramientas que puedes aplicar desde la primera
+            sesión, a tu ritmo y con seguimiento.
+          </p>
 
-        {/* Texto centrado */}
-        <div className="absolute inset-0 flex items-center justify-center px-4">
-          <div className="text-center">
-            <span className="inline-block rounded-full bg-white/80 px-3 py-1 text-xs font-medium tracking-wide text-zinc-700 backdrop-blur-sm">
-              Sobre mí
-            </span>
-            <h1 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight text-white drop-shadow sm:text-5xl lg:text-6xl">
-              {title}
-            </h1>
-            {subtitle ? (
-              <p className="mx-auto mt-4 max-w-2xl text-base text-white/90 sm:text-lg">
-                {subtitle}
-              </p>
-            ) : null}
+          <h3>Cómo trabajo</h3>
+          <ul>
+            <li>Objetivos concretos y medibles.</li>
+            <li>Técnicas validadas de TCC y psicoeducación simple.</li>
+            <li>Tareas breves entre sesiones para consolidar avances.</li>
+          </ul>
+
+          <h3>Lo que puedes esperar</h3>
+          <p>
+            Sesiones cálidas, directas y con estructura. No promesas mágicas;{" "}
+            <em>herramientas sencillas que funcionan</em>.
+          </p>
+        </article>
+
+        <aside className="md:col-span-1">
+          <div className="sticky top-20 rounded-xl border bg-white p-5 shadow-sm">
+            <h3 className="text-lg font-semibold">Agenda una sesión</h3>
+            <p className="mt-2 text-sm text-zinc-600">
+              Atención en línea y en Monterrey, N.L.
+            </p>
+            <div className="mt-4 space-y-3">
+              <Link
+                href="/agenda"
+                className="inline-flex w-full items-center justify-center rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"
+              >
+                Agendar ahora
+              </Link>
+              <Link
+                href="/sobre-mi#contacto"
+                className="inline-flex w-full items-center justify-center rounded-md border px-4 py-2.5 text-sm font-medium hover:bg-zinc-50"
+              >
+                Escribirme
+              </Link>
+            </div>
+            <hr className="my-4" />
+            <ul className="space-y-2 text-sm text-zinc-700">
+              <li>🧠 Enfoque TCC • terapia breve</li>
+              <li>💬 Adolescentes y adultos</li>
+              <li>📍 Monterrey • Online</li>
+            </ul>
           </div>
+        </aside>
+      </section>
+
+      <section id="contacto" className="mx-auto max-w-5xl px-4 pb-16">
+        <div className="rounded-xl border bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-semibold">Contacto</h3>
+          <p className="mt-2 text-sm text-zinc-600">
+            Correo:{" "}
+            <a href="mailto:danielreyna@danielreyna.com" className="underline">
+              danielreyna@danielreyna.com
+            </a>
+          </p>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
   );
 }
