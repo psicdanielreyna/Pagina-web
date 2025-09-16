@@ -1,3 +1,4 @@
+// app/(marketing)/newsletter/SubscribeForm.tsx
 "use client";
 
 import { useState } from "react";
@@ -5,12 +6,12 @@ import { useState } from "react";
 export default function SubscribeForm() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
-    setMessage("");
+    setMessage(null);
 
     try {
       const res = await fetch("/api/subscribe", {
@@ -19,29 +20,32 @@ export default function SubscribeForm() {
         body: JSON.stringify({ email }),
       });
 
-      const data = await res.json();
-
-      if (res.ok && data.ok) {
-        setStatus("success");
-        setMessage("¡Gracias por suscribirte! 🎉 Revisa tu correo 📩");
-        setEmail(""); // limpiar input
-      } else {
-        // 👇 ya no mostramos error en UI
-        console.error("Error en suscripción:", data.error || data);
-        setStatus("idle");
+      // Si el backend responde ok, mostramos éxito.
+      // Si no, simplemente volvemos a "idle" sin mostrar error.
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (data?.ok) {
+          setStatus("success");
+          setMessage("¡Gracias por suscribirte! 🎉 Revisa tu correo 📩");
+          setEmail("");
+          return;
+        }
       }
-    } catch (err) {
-      // 👇 solo log en consola
-      console.error("Error de conexión:", err);
+
+      // Nada de errores en UI: volvemos a idle y no mostramos mensaje
       setStatus("idle");
+      setMessage(null);
+    } catch {
+      // Igual: sin mensaje de error
+      setStatus("idle");
+      setMessage(null);
     }
   };
 
+  const isLoading = status === "loading";
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-2 sm:flex-row sm:items-center"
-    >
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-center">
       <input
         type="email"
         required
@@ -52,14 +56,18 @@ export default function SubscribeForm() {
       />
       <button
         type="submit"
-        disabled={status === "loading"}
+        disabled={isLoading}
         className="px-4 py-2 rounded bg-green-600 text-white disabled:opacity-50"
+        aria-busy={isLoading}
       >
-        {status === "loading" ? "Enviando..." : "Suscribirme"}
+        {isLoading ? "Enviando..." : "Suscribirme"}
       </button>
 
-      {status === "success" && (
-        <p className="text-sm text-green-700">{message}</p>
+      {/* Solo mostramos mensajes de éxito */}
+      {status === "success" && message && (
+        <p className="text-sm text-green-700" role="status" aria-live="polite">
+          {message}
+        </p>
       )}
     </form>
   );
