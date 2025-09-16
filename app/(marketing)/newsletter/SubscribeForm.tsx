@@ -8,8 +8,8 @@ export default function SubscribeForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("loading");
-    setMessage("");
+    setStatus("loading"); setMessage("");
+    console.log("[FORM] submit", email, "origin:", window.location.origin);
 
     try {
       const resp = await fetch("/api/subscribe", {
@@ -18,52 +18,44 @@ export default function SubscribeForm() {
         body: JSON.stringify({ email }),
       });
 
-      // intenta json, si no, usa texto
-      let data: any = null;
       const raw = await resp.text();
-      try { data = JSON.parse(raw); } catch { /* se queda raw */ }
+      let data: any = null; try { data = JSON.parse(raw); } catch {}
+      console.log("[FORM] resp", resp.status, "raw:", raw, "json:", data);
 
-      if (resp.ok) {
+      // ✅ Éxito: cualquier 2xx + ok/contact
+      if (resp.ok && (data?.ok || data?.contact)) {
         setStatus("success");
-        const msg =
-          (data && (data.msg || (data.already ? "Ya estabas suscrito." : null))) ||
-          "¡Listo! Te suscribimos al newsletter.";
-        setMessage(msg);
+        setMessage(data?.msg || (data?.already ? "Ya estabas suscrito." : "¡Gracias por suscribirte! 🎉 Revisa tu correo."));
         setEmail("");
         return;
       }
 
-      // Errores no 2xx
-      const errMsg =
-        (data && (data.error?.message || data.message)) ||
-        raw ||
-        "Algo salió mal. Intenta de nuevo.";
+      // ❌ Error (no 2xx)
       setStatus("error");
-      setMessage(errMsg);
+      setMessage(data?.error?.message || raw || "Algo salió mal. Intenta de nuevo.");
     } catch (err) {
+      console.error("[FORM] network error", err);
       setStatus("error");
       setMessage("Error de red. Intenta más tarde.");
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex gap-2 w-full max-w-xl">
-      <input
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="tu@email.com"
-        className="border px-3 py-2 rounded w-full"
-      />
-      <button type="submit" disabled={status === "loading"} className="px-4 py-2 rounded border">
-        {status === "loading" ? "Enviando..." : "Suscribirme"}
-      </button>
-      {message && (
-        <p className={`text-sm ${status === "error" ? "text-red-600" : "text-green-700"}`}>
-          {message}
-        </p>
-      )}
+    <form onSubmit={onSubmit} className="flex flex-col gap-3 w-full max-w-xl">
+      <div className="flex gap-2">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="tu@email.com (form bueno)"
+          className="border px-3 py-2 rounded w-full"
+        />
+        <button type="submit" disabled={status==="loading"} className="px-4 py-2 rounded bg-green-600 text-white disabled:opacity-50">
+          {status==="loading" ? "Enviando..." : "Suscribirme"}
+        </button>
+      </div>
+      {message && <p className={`text-sm ${status==="error" ? "text-red-600" : "text-green-700"}`}>{message}</p>}
     </form>
   );
 }
