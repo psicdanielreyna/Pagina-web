@@ -9,6 +9,16 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# --- Funciones / API (opcional pero útil)
+[functions]
+  node_bundler = "esbuild"
+
+# No-cache para endpoints de API
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+  Cache-Control = "no-store"
+
 # Redirect por slugs con acento → sin acento
 [[redirects]]
   from = "/blog/ansiedad-y-emoción"
@@ -16,7 +26,7 @@
   status = 301
   force = true
 
-# Headers de seguridad (top-level, no anidado)
+# Headers de seguridad (top-level)
 [[headers]]
   for = "/*"
   [headers.values]
@@ -25,7 +35,7 @@
   Referrer-Policy = "strict-origin-when-cross-origin"
   Permissions-Policy = "geolocation=(), microphone=(), camera=()"
 
-# Cache estático para assets
+# Cache estático para assets de Next
 [[headers]]
   for = "/_next/static/*"
   [headers.values]
@@ -38,7 +48,7 @@
   status = 301
   force = true
 
-  # Evitar indexado de la página y el endpoint de descarga
+# Evitar indexado de rutas sensibles
 [[headers]]
   for = "/descargar*"
   [headers.values]
