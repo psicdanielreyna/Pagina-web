@@ -4,6 +4,7 @@ import { Resend } from "resend";
 import jwt from "jsonwebtoken";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const {
   RESEND_API_KEY,
@@ -13,34 +14,23 @@ const {
   DOWNLOAD_TOKEN_SECRET,
 } = process.env;
 
-// Util: base URL confiable según entorno
 function getBaseUrl(req: Request) {
-  // En producción detrás de Netlify / Vercel
-  const hdr = (name: string) => (req.headers.get(name) || "").trim();
-  const proto = hdr("x-forwarded-proto") || "https";
-  const host = hdr("x-forwarded-host") || hdr("host") || "localhost:3000";
+  const h = (n: string) => (req.headers.get(n) || "").trim();
+  const proto = h("x-forwarded-proto") || "https";
+  const host = h("x-forwarded-host") || h("host") || "localhost:3000";
   return `${proto}://${host}`;
 }
-
-// Firma un token JWT por 7 días
 function signDownloadToken(email: string) {
   if (!DOWNLOAD_TOKEN_SECRET) throw new Error("Missing DOWNLOAD_TOKEN_SECRET");
   return jwt.sign({ email }, DOWNLOAD_TOKEN_SECRET, { expiresIn: "7d" });
 }
-
-function bool(x: unknown) {
-  return String(x).toLowerCase() === "true";
-}
-
-function ok(data: Record<string, unknown> = {}) {
-  return NextResponse.json({ ok: true, ...data }, { status: 200 });
-}
-function fail(status: number, message: string, extra: Record<string, unknown> = {}) {
-  return NextResponse.json({ ok: false, error: { message }, ...extra }, { status });
-}
+const bool = (x: unknown) => String(x).toLowerCase() === "true";
+const ok = (data: Record<string, unknown> = {}) =>
+  NextResponse.json({ ok: true, ...data }, { status: 200 });
+const fail = (status: number, message: string, extra: Record<string, unknown> = {}) =>
+  NextResponse.json({ ok: false, error: { message }, ...extra }, { status });
 
 export async function GET(req: Request) {
-  // Endpoint de salud y debug rápido
   const url = new URL(req.url);
   if (url.searchParams.get("debug") !== null) {
     return ok({
@@ -57,52 +47,63 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json().catch(() => ({} as any));
-    if (!email || typeof email !== "string") {
-      return fail(400, "Email requerido");
+    // --- soportar JSON y FORM ---
+    const ct = (req.headers.get("content-type") || "").toLowerCase();
+
+    let email = "";
+    if (ct.includes("application/json")) {
+      const body = await req.json().catch(() => ({} as any));
+      email = (body?.email || "").trim().toLowerCase();
+    } else if (ct.includes("multipart/form-data") || ct.includes("application/x-www-form-urlencoded")) {
+      const form = await req.formData();
+      email = String(form.get("email") || "").trim().toLowerCase();
+    } else {
+      // fallback: intentar JSON y luego form
+      try {
+        const body = await req.json();
+        email = (body?.email || "").trim().toLowerCase();
+      } catch {
+        const form = await req.formData().catch(() => null);
+        if (form) email = String(form.get("email") || "").trim().toLowerCase();
+      }
     }
-    const cleanEmail = email.trim().toLowerCase();
+
+    if (!email) return fail(400, "Email requerido");
 
     if (!RESEND_API_KEY) return fail(500, "Falta RESEND_API_KEY");
     if (!RESEND_AUDIENCE_ID) return fail(500, "Falta RESEND_AUDIENCE_ID");
 
     const resend = new Resend(RESEND_API_KEY);
 
-    // 1) Alta/actualización del contacto
+    // 1) Crear/asegurar contacto en la Audience
     let already = false;
     try {
-      const addRes = await resend.contacts.create({
+      const add = await resend.contacts.create({
         audienceId: RESEND_AUDIENCE_ID,
-        email: cleanEmail,
+        email,
         unsubscribed: false,
       });
-      // 201 = creado; 200/204 también son OK en algunos SDK, por si acaso:
-      if (addRes.error) {
-        // si Resend devuelve error de duplicado, lo tratamos como ya suscrito
-        if (String(addRes.error?.message || "").toLowerCase().includes("already")) {
-          already = true;
-        } else {
-          return fail(502, addRes.error.message || "Error creando contacto en Resend");
-        }
+      if (add?.error) {
+        const msg = (add.error.message || "").toLowerCase();
+        if (msg.includes("already")) already = true;
+        else return fail(502, add.error.message || "Error creando contacto en Resend");
       }
     } catch (e: any) {
-      // Si es duplicado (409), lo consideramos éxito amable
-      const msg = String(e?.message || "");
-      if (msg.includes("409") || msg.toLowerCase().includes("already")) {
+      const emsg = String(e?.message || "").toLowerCase();
+      if (emsg.includes("409") || emsg.includes("already")) {
         already = true;
       } else {
         return fail(502, "No se pudo crear el contacto en Resend");
       }
     }
 
-    // 2) Enviar email de bienvenida (si está activado)
+    // 2) Enviar email de bienvenida (si SEND_EMAILS=true)
     if (bool(SEND_EMAILS)) {
       if (!FROM_EMAIL) return fail(500, "Falta FROM_EMAIL");
       if (!DOWNLOAD_TOKEN_SECRET) return fail(500, "Falta DOWNLOAD_TOKEN_SECRET");
 
-      const token = signDownloadToken(cleanEmail);
-      const base = getBaseUrl(req);
-      const link = `${base}/api/download?token=${encodeURIComponent(token)}`;
+      const token = signDownloadToken(email);
+      const link = `${getBaseUrl(req)}/api/download?token=${encodeURIComponent(token)}`;
 
       const html = `
         <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5">
@@ -123,15 +124,15 @@ export async function POST(req: Request) {
 
       await resend.emails.send({
         from: FROM_EMAIL,
-        to: cleanEmail,
+        to: email,
         subject: "¡Bienvenido! Aquí tu mini guía anti-estrés",
         html,
       });
     }
 
-    // 3) Respuesta uniforme para el front
     return ok({ message: already ? "Ya suscrito" : "Suscripción creada", already });
   } catch (e: any) {
+    // ayuda a depurar en producción sin filtrar secretos
     return fail(500, "Error interno en el servidor");
   }
 }
