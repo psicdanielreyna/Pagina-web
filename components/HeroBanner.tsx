@@ -1,52 +1,50 @@
 // components/HeroBanner.tsx
-"use client";
-
 import Image from "next/image";
 
 type Props = {
   badge?: string;
   title: string;
   subtitle?: string;
-  imageUrl?: string; // opcional: fondo
-  className?: string;
+  imageUrl?: string; // e.g. "/talleres-hero.jpg"
 };
 
-export default function HeroBanner({ badge, title, subtitle, imageUrl, className }: Props) {
+export default function HeroBanner({ badge, title, subtitle, imageUrl }: Props) {
   return (
-    <section
-      className={`relative isolate overflow-hidden
-                  bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]
-                  from-amber-50 via-rose-50 to-white ${className ?? ""}`}
-    >
-      {/* Fondo con imagen opcional */}
-      {imageUrl ? (
-        <div className="absolute inset-0 -z-10">
+    <section className="relative isolate">
+      <div className="relative h-[320px] w-full overflow-hidden md:h-[420px]">
+        {/* Imagen de fondo optimizada */}
+        {imageUrl ? (
           <Image
             src={imageUrl}
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover opacity-90"
+            className="object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/30" />
-        </div>
-      ) : null}
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-neutral-200 to-neutral-300" />
+        )}
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-        <div className="text-center">
+        {/* Overlay para legibilidad del texto */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/35" />
+      </div>
+
+      {/* Contenido */}
+      <div className="container mx-auto max-w-5xl px-4">
+        <div className="-mt-24 pb-10 md:-mt-28 md:pb-12">
           {badge ? (
-            <span className="inline-flex items-center rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-gray-700 ring-1 ring-black/10 backdrop-blur">
+            <span className="inline-block rounded-full bg-white/85 px-3 py-1 text-xs font-medium shadow-sm backdrop-blur">
               {badge}
             </span>
           ) : null}
 
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-gray-900">
+          <h1 className="mt-3 text-4xl font-extrabold leading-tight text-neutral-900 md:text-5xl">
             {title}
           </h1>
 
           {subtitle ? (
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-700 sm:text-xl">
+            <p className="mt-3 max-w-3xl text-neutral-700">
               {subtitle}
             </p>
           ) : null}
