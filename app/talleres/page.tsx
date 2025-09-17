@@ -17,7 +17,7 @@ export default function TalleresPage() {
         badge="Talleres"
         title="Aprende y practica en vivo"
         subtitle="Sesiones prácticas para sentirte mejor en tu día a día. Modalidad online y presencial."
-        // imageUrl="/hero-talleres.jpg" // opcional si añades la imagen a /public
+        imageUrl="/hero-talleres.jpg" 
       />
 
       {/* Intro */}
