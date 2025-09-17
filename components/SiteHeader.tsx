@@ -45,7 +45,8 @@ export default function SiteHeader() {
                 <li><SheetClose asChild><Link href="/blog" className="block rounded-md px-2 py-2 hover:bg-gray-100">Blog</Link></SheetClose></li>
                 <li><SheetClose asChild><Link href="/servicios" className="block rounded-md px-2 py-2 hover:bg-gray-100">Servicios</Link></SheetClose></li>
                 <li><SheetClose asChild><Link href="/sobre-mi" className="block rounded-md px-2 py-2 hover:bg-gray-100">Sobre mí</Link></SheetClose></li>
-                <li><SheetClose asChild><Link href="/contacto" className="block rounded-md px-2 py-2 hover:bg-gray-100">Contacto</Link></SheetClose></li>
+                {/* Contacto -> Talleres */}
+                <li><SheetClose asChild><Link href="/talleres" className="block rounded-md px-2 py-2 hover:bg-gray-100">Talleres</Link></SheetClose></li>
               </ul>
 
               <div className="mt-6 border-t pt-4">
