@@ -1,30 +1,33 @@
 // scripts/send-newsletter.tsx
-import 'dotenv/config'
-import * as React from 'react'
-import { Resend } from 'resend'
-import NewsletterIssue from '@/emails/NewsletterIssue'
+import { config } from "dotenv";
+// fuerza a usar .env.local en vez de .env
+config({ path: ".env.local" });
+
+import * as React from "react";
+import { Resend } from "resend";
+import NewsletterIssue from "@/emails/NewsletterIssue";
 
 // usa tu dominio público para construir URLs absolutas
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://danielreyna.com'
-const logo = `${SITE}/logo-newsletter.png`
-const hero = `${SITE}/hero-newsletter.png`
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://danielreyna.com";
+const logo = `${SITE}/logo-newsletter.png`;
+const hero = `${SITE}/hero-newsletter.png`;
 
 async function main() {
-  const apiKey = process.env.RESEND_API_KEY
-  const FROM_EMAIL = process.env.FROM_EMAIL
+  const apiKey = process.env.RESEND_API_KEY;
+  const FROM_EMAIL = process.env.FROM_EMAIL;
 
-  console.log("🔑 RESEND_API_KEY presente:", !!apiKey)
-  console.log("📧 FROM_EMAIL:", FROM_EMAIL)
+  console.log("🔑 RESEND_API_KEY presente:", !!apiKey);
+  console.log("📧 FROM_EMAIL:", FROM_EMAIL);
 
-  if (!apiKey) throw new Error("Falta RESEND_API_KEY en .env.local")
-  if (!FROM_EMAIL) throw new Error("Falta FROM_EMAIL en .env.local")
+  if (!apiKey) throw new Error("Falta RESEND_API_KEY en .env.local");
+  if (!FROM_EMAIL) throw new Error("Falta FROM_EMAIL en .env.local");
 
-  const resend = new Resend(apiKey)
+  const resend = new Resend(apiKey);
 
   const { data, error } = await resend.emails.send({
     from: FROM_EMAIL,
-    to: ['tu-correo-de-prueba@correo.com'], // cámbialo antes de enviar
-    subject: 'Tu newsletter semanal',
+    to: ["tu-correo-de-prueba@correo.com"], // cámbialo antes de enviar
+    subject: "Tu newsletter semanal",
     react: (
       <NewsletterIssue
         subject="Tu newsletter semanal"
@@ -34,30 +37,30 @@ async function main() {
         title="Hábitos que sí se quedan"
         intro="Gracias por estar aquí. Te comparto 3 ideas breves para empezar la semana con claridad."
         sections={[
-          { type: 'heading', text: '1) Micro-pasos' },
-          { type: 'paragraph', content: 'El cambio sostenible ocurre en pasos ridículamente pequeños.' },
-          { type: 'list', items: ['1 minuto de respiración', 'Anotar 1 gratitud', 'Caminar 5 min'] },
-          { type: 'heading', text: '2) Fricción baja' },
-          { type: 'paragraph', content: 'Deja la app abierta, tenis a la vista y un vaso con agua listo.' },
+          { type: "heading", text: "1) Micro-pasos" },
+          { type: "paragraph", content: "El cambio sostenible ocurre en pasos ridículamente pequeños." },
+          { type: "list", items: ["1 minuto de respiración", "Anotar 1 gratitud", "Caminar 5 min"] },
+          { type: "heading", text: "2) Fricción baja" },
+          { type: "paragraph", content: "Deja la app abierta, tenis a la vista y un vaso con agua listo." },
         ]}
-        cta={{ label: 'Leer en el blog', href: `${SITE}/blog` }}
+        cta={{ label: "Leer en el blog", href: `${SITE}/blog` }}
         footer={{
-          siteName: 'Daniel Reyna — Psicólogo',
+          siteName: "Daniel Reyna — Psicólogo",
           websiteUrl: SITE,
-          instagram: 'https://instagram.com/psic.danielreyna',
-          youtube: 'https://youtube.com/@Psicdanielreyna',
-          x: 'https://x.com/psicdanreyna',
+          instagram: "https://instagram.com/psic.danielreyna",
+          youtube: "https://youtube.com/@Psicdanielreyna",
+          x: "https://x.com/psicdanreyna",
           unsubscribeUrl: `${SITE}/unsubscribe`,
         }}
       />
     ),
-  })
+  });
 
   if (error) {
-    console.error('❌ Error enviando newsletter:', error)
+    console.error("❌ Error enviando newsletter:", error);
   } else {
-    console.log('✅ Newsletter enviado:', data?.id)
+    console.log("✅ Newsletter enviado:", data?.id);
   }
 }
 
-main()
+main();
