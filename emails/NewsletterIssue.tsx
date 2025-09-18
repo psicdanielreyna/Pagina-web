@@ -9,11 +9,11 @@ type Section =
 export interface NewsletterIssueProps {
   subject: string;
   preheader?: string;
-  logoUrl?: string;     // admite absoluta o relativa (/logo-newsletter.png)
-  heroUrl?: string;     // admite absoluta o relativa (/hero-newsletter.jpg)
-  title: string;
-  intro?: string;
-  sections?: Section[];
+  logoUrl?: string;           // /logo.png
+  heroUrl?: string;           // imagen opcional arriba
+  title: string;              // título grande del número
+  intro?: string;             // párrafo introductorio
+  sections?: Section[];       // bloques de contenido
   cta?: { label: string; href: string };
   footer?: {
     siteName?: string;
@@ -25,23 +25,10 @@ export interface NewsletterIssueProps {
   };
 }
 
-/** Convierte rutas relativas en absolutas para email */
-function makeAbsolute(url?: string): string | undefined {
-  if (!url) return undefined;
-  // si ya es absoluta, regresa tal cual
-  if (/^https?:\/\//i.test(url)) return url;
-  // base pública (usa env si existe; fallback al dominio)
-  const base =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ||
-    "https://danielreyna.com";
-  const clean = url.startsWith("/") ? url : `/${url}`;
-  return `${base}${clean}`;
-}
-
 export default function NewsletterIssue({
   subject,
   preheader,
-  logoUrl = "/logo-newsletter.png",
+  logoUrl = "/logo.png",
   heroUrl,
   title,
   intro,
@@ -50,8 +37,6 @@ export default function NewsletterIssue({
   footer = {},
 }: NewsletterIssueProps) {
   const preheaderText = preheader || "";
-  const logoAbs = makeAbsolute(logoUrl);
-  const heroAbs = makeAbsolute(heroUrl);
 
   return (
     <html>
@@ -69,7 +54,6 @@ export default function NewsletterIssue({
             "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
           color: "#111827",
           lineHeight: 1.6,
-          WebkitTextSizeAdjust: "100%",
         }}
       >
         {/* Preheader invisible */}
@@ -77,7 +61,7 @@ export default function NewsletterIssue({
           <div
             style={{
               display: "none",
-              fontSize: "1px",
+              fontSize: 1,
               color: "#f6f7f9",
               lineHeight: "1px",
               maxHeight: 0,
@@ -85,14 +69,18 @@ export default function NewsletterIssue({
               opacity: 0,
               overflow: "hidden",
             }}
-            // Hack para Outlook (no soportado en TS nativo)
-            {...{ msoHide: "all" }}
           >
             {preheaderText}
           </div>
         ) : null}
 
-        <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
+        <table
+          role="presentation"
+          cellPadding={0}
+          cellSpacing={0}
+          width="100%"
+          style={{ width: "100%" }}
+        >
           <tbody>
             <tr>
               <td align="center" style={{ padding: "24px 12px" }}>
@@ -118,44 +106,43 @@ export default function NewsletterIssue({
                         style={{
                           padding: "20px 24px",
                           borderBottom: "1px solid #f2f2f2",
+                          textAlign: "center",
                         }}
                       >
-                        {logoAbs ? (
+                        {logoUrl ? (
                           <img
-                            src={logoAbs}
-                            width={140}
-                            height={36}
-                            alt="Daniel Reyna — Psicólogo"
+                            src={logoUrl}
+                            width="120"
+                            alt="Daniel Reyna – Psicólogo"
                             style={{
                               display: "block",
-                              border: 0,
-                              outline: "none",
-                              textDecoration: "none",
-                              height: "auto",
+                              margin: "0 auto",
+                              paddingTop: "12px",
+                              paddingBottom: "12px",
                             }}
                           />
                         ) : (
-                          <strong>Daniel Reyna — Psicólogo</strong>
+                          <strong>Daniel Reyna – Psicólogo</strong>
                         )}
                       </td>
                     </tr>
 
-                    {/* Hero (opcional) */}
-                    {heroAbs ? (
+                    {/* Hero */}
+                    {heroUrl ? (
                       <tr>
                         <td>
                           <img
-                            src={heroAbs}
+                            src={heroUrl}
                             alt=""
-                            width={640}
-                            height={360}
+                            width="640"
                             style={{
                               width: "100%",
-                              height: "auto",
                               display: "block",
-                              border: 0,
+                              margin: "0 auto",
                               maxHeight: 360,
                               objectFit: "cover",
+                              paddingTop: "8px",
+                              paddingBottom: "16px",
                             }}
                           />
                         </td>
@@ -167,9 +154,9 @@ export default function NewsletterIssue({
                       <td style={{ padding: "28px 24px 8px 24px" }}>
                         <h1
                           style={{
-                            margin: 0,
+                            margin: "0 0 12px 0",
                             fontSize: 28,
-                            lineHeight: 1.25,
+                            lineHeight: 1.35,
                             letterSpacing: "-0.01em",
                           }}
                         >
@@ -182,14 +169,21 @@ export default function NewsletterIssue({
                     {intro ? (
                       <tr>
                         <td style={{ padding: "8px 24px 0 24px" }}>
-                          <p style={{ margin: 0, fontSize: 16, color: "#374151" }}>
+                          <p
+                            style={{
+                              margin: "8px 0 16px 0",
+                              fontSize: 16,
+                              lineHeight: 1.6,
+                              color: "#374151",
+                            }}
+                          >
                             {intro}
                           </p>
                         </td>
                       </tr>
                     ) : null}
 
-                    {/* Contenido */}
+                    {/* Secciones */}
                     {sections.length ? (
                       <tr>
                         <td style={{ padding: "16px 24px 8px 24px" }}>
@@ -200,7 +194,7 @@ export default function NewsletterIssue({
                                   key={i}
                                   style={{
                                     fontSize: 18,
-                                    margin: "20px 0 8px 0",
+                                    margin: "20px 0 10px 0",
                                     lineHeight: 1.4,
                                   }}
                                 >
@@ -214,7 +208,7 @@ export default function NewsletterIssue({
                                   key={i}
                                   style={{
                                     paddingLeft: 18,
-                                    margin: "8px 0 12px 0",
+                                    margin: "8px 0 16px 0",
                                     color: "#374151",
                                   }}
                                 >
@@ -226,14 +220,14 @@ export default function NewsletterIssue({
                                 </ul>
                               );
                             }
-                            // paragraph
                             return (
                               <p
                                 key={i}
                                 style={{
-                                  margin: "8px 0 12px 0",
+                                  margin: "8px 0 16px 0",
                                   color: "#374151",
                                   fontSize: 16,
+                                  lineHeight: 1.6,
                                 }}
                               >
                                 {s.content}
@@ -247,7 +241,7 @@ export default function NewsletterIssue({
                     {/* CTA */}
                     {cta ? (
                       <tr>
-                        <td style={{ padding: "8px 24px 24px 24px" }}>
+                        <td style={{ padding: "8px 24px 24px 24px", textAlign: "center" }}>
                           <a
                             href={cta.href}
                             style={{
@@ -275,6 +269,7 @@ export default function NewsletterIssue({
                           background: "#fafafa",
                           fontSize: 13,
                           color: "#6b7280",
+                          textAlign: "center",
                         }}
                       >
                         <div style={{ marginBottom: 6 }}>
