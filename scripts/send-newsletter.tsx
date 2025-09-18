@@ -1,9 +1,14 @@
 // scripts/send-newsletter.tsx
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" }); // ← lee .env.local primero
+if (!process.env.RESEND_API_KEY) {
+  // fallback a .env por si estás en otro entorno
+  dotenv.config();
+}
+
 import * as React from "react";
 import { Resend } from "resend";
 import NewsletterIssue from "@/emails/NewsletterIssue";
-
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://danielreyna.com";
 const FROM_EMAIL = process.env.FROM_EMAIL!;
 const RESEND_API_KEY = process.env.RESEND_API_KEY!;
