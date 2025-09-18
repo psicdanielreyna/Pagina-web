@@ -41,7 +41,7 @@ async function main() {
     from: FROM_VALID ? FROM : "onboarding@resend.dev",
     to: [
       // 👇 reemplaza por tu correo de prueba o lista
-      "tu-correo-de-prueba@correo.com",
+      "psic.danielreyna@gmail.com",
     ],
     subject: "Tu newsletter semanal",
     react: (
