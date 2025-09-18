@@ -9,11 +9,11 @@ type Section =
 export interface NewsletterIssueProps {
   subject: string;
   preheader?: string;
-  logoUrl?: string;           // /logo.png
-  heroUrl?: string;           // imagen opcional arriba
-  title: string;              // título grande del número
-  intro?: string;             // párrafo introductorio
-  sections?: Section[];       // bloques de contenido
+  logoUrl?: string;     // admite absoluta o relativa (/logo-newsletter.png)
+  heroUrl?: string;     // admite absoluta o relativa (/hero-newsletter.jpg)
+  title: string;
+  intro?: string;
+  sections?: Section[];
   cta?: { label: string; href: string };
   footer?: {
     siteName?: string;
@@ -25,10 +25,23 @@ export interface NewsletterIssueProps {
   };
 }
 
+/** Convierte rutas relativas en absolutas para email */
+function makeAbsolute(url?: string): string | undefined {
+  if (!url) return undefined;
+  // si ya es absoluta, regresa tal cual
+  if (/^https?:\/\//i.test(url)) return url;
+  // base pública (usa env si existe; fallback al dominio)
+  const base =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ||
+    "https://danielreyna.com";
+  const clean = url.startsWith("/") ? url : `/${url}`;
+  return `${base}${clean}`;
+}
+
 export default function NewsletterIssue({
   subject,
   preheader,
-  logoUrl = "/logo.png",
+  logoUrl = "/logo-newsletter.png",
   heroUrl,
   title,
   intro,
@@ -36,8 +49,9 @@ export default function NewsletterIssue({
   cta,
   footer = {},
 }: NewsletterIssueProps) {
-  // Preheader accesible (oculto visualmente en la mayoría de clientes)
   const preheaderText = preheader || "";
+  const logoAbs = makeAbsolute(logoUrl);
+  const heroAbs = makeAbsolute(heroUrl);
 
   return (
     <html>
@@ -55,6 +69,7 @@ export default function NewsletterIssue({
             "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
           color: "#111827",
           lineHeight: 1.6,
+          WebkitTextSizeAdjust: "100%",
         }}
       >
         {/* Preheader invisible */}
@@ -62,7 +77,7 @@ export default function NewsletterIssue({
           <div
             style={{
               display: "none",
-              fontSize: 1,
+              fontSize: "1px",
               color: "#f6f7f9",
               lineHeight: "1px",
               maxHeight: 0,
@@ -70,18 +85,14 @@ export default function NewsletterIssue({
               opacity: 0,
               overflow: "hidden",
             }}
+            // Hack para Outlook (no soportado en TS nativo)
+            {...{ msoHide: "all" }}
           >
             {preheaderText}
           </div>
         ) : null}
 
-        <table
-          role="presentation"
-          cellPadding={0}
-          cellSpacing={0}
-          width="100%"
-          style={{ width: "100%" }}
-        >
+        <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
           <tbody>
             <tr>
               <td align="center" style={{ padding: "24px 12px" }}>
@@ -109,43 +120,40 @@ export default function NewsletterIssue({
                           borderBottom: "1px solid #f2f2f2",
                         }}
                       >
-                        <table
-                          role="presentation"
-                          width="100%"
-                          cellPadding={0}
-                          cellSpacing={0}
-                        >
-                          <tbody>
-                            <tr>
-                              <td>
-                                {logoUrl ? (
-                                  <img
-                                    src={logoUrl}
-                                    width="120"
-                                    alt="Daniel Reyna – Psicólogo"
-                                    style={{ display: "block" }}
-                                  />
-                                ) : (
-                                  <strong>Daniel Reyna – Psicólogo</strong>
-                                )}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                        {logoAbs ? (
+                          <img
+                            src={logoAbs}
+                            width={140}
+                            height={36}
+                            alt="Daniel Reyna — Psicólogo"
+                            style={{
+                              display: "block",
+                              border: 0,
+                              outline: "none",
+                              textDecoration: "none",
+                              height: "auto",
+                            }}
+                          />
+                        ) : (
+                          <strong>Daniel Reyna — Psicólogo</strong>
+                        )}
                       </td>
                     </tr>
 
                     {/* Hero (opcional) */}
-                    {heroUrl ? (
+                    {heroAbs ? (
                       <tr>
                         <td>
                           <img
-                            src={heroUrl}
+                            src={heroAbs}
                             alt=""
-                            width="640"
+                            width={640}
+                            height={360}
                             style={{
                               width: "100%",
+                              height: "auto",
                               display: "block",
+                              border: 0,
                               maxHeight: 360,
                               objectFit: "cover",
                             }}
