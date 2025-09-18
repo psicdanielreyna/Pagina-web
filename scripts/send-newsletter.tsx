@@ -49,7 +49,7 @@ async function main() {
         subject="Tu newsletter semanal"
         preheader="3 ideas prácticas para la semana"
         logoUrl="https://danielreyna.com/logo.png"
-        heroUrl="https://danielreyna.com/og.jpg"
+        heroUrl="https://danielreyna.com/hero-newsletter.png"
         title="Hábitos que sí se quedan"
         intro="Gracias por estar aquí. Te comparto 3 ideas breves para empezar la semana con claridad."
         sections={[
