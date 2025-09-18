@@ -4,42 +4,41 @@ import { useState } from "react";
 
 export default function SubscribeForm() {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false); // solo control de éxito
+  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setSuccess(false);
+    setStatus("loading");
+    setMessage("");
 
     try {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
-        // importantísimo para Netlify/Next edge: no cachear
-        cache: "no-store",
       });
 
-      // si tu endpoint responde { ok: true }, marcamos éxito
-      const data = await res.json().catch(() => ({} as any));
-      if (res.ok && (data?.ok === true || data?.ok === "true")) {
-        setSuccess(true);
-        setEmail("");
+      // 🔹 Forzamos éxito si responde 200
+      if (res.ok) {
+        setStatus("success");
+        setMessage("¡Gracias por suscribirte! 🎉 Revisa tu correo 📩");
+        setEmail(""); // limpiar input
       } else {
-        // Silencioso: NO mostramos mensaje de error
-        // Puedes loguearlo en consola para debug:
-        // console.debug("subscribe error", { status: res.status, data });
+        // en lugar de mostrar error, no hacemos nada visible
+        setStatus("idle");
       }
-    } catch {
-      // Silencioso también
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      // tampoco mostramos error
+      setStatus("idle");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-2 sm:flex-row sm:items-center"
+    >
       <input
         type="email"
         required
@@ -47,22 +46,18 @@ export default function SubscribeForm() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Tu correo electrónico"
         className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
-        aria-label="Correo para suscribirte"
       />
-
       <button
         type="submit"
-        disabled={loading}
+        disabled={status === "loading"}
         className="px-4 py-2 rounded bg-green-600 text-white disabled:opacity-50"
       >
-        {loading ? "Enviando..." : "Suscribirme"}
+        {status === "loading" ? "Enviando..." : "Suscribirme"}
       </button>
 
-      {/* Solo éxito, jamás error */}
-      {success && (
-        <p className="text-sm text-green-700" aria-live="polite">
-          ¡Listo! 🎉 Revisa tu correo 📩
-        </p>
+      {/* 🔹 Solo mostramos éxito */}
+      {status === "success" && message && (
+        <p className="text-sm text-green-700">{message}</p>
       )}
     </form>
   );
