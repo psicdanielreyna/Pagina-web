@@ -14,12 +14,10 @@ export default function ServiciosPage() {
     <>
       {/* Hero con estilo sobre-mi */}
       <HeroBanner
-        pill="Servicios"
+        badge="Servicios"
         title="Agenda tu proceso con TCC breve"
         subtitle="Atención en línea y presencial (Monterrey). Herramientas prácticas y enfocadas a objetivos."
-        image="/img/hero-servicios.jpg" // puedes cambiarla según tu preferencia
-        overlay="dark"
-        align="center"
+        imageUrl="/img/hero-servicios.jpg"
       />
 
       {/* Intro */}
