@@ -23,7 +23,7 @@ async function main() {
 
   const { data, error } = await resend.emails.send({
     from: FROM_EMAIL,
-    to: ['tu-correo-de-prueba@correo.com'], // cámbialo
+    to: ['tu-correo-de-prueba@correo.com'], // cámbialo antes de enviar
     subject: 'Tu newsletter semanal',
     react: (
       <NewsletterIssue
