@@ -4,15 +4,23 @@ import * as React from 'react'
 import { Resend } from 'resend'
 import NewsletterIssue from '@/emails/NewsletterIssue'
 
-const resend = new Resend(process.env.RESEND_API_KEY!)
-const FROM_EMAIL = process.env.FROM_EMAIL!
-
 // usa tu dominio público para construir URLs absolutas
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://danielreyna.com'
 const logo = `${SITE}/logo-newsletter.png`
 const hero = `${SITE}/hero-newsletter.png`
 
 async function main() {
+  const apiKey = process.env.RESEND_API_KEY
+  const FROM_EMAIL = process.env.FROM_EMAIL
+
+  console.log("🔑 RESEND_API_KEY presente:", !!apiKey)
+  console.log("📧 FROM_EMAIL:", FROM_EMAIL)
+
+  if (!apiKey) throw new Error("Falta RESEND_API_KEY en .env.local")
+  if (!FROM_EMAIL) throw new Error("Falta FROM_EMAIL en .env.local")
+
+  const resend = new Resend(apiKey)
+
   const { data, error } = await resend.emails.send({
     from: FROM_EMAIL,
     to: ['tu-correo-de-prueba@correo.com'], // cámbialo
@@ -53,5 +61,3 @@ async function main() {
 }
 
 main()
-
-console.log("RESEND_API_KEY:", process.env.RESEND_API_KEY);
