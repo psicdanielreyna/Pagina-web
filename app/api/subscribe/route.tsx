@@ -1,7 +1,9 @@
 // app/api/subscribe/route.ts
+import * as React from "react";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import jwt from "jsonwebtoken";
+import WelcomeEmail from "@/emails/WelcomeEmail";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,6 +14,7 @@ const {
   FROM_EMAIL,
   SEND_EMAILS,
   DOWNLOAD_TOKEN_SECRET,
+  NEXT_PUBLIC_SITE_URL,
 } = process.env;
 
 const asBool = (v: unknown) => String(v).toLowerCase() === "true";
@@ -20,7 +23,9 @@ const ok = (data: Record<string, unknown> = {}) =>
 const fail = (status: number, message: string, extra: Record<string, unknown> = {}) =>
   NextResponse.json({ ok: false, message, ...extra }, { status });
 
-function getBaseUrl(req: Request) {
+/** Base URL segura para los enlaces absolutos del email */
+function siteBase(req: Request) {
+  if (NEXT_PUBLIC_SITE_URL) return NEXT_PUBLIC_SITE_URL;
   const h = (n: string) => (req.headers.get(n) || "").trim();
   const proto = h("x-forwarded-proto") || "https";
   const host = h("x-forwarded-host") || h("host") || "localhost:3000";
@@ -41,6 +46,7 @@ export async function GET(req: Request) {
   if (url.searchParams.get("debug") !== null) {
     return ok({
       msg: "subscribe endpoint alive",
+      version: "v2-react",
       nodeEnv: process.env.NODE_ENV,
       hasKey: !!RESEND_API_KEY,
       audienceLen: (RESEND_AUDIENCE_ID || "").length,
@@ -53,10 +59,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    // ——— Content negotiation (JSON y FORM) ———
     const ct = (req.headers.get("content-type") || "").toLowerCase();
-
     let email = "";
+
     if (ct.includes("application/json")) {
       const body = (await req.json().catch(() => ({}))) as any;
       email = String(body?.email || "").trim().toLowerCase();
@@ -67,7 +72,6 @@ export async function POST(req: Request) {
       const form = await req.formData();
       email = String(form.get("email") || "").trim().toLowerCase();
     } else {
-      // Fallback defensivo
       try {
         const body = (await req.json()) as any;
         email = String(body?.email || "").trim().toLowerCase();
@@ -79,74 +83,68 @@ export async function POST(req: Request) {
 
     if (!email) return fail(400, "Email requerido");
     if (!isValidEmail(email)) return fail(400, "Email inválido");
-
     if (!RESEND_API_KEY) return fail(500, "Falta RESEND_API_KEY");
     if (!RESEND_AUDIENCE_ID) return fail(500, "Falta RESEND_AUDIENCE_ID");
 
     const resend = new Resend(RESEND_API_KEY);
 
-    // ——— 1) Crear/asegurar contacto en la Audience ———
+    // 1) asegurar contacto en la Audience
     let already = false;
     try {
       const add = await resend.contacts.create({
-        audienceId: RESEND_AUDIENCE_ID,
+        audienceId: RESEND_AUDIENCE_ID!,
         email,
         unsubscribed: false,
-      });
-      if (add?.error) {
-        const msg = (add.error.message || "").toLowerCase();
-        if (msg.includes("already")) {
-          already = true;
-        } else {
-          return fail(502, add.error.message || "Error creando contacto en Resend");
-        }
+      } as any);
+      if ((add as any)?.error) {
+        const msg = String((add as any).error?.message || "").toLowerCase();
+        if (msg.includes("already")) already = true;
+        else return fail(502, (add as any).error?.message || "Error creando contacto en Resend");
       }
     } catch (e: any) {
       const emsg = String(e?.message || "");
-      if (emsg.includes("409") || emsg.toLowerCase().includes("already")) {
-        already = true;
-      } else {
-        return fail(502, "No se pudo crear el contacto en Resend");
-      }
+      if (emsg.includes("409") || emsg.toLowerCase().includes("already")) already = true;
+      else return fail(502, "No se pudo crear el contacto en Resend");
     }
 
-    // ——— 2) Enviar email de bienvenida (si aplica) ———
+    // 2) enviar email de bienvenida con React (si aplica)
     if (asBool(SEND_EMAILS)) {
       if (!FROM_EMAIL) return fail(500, "Falta FROM_EMAIL");
       if (!DOWNLOAD_TOKEN_SECRET) return fail(500, "Falta DOWNLOAD_TOKEN_SECRET");
 
       const token = signDownloadToken(email);
-      const link = `${getBaseUrl(req)}/api/download?token=${encodeURIComponent(token)}`;
-
-      const html = `
-        <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6">
-          <h2 style="margin:0 0 8px 0">¡Gracias por suscribirte!</h2>
-          <p style="margin:0 0 12px 0">Te agregué al newsletter. Aquí puedes descargar tu mini guía:</p>
-          <p style="margin:0 0 16px 0">
-            <a href="${link}" style="display:inline-block;background:#166534;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">
-              Descargar mini guía (PDF)
-            </a>
-          </p>
-          <p style="font-size:13px;color:#555;margin:0 0 12px 0">
-            El enlace expira en 7 días. Si no funciona, copia y pega:<br/>
-            <span style="word-break:break-all">${link}</span>
-          </p>
-          <p style="margin:12px 0 0 0">Abrazo,<br/>Daniel</p>
-        </div>
-      `;
+      const base = siteBase(req); // << corregido: usamos siteBase, no getBaseUrl
+      const downloadLink = `${base}/api/download?token=${encodeURIComponent(token)}`;
 
       await resend.emails.send({
         from: FROM_EMAIL,
         to: email,
         subject: "¡Bienvenido! Aquí tu mini guía anti-estrés",
-        html,
+        react: (
+          <WelcomeEmail
+            subject="¡Bienvenido! Aquí tu mini guía anti-estrés"
+            preheader="Descarga tu mini guía y comienza a cuidarte hoy mismo."
+            greetingName={email.split("@")[0]}
+            logoUrl={`${base}/logo-newsletter.png`}
+            heroUrl={`${base}/welcome-hero.jpg`}
+            title="Gracias por suscribirte ✨"
+            subtitle="Te he agregado a mi newsletter."
+            intro="Aquí tienes tu mini guía gratuita (válida 7 días):"
+            cta={{ label: "Descargar mini guía (PDF)", href: downloadLink }}
+            brand="Daniel Reyna — Psicólogo"
+            socials={{
+              website: base,
+              instagram: "https://instagram.com/psic.danielreyna",
+              youtube: "https://youtube.com/@Psicdanielreyna",
+              x: "https://x.com/psicdanreyna",
+            }}
+            unsubscribeUrl={`${base}/unsubscribe`}
+          />
+        ) as React.ReactElement, // << tipado para contentar a TS
       });
     }
 
-    return ok({
-      message: already ? "Ya suscrito" : "Suscripción creada",
-      already,
-    });
+    return ok({ message: already ? "Ya suscrito" : "Suscripción creada", already });
   } catch {
     return fail(500, "Error interno en el servidor");
   }
