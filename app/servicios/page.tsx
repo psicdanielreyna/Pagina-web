@@ -12,21 +12,24 @@ export const metadata: Metadata = {
 export default function ServiciosPage() {
   return (
     <>
-      {/* Hero con estilo sobre-mi */}
       <HeroBanner
         badge="Servicios"
-        title="Agenda tu proceso con TCC breve"
+        title="Agenda tu proceso con Terapia Cognitivo-Conductual"
         subtitle="Atención en línea y presencial (Monterrey). Herramientas prácticas y enfocadas a objetivos."
-        imageUrl="/img/hero-servicios.jpg"
+        imageUrl="/hero-servicios.jpg"
       />
 
-      {/* Intro */}
-      <section className="bg-[#EEDDCB] py-10">
-        <div className="mx-auto max-w-6xl px-4">
-          <p className="mx-auto max-w-3xl text-base text-gray-800">
-            Trabajo con Terapia Cognitivo-Conductual breve para ansiedad,
-            depresión, duelo y autoestima. Acompañamiento claro, práctico y con
-            ejercicios entre sesiones para que veas avances en tu día a día.
+      <section className="bg-[#FEEDCB] py-10">
+        <div className="container mx-auto max-w-3xl px-4 text-center space-y-6">
+          <p className="text-base md:text-lg text-gray-800">
+            Trabajo con <strong>Terapia Cognitivo-Conductual (TCC)</strong> breve para ansiedad,
+            depresión, duelo y autoestima.  
+            Esta terapia se centra en cómo tus pensamientos influyen en tus emociones y
+            comportamientos, ayudándote a identificar y cambiar patrones poco útiles.
+          </p>
+          <p className="text-base md:text-lg text-gray-800">
+            Acompañamiento claro, práctico y con ejercicios entre sesiones para que veas
+            avances en tu día a día.
           </p>
         </div>
       </section>
