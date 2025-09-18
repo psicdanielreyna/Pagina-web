@@ -1,17 +1,27 @@
-// scripts/send-newsletter.ts
-import 'dotenv/config';
+// scripts/send-newsletter.tsx
+import { config } from "dotenv";
+config({ path: ".env.local" });
+
+import * as React from "react";
 import { Resend } from "resend";
-import NewsletterIssue from "@/emails/NewsletterIssue";
+import NewsletterIssue from "../emails/NewsletterIssue";
+
+if (!process.env.RESEND_API_KEY) {
+  console.error("❌ Falta RESEND_API_KEY (no se cargó .env.local)");
+  process.exit(1);
+}
+
+if (!process.env.FROM_EMAIL) {
+  console.error("❌ Falta FROM_EMAIL en el .env.local");
+  process.exit(1);
+}
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
-const FROM_EMAIL = process.env.FROM_EMAIL!;
-
-const recipients = ["tu-correo-de-prueba@correo.com"]; // cámbialo por tu Audience o lista real
 
 async function main() {
   const { data, error } = await resend.emails.send({
-    from: FROM_EMAIL,
-    to: recipients,
+    from: process.env.FROM_EMAIL!,
+    to: ["tu-correo-de-prueba@correo.com"], // 👈 cámbialo a tu correo real de prueba
     subject: "Tu newsletter semanal",
     react: (
       <NewsletterIssue
@@ -24,7 +34,7 @@ async function main() {
         sections={[
           { type: "heading", text: "1) Micro-pasos" },
           { type: "paragraph", content: "El cambio sostenible ocurre en pasos ridículamente pequeños." },
-          { type: "list", items: ["1 minuto de respiración", "Anotar 1 gratitud", "Salir a caminar 5 min"] },
+          { type: "list", items: ["1 minuto de respiración", "Anotar 1 gratitud", "Caminar 5 min"] },
           { type: "heading", text: "2) Fricción baja" },
           { type: "paragraph", content: "Deja la app abierta, tenis a la vista y un vaso con agua listo." },
         ]}
@@ -43,9 +53,10 @@ async function main() {
 
   if (error) {
     console.error("❌ Error enviando newsletter:", error);
-  } else {
-    console.log("✅ Newsletter enviado:", data);
+    process.exit(1);
   }
+
+  console.log("✅ Newsletter enviado:", data?.id);
 }
 
 main();
