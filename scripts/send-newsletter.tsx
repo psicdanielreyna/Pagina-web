@@ -1,4 +1,5 @@
 // scripts/send-newsletter.ts
+import 'dotenv/config';
 import { Resend } from "resend";
 import NewsletterIssue from "@/emails/NewsletterIssue";
 
