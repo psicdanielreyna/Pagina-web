@@ -44,7 +44,7 @@ export default function Footer() {
         {/* Contacto */}
         <div>
           <h3 className="font-semibold mb-3">CONTACTO</h3>
-          <p className="text-sm text-gray-700">danielreyna@danielreyna.mx</p>
+          <p className="text-sm text-gray-700">danielreyna@danielreyna.com</p>
           <p className="text-sm text-gray-700">Monterrey, N.L. · México</p>
           <p className="text-sm text-gray-700">Atención en línea</p>
         </div>
