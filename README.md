@@ -37,3 +37,18 @@ Ejemplo en `app/blog/mi-primer-post/page.mdx`. Crea más carpetas MDX dentro de 
 - Conecta tu proveedor de newsletter real (Resend/Beehiiv) en `components/newsletter-form.tsx`.
 
 > Próximos pasos sugeridos: Stripe/Mercado Pago, descargas seguras y área de cliente.
+
+## Enviar newsletter (Resend)
+
+Requisitos:
+- `.env.local` con `RESEND_API_KEY`, `FROM_EMAIL`, `RESEND_AUDIENCE_ID`, `SEND_EMAILS=true`, `NEXT_PUBLIC_SITE_URL`, etc.
+- Verificar dominio y SPF/DKIM en Resend.
+
+Comandos:
+
+```bash
+# envío real
+npm run send:newsletter
+
+# simulación (no envía, solo prueba contactos/lotes)
+npm run send:dry
