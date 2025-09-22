@@ -2,7 +2,7 @@
 import Hero from "@/components/Hero";
 import Recursos from "@/components/Recursos";
 import LatestBlog from "@/components/LatestBlog";
-import NewsletterForm from "@/components/NewsletterForm"; // 👈 importa aquí
+import NewsletterForm from "@/components/newsletter-form"; // 👈 importa aquí
 
 export default function HomePage() {
   return (
