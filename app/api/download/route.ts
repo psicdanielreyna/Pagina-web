@@ -35,21 +35,23 @@ export async function GET(req: NextRequest) {
     const safeRel = path.normalize(data.file_path).replace(/^(\.\.(\/|\\|$))+/, "");
     const abs = path.join(process.cwd(), safeRel);
 
-    // 3) Lee el archivo (si no existe, tirará ENOENT y NO marcará como usado)
+    // 3) Lee el archivo
     const buffer = await fs.readFile(abs);
 
-    // 4) Marca como usado (best-effort; si falla, igualmente enviamos el archivo)
+    // 4) Marca como usado (best-effort)
     await supabaseAdmin
       .from("DownloadToken")
       .update({ used: true })
       .eq("id", data.id);
 
-    // 5) Devuelve el PDF con headers de descarga
+    // 5) Devuelve el PDF con Blob (no Buffer)
+    const blob = new Blob([buffer], { type: "application/pdf" });
     const fileName = path.basename(abs);
-    return new NextResponse(buffer, {
+
+    return new NextResponse(blob, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Length": String(buffer.length),
+        "Content-Length": String(buffer.byteLength),
         "Content-Disposition": `attachment; filename="${fileName}"`,
         "Cache-Control": "no-store",
       },
