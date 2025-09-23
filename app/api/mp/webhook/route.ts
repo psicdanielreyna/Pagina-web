@@ -1,50 +1,71 @@
-import { NextRequest } from 'next/server'
-import { MercadoPagoConfig, Payment } from 'mercadopago'
-import { Resend } from 'resend'
-import { signToken } from '@/lib/tokens'
+export const runtime = "nodejs";
 
-export const runtime = 'nodejs'
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { generateToken } from "@/lib/tokens";
 
 export async function POST(req: NextRequest) {
-  // MP envía ?type=payment&id=... (o ?topic=payment)
-  const url = new URL(req.url)
-  const type = url.searchParams.get('type') || url.searchParams.get('topic')
-  const paymentId = url.searchParams.get('id') || url.searchParams.get('data.id')
-  if (type !== 'payment' || !paymentId) return new Response('OK', { status: 200 })
+  const rawBody = await req.text();
+  const signatureHeader = req.headers.get("x-signature");
 
-  try {
-    const mp = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN! })
-    const payment = new Payment(mp)
-    const res = await payment.get({ id: paymentId })
-
-    if (res.status !== 'approved') return new Response('OK', { status: 200 })
-
-    const email = res.payer?.email || ''
-    const id = (res.metadata as any)?.id || ''
-    if (!email || !id) return new Response('OK', { status: 200 })
-
-    // token 24h
-    const token = signToken({ id, email }, 60 * 60 * 24)
-    const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
-    const urlLink = `${site}/api/download?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`
-
-    const resend = new Resend(process.env.RESEND_API_KEY!)
-    await resend.emails.send({
-      from: process.env.FROM_EMAIL!,
-      to: email,
-      subject: 'Tu descarga está lista',
-      html: `
-        <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto">
-          <h2>¡Gracias por tu compra!</h2>
-          <p>Puedes descargar tu archivo durante las próximas 24 horas:</p>
-          <p><a href="${urlLink}">Descargar ahora</a></p>
-          <p style="color:#555">Si el enlace expira, respóndenos este correo y te lo reactivamos.</p>
-        </div>
-      `,
-    })
-
-    return new Response('OK', { status: 200 })
-  } catch {
-    return new Response('OK', { status: 200 }) // no fallar el webhook
+  const secret = process.env.MP_WEBHOOK_SECRET || process.env.MP_ACCESS_TOKEN;
+  if (!signatureHeader || !secret) {
+    return new NextResponse("Missing signature/secret", { status: 400 });
   }
+
+  const parts = Object.fromEntries(
+    signatureHeader.split(",").map((pair) => {
+      const [k, v] = pair.split("=");
+      return [k.trim(), (v ?? "").trim()];
+    })
+  ) as Record<string, string>;
+
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(`${parts.ts}.${rawBody}`)
+    .digest("base64url");
+
+  if (expected !== parts.v1) {
+    return new NextResponse("Invalid signature", { status: 401 });
+  }
+
+  const event = JSON.parse(rawBody);
+  const paymentId: string | undefined = event?.data?.id ?? event?.data?.payment?.id;
+  if (!paymentId) return NextResponse.json({ ok: true });
+
+  // consulta pago real
+  const payResp = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+    headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}` },
+    cache: "no-store",
+  });
+  if (!payResp.ok) return new NextResponse("MP error", { status: 502 });
+  const payment = await payResp.json();
+
+  if (payment.status !== "approved") return NextResponse.json({ ok: true });
+
+  const filePath: string = payment.metadata?.filePath ?? "/private/ebooks/default.pdf";
+  const email: string | null = payment.payer?.email ?? null;
+
+  // upsert por paymentId (evita duplicar si llega el webhook 2 veces)
+  const token = generateToken();
+  const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
+
+  // intenta insertar; si ya existe, ignora
+  const { error } = await supabaseAdmin
+    .from("DownloadToken")
+    .insert([{ token, paymentId: String(paymentId), email, filePath, expiresAt }])
+    .select()
+    .single();
+
+  if (error && !/duplicate key|unique/i.test(error.message)) {
+    console.error("Supabase insert error", error);
+    return new NextResponse("DB error", { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
+export async function GET() {
+  return NextResponse.json({ ok: true });
 }

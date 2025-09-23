@@ -1,33 +1,47 @@
-// app/api/download/route.ts
-import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { NextRequest } from "next/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { createReadStream, statSync } from "fs";
+import { join } from "path";
 
-export const runtime = "nodejs";
+export async function GET(req: NextRequest) {
+  const token = req.nextUrl.searchParams.get("token");
+  if (!token) return Response.json({ error: "Falta token" }, { status: 400 });
 
-const { DOWNLOAD_TOKEN_SECRET } = process.env;
+  const { data, error } = await supabaseAdmin
+    .from("DownloadToken")
+    .select("*")
+    .eq("token", token)
+    .single();
 
-// Descarga protegida por token (JWT). Redirige al PDF público.
-export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const token = url.searchParams.get("token");
+  if (error) return Response.json({ error: "DB error" }, { status: 500 });
+  if (!data) return Response.json({ error: "Token inválido" }, { status: 404 });
+  if (data.used) return Response.json({ error: "Enlace ya utilizado" }, { status: 410 });
+  if (new Date(data.expiresAt) < new Date()) return Response.json({ error: "Enlace expirado" }, { status: 410 });
 
-  if (!token) {
-    return NextResponse.json({ ok: false, error: "Token requerido" }, { status: 400 });
-  }
-  if (!DOWNLOAD_TOKEN_SECRET) {
-    return NextResponse.json({ ok: false, error: "Server misconfig: falta DOWNLOAD_TOKEN_SECRET" }, { status: 500 });
-  }
+  // marca como usado (transaccional simple)
+  const { error: updErr } = await supabaseAdmin
+    .from("DownloadToken")
+    .update({ used: true })
+    .eq("token", token);
 
-  try {
-    // Verifica expiración y firma
-    jwt.verify(token, DOWNLOAD_TOKEN_SECRET);
+  if (updErr) return Response.json({ error: "DB error" }, { status: 500 });
 
-    // Si todo OK, redirige al archivo en /public/downloads/...
-    // Asegúrate de colocar el PDF en: /public/downloads/mini-guia-anti-estres.pdf
-    const pdfPath = "/downloads/mini-guia-anti-estres.pdf";
-    const dest = new URL(pdfPath, url.origin);
-    return NextResponse.redirect(dest, { status: 302 });
-  } catch {
-    return NextResponse.json({ ok: false, error: "Token inválido o expirado" }, { status: 401 });
-  }
+  // sirve el archivo local (ajusta si usas Storage)
+  const baseDir = process.cwd();
+  const absPath = data.filePath.startsWith("/")
+    ? join(baseDir, data.filePath)
+    : join(baseDir, "private", data.filePath);
+
+  const { size } = statSync(absPath);
+  const stream = createReadStream(absPath);
+
+  return new Response(stream as any, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Length": String(size),
+      "Content-Disposition": `attachment; filename="${absPath.split("/").pop()}"`,
+      "Cache-Control": "no-store",
+    },
+  });
 }
