@@ -20,15 +20,9 @@ export async function GET(req: NextRequest) {
     console.error("download DB error", { token, error });
     return NextResponse.json({ error: "DB error" }, { status: 500 });
   }
-  if (!data) {
-    return NextResponse.json({ error: "Token inválido" }, { status: 404 });
-  }
-  if (data.used) {
-    return NextResponse.json({ error: "Enlace ya utilizado" }, { status: 410 });
-  }
-  if (new Date(data.expires_at) < new Date()) {
-    return NextResponse.json({ error: "Enlace expirado" }, { status: 410 });
-  }
+  if (!data) return NextResponse.json({ error: "Token inválido" }, { status: 404 });
+  if (data.used) return NextResponse.json({ error: "Enlace ya utilizado" }, { status: 410 });
+  if (new Date(data.expires_at) < new Date()) return NextResponse.json({ error: "Enlace expirado" }, { status: 410 });
 
   try {
     // 2) Normaliza la ruta y asegúrate de que esté dentro de /private
@@ -39,16 +33,13 @@ export async function GET(req: NextRequest) {
     const buffer = await fs.readFile(abs);
 
     // 4) Marca como usado (best-effort)
-    await supabaseAdmin
-      .from("DownloadToken")
-      .update({ used: true })
-      .eq("id", data.id);
+    await supabaseAdmin.from("DownloadToken").update({ used: true }).eq("id", data.id);
 
-    // 5) Devuelve el PDF con Blob (no Buffer)
-    const blob = new Blob([buffer], { type: "application/pdf" });
+    // 5) Devuelve el PDF con ArrayBuffer (no Buffer/Blob)
+    const ab = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength); // Buffer -> ArrayBuffer
     const fileName = path.basename(abs);
 
-    return new NextResponse(blob, {
+    return new NextResponse(ab, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Length": String(buffer.byteLength),
