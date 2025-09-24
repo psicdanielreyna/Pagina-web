@@ -3,10 +3,14 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+// Asegura runtime Node (no edge; necesitamos fs)
+export const runtime = "nodejs";
+
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
   if (!token) return NextResponse.json({ error: "Falta token" }, { status: 400 });
 
+  // 1) Busca registro (snake_case + maybeSingle)
   const { data, error } = await supabaseAdmin
     .from("DownloadToken")
     .select("id, token, file_path, used, expires_at")
@@ -22,23 +26,30 @@ export async function GET(req: NextRequest) {
   if (new Date(data.expires_at) < new Date()) return NextResponse.json({ error: "Enlace expirado" }, { status: 410 });
 
   try {
+    // 2) Normaliza ruta
     const safeRel = path.normalize(data.file_path).replace(/^(\.\.(\/|\\|$))+/, "");
     const abs = path.join(process.cwd(), safeRel);
 
+    // 3) Lee archivo
     const buffer = await fs.readFile(abs);
+    const bytes = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
 
-    // Marca como usado (best-effort)
+    // 4) Marca como usado (best-effort; si falla igual servimos)
     await supabaseAdmin.from("DownloadToken").update({ used: true }).eq("id", data.id);
 
-    // ✅ Blob desde Uint8Array (no Buffer)
-    const uint8 = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-    const blob = new Blob([uint8], { type: "application/pdf" });
-    const fileName = path.basename(abs);
+    // 5) Sirve como ReadableStream (evita conflictos de tipos)
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(bytes);
+        controller.close();
+      },
+    });
 
-    return new NextResponse(blob, {
+    const fileName = path.basename(abs);
+    return new NextResponse(stream as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Length": String(blob.size),
+        // Content-Length no es necesario con streams
         "Content-Disposition": `attachment; filename="${fileName}"`,
         "Cache-Control": "no-store",
       },
