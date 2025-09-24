@@ -5,11 +5,8 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
-  if (!token) {
-    return NextResponse.json({ error: "Falta token" }, { status: 400 });
-  }
+  if (!token) return NextResponse.json({ error: "Falta token" }, { status: 400 });
 
-  // 1) Busca el registro (snake_case + maybeSingle)
   const { data, error } = await supabaseAdmin
     .from("DownloadToken")
     .select("id, token, file_path, used, expires_at")
@@ -25,21 +22,19 @@ export async function GET(req: NextRequest) {
   if (new Date(data.expires_at) < new Date()) return NextResponse.json({ error: "Enlace expirado" }, { status: 410 });
 
   try {
-    // 2) Normaliza la ruta y asegúrate de que esté dentro de /private
     const safeRel = path.normalize(data.file_path).replace(/^(\.\.(\/|\\|$))+/, "");
     const abs = path.join(process.cwd(), safeRel);
 
-    // 3) Lee el archivo
     const buffer = await fs.readFile(abs);
 
-    // 4) Marca como usado (best-effort)
+    // Marca como usado (best-effort)
     await supabaseAdmin.from("DownloadToken").update({ used: true }).eq("id", data.id);
 
-    // 5) Devuelve el PDF con ArrayBuffer (no Buffer/Blob)
-    const ab = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength); // Buffer -> ArrayBuffer
+    // 👉 Body como Uint8Array (ArrayBufferView), aceptado por Fetch/NextResponse
+    const body = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
     const fileName = path.basename(abs);
 
-    return new NextResponse(ab, {
+    return new NextResponse(body, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Length": String(buffer.byteLength),
