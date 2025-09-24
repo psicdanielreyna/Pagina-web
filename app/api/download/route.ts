@@ -30,14 +30,15 @@ export async function GET(req: NextRequest) {
     // Marca como usado (best-effort)
     await supabaseAdmin.from("DownloadToken").update({ used: true }).eq("id", data.id);
 
-    // 👉 Body como Uint8Array (ArrayBufferView), aceptado por Fetch/NextResponse
-    const body = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    // ✅ Blob desde Uint8Array (no Buffer)
+    const uint8 = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    const blob = new Blob([uint8], { type: "application/pdf" });
     const fileName = path.basename(abs);
 
-    return new NextResponse(body, {
+    return new NextResponse(blob, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Length": String(buffer.byteLength),
+        "Content-Length": String(blob.size),
         "Content-Disposition": `attachment; filename="${fileName}"`,
         "Cache-Control": "no-store",
       },
