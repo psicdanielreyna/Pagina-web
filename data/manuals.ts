@@ -9,7 +9,7 @@ export type Manual = {
 
 export const MANUALS: Manual[] = [
   {
-    slug: "como-apagar-la-mente",
+    slug: "apagar-mente",
     title: "Cómo Apagar tu Mente",
     price: 199,
     description: "Guía práctica para calmar el ruido mental.",
