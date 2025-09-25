@@ -3,19 +3,20 @@ import Image from "next/image";
 import Link from "next/link";
 
 type Producto = {
-  slug: string;
+  slug: string;          // slug en /tienda
+  checkoutSlug: string;  // slug en /checkout
   title: string;
   price: string;
   short: string;
   long: string;
   img: string;
   alt: string;
-  mpUrl: string; // Mercado Pago
 };
 
 const productos: Producto[] = [
   {
     slug: "apagar-mente",
+    checkoutSlug: "como-apagar-la-mente",
     title: "Cómo Apagar tu Mente",
     price: "$249 MXN",
     short: "Técnicas efectivas para calmar el sobrepensamiento.",
@@ -23,19 +24,17 @@ const productos: Producto[] = [
       "Método paso a paso para identificar gatillos, regular la activación y salir del bucle rumiativo.",
     img: "/images/tienda/apagar-mente.png",
     alt: "Portada Cómo Apagar tu Mente",
-    mpUrl: "https://mpago.la/REEMPLAZA_CON_TU_LINK_1",
   },
   {
     slug: "el-arte-de-creer-en-ti",
+    checkoutSlug: "el-arte-de-creer-en-ti", // cuando tengas el checkout, quedará listo
     title: "El Arte de Creer en Ti",
     price: "$249 MXN",
-    short:
-      "Estrategias para fortalecer tu autoestima y confianza.",
+    short: "Estrategias para fortalecer tu autoestima y confianza.",
     long:
       "Pequeños cambios diarios, ejercicios prácticos y plantillas para consolidar tu autoconfianza.",
     img: "/images/tienda/el-arte-de-creer-en-ti.png",
     alt: "Portada El Arte de Creer en Ti",
-    mpUrl: "https://mpago.la/REEMPLAZA_CON_TU_LINK_2",
   },
 ];
 
@@ -78,8 +77,7 @@ export default function TiendaPage() {
 
                 <div className="mt-3 flex gap-3">
                   <Link
-                    href={p.mpUrl}
-                    target="_blank"
+                    href={`/checkout/${p.checkoutSlug}`}
                     className="inline-flex items-center justify-center rounded-full px-5 py-2 bg-blue-600 text-white hover:bg-blue-700"
                   >
                     Comprar
