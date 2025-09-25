@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(stream as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
-        // Content-Length no es necesario con streams
+        // Content-Length no es requerido para streams
         "Content-Disposition": `attachment; filename="${fileName}"`,
         "Cache-Control": "no-store",
       },
