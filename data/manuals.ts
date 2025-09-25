@@ -2,25 +2,26 @@
 export type Manual = {
   slug: string;
   title: string;
-  price: number;      // MXN
+  price: number;         // MXN
   description?: string;
+  cover?: { src: string; alt?: string };
 };
 
 export const MANUALS: Manual[] = [
   {
     slug: "como-apagar-la-mente",
-    title: "Cómo Apagar la Mente",
+    title: "Cómo Apagar tu Mente",
     price: 199,
     description: "Guía práctica para calmar el ruido mental.",
+    cover: { src: "/images/tienda/apagar-mente.png", alt: "Portada Cómo Apagar tu Mente" },
   },
   {
     slug: "el-arte-de-creer-en-ti",
     title: "El Arte de Creer en Ti",
     price: 199,
-    description: "Estrategias para fortalecer tu autoconfianza.",
+    description: "Estrategias para potenciar tu autoestima.",
+    cover: { src: "/images/tienda/el-arte-de-creer-en-ti.png", alt: "Portada El Arte de Creer en Ti" },
   },
 ];
 
-// helper
-export const getManual = (slug: string) =>
-  MANUALS.find((m) => m.slug === slug);
+export const getManual = (slug: string) => MANUALS.find(m => m.slug === slug);
