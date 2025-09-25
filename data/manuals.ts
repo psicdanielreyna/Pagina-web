@@ -2,7 +2,7 @@
 export type Manual = {
   slug: string;
   title: string;
-  price: number;        // en MXN
+  price: number;      // MXN
   description?: string;
 };
 
@@ -14,13 +14,13 @@ export const MANUALS: Manual[] = [
     description: "Guía práctica para calmar el ruido mental.",
   },
   {
-    slug: "tecnicas-para-detener-el-sobrepensamiento",
-    title: "Técnicas para Detener el Sobrepensamiento",
+    slug: "el-arte-de-creer-en-ti",
+    title: "El Arte de Creer en Ti",
     price: 199,
-    description: "Estrategias simples para salir del bucle mental.",
+    description: "Estrategias para fortalecer tu autoconfianza.",
   },
 ];
 
-export function getManual(slug: string) {
-  return MANUALS.find((m) => m.slug === slug) ?? null;
-}
+// helper
+export const getManual = (slug: string) =>
+  MANUALS.find((m) => m.slug === slug);

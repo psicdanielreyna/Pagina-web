@@ -1,24 +1,41 @@
-// components/CopyButton.tsx
 "use client";
 
-type Props = { text: string; label?: string; className?: string };
+import { useState } from "react";
 
-export default function CopyButton({ text, label = "Copiar", className }: Props) {
-  async function copy() {
+type Props = {
+  text: string;
+  label?: string;
+  className?: string;
+  small?: boolean; // ← NUEVO
+};
+
+export default function CopyButton({
+  text,
+  label = "Copiar",
+  className = "",
+  small = false,
+}: Props) {
+  const [copied, setCopied] = useState(false);
+
+  const onCopy = async () => {
     try {
       await navigator.clipboard.writeText(text);
-      alert("Copiado ✔");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
     } catch {
-      alert("No se pudo copiar");
+      // opcional: manejar error
     }
-  }
+  };
+
   return (
     <button
-      onClick={copy}
-      className={className ?? "px-3 py-1 rounded border text-sm hover:bg-gray-50"}
       type="button"
+      onClick={onCopy}
+      aria-label={`Copiar ${text}`}
+      className={`inline-flex items-center rounded-full border border-slate-300 bg-white hover:bg-slate-50
+        ${small ? "px-2 py-1 text-xs" : "px-3 py-1.5 text-sm"} ${className}`}
     >
-      {label}
+      {copied ? "¡Copiado!" : label}
     </button>
   );
 }
