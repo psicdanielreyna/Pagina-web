@@ -2,7 +2,6 @@
 import * as React from "react";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import jwt from "jsonwebtoken";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 
 export const runtime = "nodejs";
@@ -13,15 +12,17 @@ const {
   RESEND_AUDIENCE_ID,
   FROM_EMAIL,
   SEND_EMAILS,
-  DOWNLOAD_TOKEN_SECRET,
   NEXT_PUBLIC_SITE_URL,
 } = process.env;
 
 const asBool = (v: unknown) => String(v).toLowerCase() === "true";
 const ok = (data: Record<string, unknown> = {}) =>
   NextResponse.json({ ok: true, ...data }, { status: 200 });
-const fail = (status: number, message: string, extra: Record<string, unknown> = {}) =>
-  NextResponse.json({ ok: false, message, ...extra }, { status });
+const fail = (
+  status: number,
+  message: string,
+  extra: Record<string, unknown> = {}
+) => NextResponse.json({ ok: false, message, ...extra }, { status });
 
 /** Base URL segura para los enlaces absolutos del email */
 function siteBase(req: Request) {
@@ -30,11 +31,6 @@ function siteBase(req: Request) {
   const proto = h("x-forwarded-proto") || "https";
   const host = h("x-forwarded-host") || h("host") || "localhost:3000";
   return `${proto}://${host}`;
-}
-
-function signDownloadToken(email: string) {
-  if (!DOWNLOAD_TOKEN_SECRET) throw new Error("Missing DOWNLOAD_TOKEN_SECRET");
-  return jwt.sign({ email }, DOWNLOAD_TOKEN_SECRET, { expiresIn: "7d" });
 }
 
 function isValidEmail(email: string) {
@@ -99,22 +95,27 @@ export async function POST(req: Request) {
       if ((add as any)?.error) {
         const msg = String((add as any).error?.message || "").toLowerCase();
         if (msg.includes("already")) already = true;
-        else return fail(502, (add as any).error?.message || "Error creando contacto en Resend");
+        else
+          return fail(
+            502,
+            (add as any).error?.message || "Error creando contacto en Resend"
+          );
       }
     } catch (e: any) {
       const emsg = String(e?.message || "");
-      if (emsg.includes("409") || emsg.toLowerCase().includes("already")) already = true;
+      if (emsg.includes("409") || emsg.toLowerCase().includes("already"))
+        already = true;
       else return fail(502, "No se pudo crear el contacto en Resend");
     }
 
     // 2) enviar email de bienvenida con React (si aplica)
     if (asBool(SEND_EMAILS)) {
       if (!FROM_EMAIL) return fail(500, "Falta FROM_EMAIL");
-      if (!DOWNLOAD_TOKEN_SECRET) return fail(500, "Falta DOWNLOAD_TOKEN_SECRET");
 
-      const token = signDownloadToken(email);
-      const base = siteBase(req); // << corregido: usamos siteBase, no getBaseUrl
-      const downloadLink = `${base}/api/download?token=${encodeURIComponent(token)}`;
+      const base = siteBase(req);
+
+      // ✅ Link directo a la mini-guía pública (sin token)
+      const downloadLink = `${base}/downloads/mini-guia-anti-estres.pdf`;
 
       await resend.emails.send({
         from: FROM_EMAIL,
@@ -129,7 +130,8 @@ export async function POST(req: Request) {
             heroUrl={`${base}/welcome-hero.jpg`}
             title="Gracias por suscribirte ✨"
             subtitle="Te he agregado a mi newsletter."
-            intro="Aquí tienes tu mini guía gratuita (válida 7 días):"
+            // (quitamos el 'válida 7 días' porque ya no hay token)
+            intro="Aquí tienes tu mini guía gratuita:"
             cta={{ label: "Descargar mini guía (PDF)", href: downloadLink }}
             brand="Daniel Reyna — Psicólogo"
             socials={{
@@ -140,11 +142,14 @@ export async function POST(req: Request) {
             }}
             unsubscribeUrl={`${base}/unsubscribe`}
           />
-        ) as React.ReactElement, // << tipado para contentar a TS
+        ) as React.ReactElement,
       });
     }
 
-    return ok({ message: already ? "Ya suscrito" : "Suscripción creada", already });
+    return ok({
+      message: already ? "Ya suscrito" : "Suscripción creada",
+      already,
+    });
   } catch {
     return fail(500, "Error interno en el servidor");
   }
