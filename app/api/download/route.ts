@@ -1,66 +1,94 @@
-import { NextRequest, NextResponse } from "next/server";
-import path from "node:path";
-import fs from "node:fs/promises";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+// app/api/download/route.ts
+import { NextRequest } from "next/server";
+import path from "path";
+import { promises as fs } from "fs";
+import { jwtVerify, JWTPayload } from "jose";
 
-// Asegura runtime Node (no edge; necesitamos fs)
 export const runtime = "nodejs";
 
+// Carpeta privada de descargas
+const DOWNLOAD_DIR = path.join(process.cwd(), "private", "downloads");
+
+const MIME_BY_EXT: Record<string, string> = {
+  ".pdf": "application/pdf",
+  ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".zip": "application/zip",
+  ".epub": "application/epub+zip",
+  ".mobi": "application/x-mobipocket-ebook",
+};
+
+function inferMime(filename: string) {
+  const ext = path.extname(filename).toLowerCase();
+  return MIME_BY_EXT[ext] || "application/octet-stream";
+}
+
+function requireEnv(name: string): string {
+  const v = process.env[name];
+  if (!v) throw new Error(`Falta la variable de entorno ${name}`);
+  return v;
+}
+
 export async function GET(req: NextRequest) {
-  const token = req.nextUrl.searchParams.get("token");
-  if (!token) return NextResponse.json({ error: "Falta token" }, { status: 400 });
-
-  // 1) Busca registro (snake_case + maybeSingle)
-  const { data, error } = await supabaseAdmin
-    .from("DownloadToken")
-    .select("id, token, file_path, used, expires_at")
-    .eq("token", token)
-    .maybeSingle();
-
-  if (error) {
-    console.error("download DB error", { token, error });
-    return NextResponse.json({ error: "DB error" }, { status: 500 });
-  }
-  if (!data) return NextResponse.json({ error: "Token inválido" }, { status: 404 });
-  if (data.used) return NextResponse.json({ error: "Enlace ya utilizado" }, { status: 410 });
-  if (new Date(data.expires_at) < new Date()) return NextResponse.json({ error: "Enlace expirado" }, { status: 410 });
-
   try {
-    // 2) Normaliza ruta
-    const safeRel = path.normalize(data.file_path).replace(/^(\.\.(\/|\\|$))+/, "");
-    const abs = path.join(process.cwd(), safeRel);
+    // 1. Token en query
+    const token = req.nextUrl.searchParams.get("token");
+    if (!token) {
+      return new Response(JSON.stringify({ error: "Token requerido" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
-    // 3) Lee archivo
-    const buffer = await fs.readFile(abs);
-    const bytes = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    // 2. Verificar token
+    const secret = new TextEncoder().encode(requireEnv("DOWNLOAD_JWT_SECRET"));
+    const { payload } = await jwtVerify(token, secret);
 
-    // 4) Marca como usado (best-effort; si falla igual servimos)
-    await supabaseAdmin.from("DownloadToken").update({ used: true }).eq("id", data.id);
+    const { file: fileFromToken, filename: downloadNameFromToken } =
+      payload as JWTPayload & { file?: string; filename?: string };
 
-    // 5) Sirve como ReadableStream (evita conflictos de tipos)
-    const stream = new ReadableStream<Uint8Array>({
+    const fileName = fileFromToken ?? "como-apagar-tu-mente.pdf";
+    const downloadName = downloadNameFromToken ?? fileName;
+
+    // 3. Leer archivo
+    const filePath = path.join(DOWNLOAD_DIR, fileName);
+    const fileBuffer = await fs.readFile(filePath);
+
+    // 4. Crear stream (esto sí es 100% válido para Response)
+    const stream = new ReadableStream({
       start(controller) {
-        controller.enqueue(bytes);
+        controller.enqueue(fileBuffer);
         controller.close();
       },
     });
 
-    const fileName = path.basename(abs);
-    return new NextResponse(stream as unknown as BodyInit, {
+    // 5. Responder
+    return new Response(stream, {
+      status: 200,
       headers: {
-        "Content-Type": "application/pdf",
-        // Content-Length no es requerido para streams
-        "Content-Disposition": `attachment; filename="${fileName}"`,
-        "Cache-Control": "no-store",
+        "Content-Type": inferMime(fileName),
+        "Content-Disposition": `attachment; filename="${encodeURIComponent(
+          downloadName
+        )}"`,
+        "Cache-Control": "private, max-age=0, must-revalidate",
       },
     });
-  } catch (e: any) {
-    console.error("file error", {
-      token,
-      file_path: data.file_path,
-      cwd: process.cwd(),
-      err: { name: e?.name, message: e?.message, code: e?.code },
+  } catch (err: any) {
+    const msg = err?.message ?? "Error";
+    if (/exp/i.test(msg) || /expired/i.test(msg)) {
+      return new Response(
+        JSON.stringify({ error: "El enlace de descarga ha expirado" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    if (/ENOENT|no such file/i.test(msg)) {
+      return new Response(
+        JSON.stringify({ error: "Archivo no encontrado" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    return new Response(JSON.stringify({ error: "Solicitud inválida" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
     });
-    return NextResponse.json({ error: "Archivo no encontrado" }, { status: 500 });
   }
 }
