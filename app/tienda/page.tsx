@@ -3,8 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 type Producto = {
-  slug: string;          // slug en /tienda
-  checkoutSlug: string;  // slug en /checkout
+  slug: string;        // slug para /tienda/<slug>
+  manualSlug: string;  // slug real del manual para /checkout/<manualSlug>
   title: string;
   price: string;
   short: string;
@@ -16,7 +16,7 @@ type Producto = {
 const productos: Producto[] = [
   {
     slug: "apagar-mente",
-    checkoutSlug: "como-apagar-la-mente",
+    manualSlug: "como-apagar-la-mente",
     title: "Cómo Apagar tu Mente",
     price: "$249 MXN",
     short: "Técnicas efectivas para calmar el sobrepensamiento.",
@@ -27,7 +27,7 @@ const productos: Producto[] = [
   },
   {
     slug: "el-arte-de-creer-en-ti",
-    checkoutSlug: "el-arte-de-creer-en-ti", // cuando tengas el checkout, quedará listo
+    manualSlug: "el-arte-de-creer-en-ti",
     title: "El Arte de Creer en Ti",
     price: "$249 MXN",
     short: "Estrategias para fortalecer tu autoestima y confianza.",
@@ -64,9 +64,9 @@ export default function TiendaPage() {
                   fill
                   className="object-contain"
                   sizes="(max-width: 640px) 100vw, 600px"
-                  priority
                 />
               </div>
+
               <div className="p-5 space-y-2">
                 <h2 className="text-lg font-semibold text-slate-900">
                   {p.title}
@@ -77,7 +77,7 @@ export default function TiendaPage() {
 
                 <div className="mt-3 flex gap-3">
                   <Link
-                    href={`/checkout/${p.checkoutSlug}`}
+                    href={`/checkout/${p.manualSlug}`}
                     className="inline-flex items-center justify-center rounded-full px-5 py-2 bg-blue-600 text-white hover:bg-blue-700"
                   >
                     Comprar
