@@ -39,3 +39,5 @@ export function getManualAny(slug: string) {
 export function manualSlugsForBuild() {
   return [...MANUALS.map((m) => m.slug), ...Object.keys(MANUAL_ALIASES)];
 }
+
+export { getManualAny as getManual };
