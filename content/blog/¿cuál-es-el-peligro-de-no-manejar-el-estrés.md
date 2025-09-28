@@ -8,9 +8,9 @@ description: "¿Alguna vez te haz preguntado si vivir con estrés puede afectart
   identificarlo y qué hacer."
 image: /uploads/diseño-sin-título-2-.jpg
 ---
-<div class="text-center">
-# **¿Por qué nos estresamos?**
-</div>
+# ¿Por qué nos estresamos?
+
+
 
 La pregunta del millón, el estrés es parte de la vida, tanto psicológicamente como físicamente. El estrés es una reacción natural y necesaria del cuerpo humano, es tan natural que incluso otras especies las sufren.
 
@@ -39,8 +39,6 @@ Este tipo de situaciones nos generan a la larga problemas físicos también, tri
 
 Y la lista continúa y continúa, incluso en casos muy graves, lleva a desarrollar ciertos tipos de cáncer, los más frecuentes son de pulmón y estómago.
 
-
-
 ## Mini-checklist (1 minuto)
 
 **Si respondes “sí” a 3 o más, tu estrés podría estar siendo crónico:**
@@ -52,15 +50,11 @@ Y la lista continúa y continúa, incluso en casos muy graves, lleva a desarroll
 * Postergó cosas porque me siento abrumado/a.
 * Me enojo o me pongo sensible con facilidad.
 
-
-
 ## “Trabajo mejor bajo presión”… ¿seguro?
 
 Si usted, persona bonita que lee esto, dice: *La neta si soy, vivo con estrés y trabajo mejor bajo presión,* Tome en cuenta que a pesar de que "trabajes mejor" bajo estrés no quiere decir que sea proporcionalmente mejor.
 
 ***Probablemente puedo resolver problemas de física mucho mejor si alguien me apunta con una pistola cargada, pero no quiere decir que esa es la mejor forma.***
-
-
 
 ## Cómo convertir tu estrés en aliado
 
@@ -69,8 +63,6 @@ Si usted, persona bonita que lee esto, dice: *La neta si soy, vivo con estrés y
 3. **Agenda límites:** bloques de trabajo + pausas breves (pomodoro).
 4. **Cuida lo básico:** sueño, comida regular, movimiento diario.
 5. **Pensamiento flexible:** sustituye “tengo que poder con todo” por “priorizo y pido ayuda cuando hace falta”.
-
-
 
 Si quieres aprender a manejar y gestionar tu estrés para desarrollarlo en un estrés benéfico para ti, agenda una cita conmigo, ve a la sección de [servicios](danielreyna.com/servicios) y [agenda](danielreyna.com/agenda).
 
