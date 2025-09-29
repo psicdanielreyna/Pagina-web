@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "send:newsletter": "dotenv -e .env.local -- tsx scripts/send-newsletter.tsx",
-    "send:dry": "DRY_RUN=true dotenv -e .env.local -- tsx scripts/send-newsletter.tsx"
+    "send:dry": "DRY_RUN=true dotenv -e .env.local -- tsx scripts/send-newsletter.tsx",
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "@portabletext/react": "^4.0.1",
