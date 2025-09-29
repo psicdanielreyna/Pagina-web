@@ -1,5 +1,5 @@
 [build]
-  base = "Pagina-web"         # 👈 clave: tu Next.js está aquí
+  # Quita cualquier línea "base = ..."
   command = "npm run build"
   publish = ".next"
 
@@ -9,6 +9,9 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# (lo demás igual que ya lo tienes)
+
 
 [functions]
   node_bundler = "esbuild"
