@@ -1,27 +1,47 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: psicdanielreyna/Pagina-web           # ← cambia esto
   branch: main
 
-site_url: https://danielreyna.com
-logo_url: https://danielreyna.com/logo.png
+# Opcional para editar local sin tocar Git remoto:
+# local_backend: true
 
-media_folder: "public/uploads"
-public_folder: "/uploads"
+media_folder: "public/uploads"         # dónde guarda los archivos en el repo
+public_folder: "/uploads"              # cómo se referencian en el sitio
+
+publish_mode: simple                   # "simple" = publica directo a main
+# publish_mode: editorial_workflow     # usa Draft/Review/Publish (si lo prefieres)
 
 collections:
   - name: "blog"
     label: "Blog"
     folder: "content/blog"
     create: true
-    slug: "{{slug}}"
-    slugify:
-      clean_accents: true
-      trim: true
-      sanitize_replacement: "-"
+    extension: "mdx"                   # tus helpers soportan .md y .mdx
     format: "frontmatter"
+    slug: "{{slug}}"
+
     fields:
       - { label: "Título", name: "title", widget: "string" }
-      - { label: "Fecha", name: "date", widget: "datetime" }
-      - { label: "Resumen (opcional)", name: "description", widget: "string", required: false }
-      - { label: "Imagen destacada", name: "image", widget: "image", required: false }
-      - { label: "Contenido", name: "body", widget: "markdown" }
+      - { label: "Slug (opcional)", name: "slug", widget: "string", required: false, hint: "Si lo dejas vacío, se usa el filename" }
+      - { label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD", dateFormat: "YYYY-MM-DD", timeFormat: false }
+      - { label: "Imagen (OG/cover)", name: "image", widget: "image", required: false, hint: "Se mapea a cover en el sitio" }
+      - { label: "Extracto", name: "excerpt", widget: "text", required: false, hint: "Si se omite, se genera automático del contenido" }
+
+      # SEO opcional (tu lib puede mapearlos si agregas los campos sugeridos)
+      - { label: "SEO Title", name: "seoTitle", widget: "string", required: false }
+      - { label: "SEO Description", name: "seoDescription", widget: "text", required: false }
+      - { label: "No index", name: "noindex", widget: "boolean", required: false, default: false }
+      - { label: "No follow", name: "nofollow", widget: "boolean", required: false, default: false }
+
+      - { label: "Tags", name: "tags", widget: "list", required: false, default: [] }
+
+      - label: "Contenido"
+        name: "body"
+        widget: "markdown"
+        hint: "Acepta MDX"
+
+# Opcional: previsualizaciones
+# load_config_file: false
+# editor:
+#   preview: true

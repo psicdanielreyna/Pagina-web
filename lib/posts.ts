@@ -10,10 +10,15 @@ const postsDirectory = path.join(process.cwd(), "content", "blog");
 export type PostMeta = {
   slug: string;
   title?: string;
-  date?: string;            // ISO o string plano
-  cover?: string | null;    // ruta absoluta (/uploads/...) o URL
-  excerpt?: string;         // texto plano corto
+  date?: string;
+  cover?: string | null;
+  excerpt?: string;
   tags?: string[];
+  // NEW
+  seoTitle?: string;
+  seoDescription?: string;
+  noindex?: boolean;
+  nofollow?: boolean;
 };
 
 /* ----------------------------- helpers ----------------------------- */
