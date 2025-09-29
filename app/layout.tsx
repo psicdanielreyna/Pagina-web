@@ -1,3 +1,4 @@
+// app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
@@ -6,17 +7,35 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   metadataBase: new URL("https://danielreyna.com"),
   title: {
-    default: "Daniel Reyna – Psicólogo",
-    template: "%s | Daniel Reyna – Psicólogo",
+    default: "Daniel Reyna - Psicólogo | Psicólogo en Monterrey",
+    template: "%s | Daniel Reyna - Psicólogo",
   },
   description: "Terapia cognitivo-conductual, recursos y blog de psicología.",
-  alternates: { canonical: "/" },
+  // ❌ Quitar canonical aquí para no forzar / en todas las páginas
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     type: "website",
     url: "https://danielreyna.com",
     siteName: "Daniel Reyna – Psicólogo",
+    images: [
+      { url: "/og/home.jpg", width: 1200, height: 630, alt: "Daniel Reyna – Psicólogo" },
+    ],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Daniel Reyna – Psicólogo",
+    images: ["/og/home.jpg"],
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", type: "image/x-icon" },
