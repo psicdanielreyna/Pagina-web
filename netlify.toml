@@ -1,33 +1,30 @@
 [build]
+  base = "Pagina-web"         # 👈 clave: tu Next.js está aquí
   command = "npm run build"
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "20"                      # ← antes tenías 18
+  NODE_VERSION = "20"
   NEXT_TELEMETRY_DISABLED = "1"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# --- Funciones / API
 [functions]
   node_bundler = "esbuild"
-  included_files = ["private/**"]          # ← añade esto para incluir tus PDFs
+  included_files = ["private/**"]
 
-# No-cache para endpoints de API
 [[headers]]
   for = "/api/*"
   [headers.values]
   Cache-Control = "no-store"
 
-# Redirect por slugs con acento → sin acento
 [[redirects]]
   from = "/blog/ansiedad-y-emoción"
   to = "/blog/ansiedad-y-emocion"
   status = 301
   force = true
 
-# Headers de seguridad (top-level)
 [[headers]]
   for = "/*"
   [headers.values]
@@ -36,20 +33,17 @@
   Referrer-Policy = "strict-origin-when-cross-origin"
   Permissions-Policy = "geolocation=(), microphone=(), camera=()"
 
-# Cache estático para assets de Next
 [[headers]]
   for = "/_next/static/*"
   [headers.values]
   Cache-Control = "public, max-age=31536000, immutable"
 
-# Canonical redirect si usas apex vs www
 [[redirects]]
   from = "https://www.danielreyna.com/*"
   to = "https://danielreyna.com/:splat"
   status = 301
   force = true
 
-# Evitar indexado de rutas sensibles
 [[headers]]
   for = "/descargar*"
   [headers.values]
