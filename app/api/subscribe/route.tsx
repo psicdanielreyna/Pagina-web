@@ -112,38 +112,33 @@ export async function POST(req: Request) {
     if (asBool(SEND_EMAILS)) {
       if (!FROM_EMAIL) return fail(500, "Falta FROM_EMAIL");
 
-      const base = siteBase(req);
-
-      // ✅ Link directo a la mini-guía pública (sin token)
-      const downloadLink = `${base}/downloads/mini-guia-anti-estres.pdf`;
-
-      await resend.emails.send({
-        from: FROM_EMAIL,
-        to: email,
-        subject: "¡Bienvenido! Aquí tu mini guía anti-estrés",
-        react: (
-          <WelcomeEmail
-            subject="¡Bienvenido! Aquí tu mini guía anti-estrés"
-            preheader="Descarga tu mini guía y comienza a cuidarte hoy mismo."
-            greetingName={email.split("@")[0]}
-            logoUrl={`${base}/logo-newsletter.png`}
-            heroUrl={`${base}/welcome-hero.jpg`}
-            title="Gracias por suscribirte ✨"
-            subtitle="Te he agregado a mi newsletter."
-            // (quitamos el 'válida 7 días' porque ya no hay token)
-            intro="Aquí tienes tu mini guía gratuita:"
-            cta={{ label: "Descargar mini guía (PDF)", href: downloadLink }}
-            brand="Daniel Reyna — Psicólogo"
-            socials={{
-              website: base,
-              instagram: "https://instagram.com/psic.danielreyna",
-              youtube: "https://youtube.com/@Psicdanielreyna",
-              x: "https://x.com/psicdanreyna",
-            }}
-            unsubscribeUrl={`${base}/unsubscribe`}
-          />
-        ) as React.ReactElement,
-      });
+    const base = siteBase(req);
+await resend.emails.send({
+  from: FROM_EMAIL,
+  to: email,
+  subject: "¡Bienvenido! Aquí tu mini guía anti-estrés",
+  react: (
+    <WelcomeEmail
+      subject="¡Bienvenido! Aquí tu mini guía anti-estrés"
+      preheader="Descarga tu mini guía y comienza a cuidarte hoy mismo."
+      greetingName={email.split("@")[0]}
+      logoUrl={`${base}/logo-newsletter.png`}
+      heroUrl={`${base}/welcome-hero.jpg`}
+      title="Gracias por suscribirte ✨"
+      subtitle="Te he agregado a mi newsletter."
+      intro="Aquí tienes tu mini guía gratuita:"
+      cta={{ label: "Descargar mini guía (PDF)", href: `${base}/downloads/mini-guia-anti-estres.pdf` }}
+      brand="Daniel Reyna — Psicólogo"
+      socials={{
+        website: base,
+        instagram: "https://instagram.com/psic.danielreyna",
+        youtube: "https://youtube.com/@Psicdanielreyna",
+        x: "https://x.com/psicdanreyna",
+      }}
+      unsubscribeUrl={`${base}/unsubscribe?email=${encodeURIComponent(email)}`}
+    />
+  ) as React.ReactElement,
+});
     }
 
     return ok({

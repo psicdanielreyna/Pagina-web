@@ -24,7 +24,7 @@ export interface WelcomeEmailProps {
   // pie
   brand?: string;        // “Daniel Reyna — Psicólogo”
   socials?: SocialLinks;
-  unsubscribeUrl?: string;
+  unsubscribeUrl?: string; // ej. https://danielreyna.com/unsubscribe?email=...
 }
 
 export default function WelcomeEmail({
@@ -201,7 +201,7 @@ export default function WelcomeEmail({
                           {cta.label}
                         </a>
 
-                        {/* Notita */}
+                        {/* Notita con enlace de baja */}
                         <p
                           style={{
                             margin: "18px 0 0 0",
@@ -209,8 +209,24 @@ export default function WelcomeEmail({
                             color: "#94a3b8",
                           }}
                         >
-                          PD: Si en algún momento ya no deseas recibir correos,
-                          puedes darte de baja al final del email sin problema.
+                          PD: Si en algún momento ya no deseas recibir correos,{" "}
+                          {unsubscribeUrl ? (
+                            <>
+                              puedes{" "}
+                              <a
+                                href={unsubscribeUrl}
+                                style={{
+                                  color: "#a7f3d0",
+                                  textDecoration: "underline",
+                                }}
+                              >
+                                darte de baja aquí
+                              </a>
+                              .
+                            </>
+                          ) : (
+                            "puedes darte de baja al final del email sin problema."
+                          )}
                         </p>
                       </td>
                     </tr>
@@ -290,7 +306,10 @@ export default function WelcomeEmail({
                           <div>
                             <a
                               href={unsubscribeUrl}
-                              style={{ color: "#94a3b8", textDecoration: "underline" }}
+                              style={{
+                                color: "#94a3b8",
+                                textDecoration: "underline",
+                              }}
                             >
                               Darse de baja
                             </a>
