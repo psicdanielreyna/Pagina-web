@@ -1,37 +1,27 @@
 // app/unsubscribe/page.tsx
-"use client";
+import type { Metadata } from "next";
+import { UnsubscribeForm } from "./unsubscribe-form";
 
-import { useSearchParams } from "next/navigation";
-import { useState, FormEvent } from "react";
+export const metadata: Metadata = {
+  title: "Darse de baja | Daniel Reyna – Psicólogo",
+  description:
+    "Gestiona tu suscripción y deja de recibir correos cuando quieras.",
+  alternates: { canonical: "/unsubscribe" },
+  openGraph: {
+    title: "Darse de baja del newsletter",
+    description: "Gestiona tu suscripción cuando lo necesites.",
+    url: "/unsubscribe",
+    type: "website",
+  },
+};
 
-export default function UnsubscribePage() {
-  const params = useSearchParams();
-  const initialEmail = params.get("email") || "";
-  const [email, setEmail] = useState(initialEmail);
-  const [loading, setLoading] = useState(false);
-  const [ok, setOk] = useState<string | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setOk(null);
-    setErr(null);
-
-    try {
-      const fd = new FormData();
-      fd.set("email", email);
-      const res = await fetch("/api/unsubscribe", { method: "POST", body: fd });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data?.message || "Error desconocido");
-      setOk(data.message);
-    } catch (e: any) {
-      setErr(e.message || "Ocurrió un error.");
-    } finally {
-      setLoading(false);
-    }
-  }
+export default function UnsubscribePage({
+  searchParams,
+}: {
+  searchParams: { email?: string };
+}) {
+  const initialEmail =
+    typeof searchParams?.email === "string" ? searchParams.email : "";
 
   return (
     <main className="mx-auto max-w-lg px-4 py-12 text-center">
@@ -41,27 +31,9 @@ export default function UnsubscribePage() {
         mensajes.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="tucorreo@ejemplo.com"
-          className="w-full rounded-md border px-3 py-2"
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-red-600 px-4 py-2 font-semibold text-white hover:opacity-90 disabled:opacity-60"
-        >
-          {loading ? "Procesando..." : "Confirmar baja"}
-        </button>
-
-        {ok && <p className="text-emerald-600 text-sm">{ok}</p>}
-        {err && <p className="text-red-600 text-sm">{err}</p>}
-      </form>
+      <div className="mt-6">
+        <UnsubscribeForm initialEmail={initialEmail} />
+      </div>
 
       <p className="mt-6 text-xs text-muted-foreground">
         Si cambias de opinión, puedes volver a{" "}
