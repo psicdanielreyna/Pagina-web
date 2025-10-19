@@ -13,7 +13,6 @@ export function UnsubscribeForm({ initialEmail = "" }: { initialEmail?: string }
     setLoading(true);
     setOk(null);
     setErr(null);
-
     try {
       const fd = new FormData();
       fd.set("email", email.trim().toLowerCase());
