@@ -30,7 +30,7 @@ export default function HomePage() {
         Agendar sesión
       </Link>
       <Link 
-        href="/recursos" 
+        href="/tienda" 
         className="border border-emerald-700 text-emerald-700 hover:bg-emerald-50 px-5 py-2.5 rounded-md text-sm font-medium transition-colors"
       >
         Ver recursos
