@@ -58,6 +58,7 @@ export default function Footer() {
             <li><Link href="/servicios">Servicios</Link></li>
             <li><Link href="/sobre-mi">Sobre mí</Link></li>
             <li><Link href="/contacto">Contacto</Link></li>
+            <li><Link href="/faq">Preguntas frecuentes</Link></li>
           </ul>
         </div>
 
