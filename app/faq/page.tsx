@@ -93,25 +93,27 @@ export default function FAQPage() {
         </p>
       </header>
 
-      <section className="space-y-3">
-        {faqs.map((item) => (
-          <details
-            key={item.q}
-            className="group rounded-lg border bg-background p-4 open:shadow-sm transition-all"
-          >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-              <h2 className="text-base font-semibold">{item.q}</h2>
-              <span
-                aria-hidden
-                className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-md border text-sm transition group-open:rotate-180"
-              >
-                ▾
-              </span>
-            </summary>
-            <div className="mt-3 text-sm text-muted-foreground">{item.a}</div>
-          </details>
-        ))}
-      </section>
+     <section className="space-y-4">
+  {faqs.map((item) => (
+    <details
+      key={item.q}
+      className="group mx-auto w-full rounded-lg border border-emerald-200 bg-emerald-50/70 p-5 text-center shadow-sm transition-all hover:shadow-md open:bg-emerald-100"
+    >
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-emerald-900">
+        <h2 className="mx-auto text-base font-semibold text-emerald-900">
+          {item.q}
+        </h2>
+        <span
+          aria-hidden
+          className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-emerald-300 bg-white text-sm text-emerald-700 transition-transform group-open:rotate-180"
+        >
+          ▾
+        </span>
+      </summary>
+      <div className="mt-3 text-sm text-emerald-900/90">{item.a}</div>
+    </details>
+  ))}
+</section>
 
       <aside className="mt-10 rounded-lg border p-5">
         <h3 className="text-base font-semibold">¿No encontraste lo que buscabas?</h3>
