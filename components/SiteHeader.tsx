@@ -45,6 +45,11 @@ export default function SiteHeader() {
                 <li><SheetClose asChild><Link href="/servicios" className="block rounded-md px-2 py-2 hover:bg-gray-100">Servicios</Link></SheetClose></li>
                 <li><SheetClose asChild><Link href="/talleres" className="block rounded-md px-2 py-2 hover:bg-gray-100">Talleres</Link></SheetClose></li>
                 <li><SheetClose asChild><Link href="/sobre-mi" className="block rounded-md px-2 py-2 hover:bg-gray-100">Sobre mí</Link></SheetClose></li>
+
+                {/* ➕ añadidos */}
+                <li><SheetClose asChild><Link href="/newsletter" className="block rounded-md px-2 py-2 hover:bg-gray-100">Newsletter</Link></SheetClose></li>
+                <li><SheetClose asChild><Link href="/faq" className="block rounded-md px-2 py-2 hover:bg-gray-100">Preguntas frecuentes</Link></SheetClose></li>
+
                 <li><SheetClose asChild><Link href="/contacto" className="block rounded-md px-2 py-2 hover:bg-gray-100">Contacto</Link></SheetClose></li>
               </ul>
             </nav>
