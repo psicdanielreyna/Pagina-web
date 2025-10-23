@@ -52,7 +52,7 @@ export default function HomePage() {
         {/* Columna derecha: imagen */}
         <div className="md:col-span-6 flex justify-center md:justify-end">
           <Image
-            src="/images/hero/herodos.jpg"  // <- revisa: antes tenías .jpg.jpg
+            src="/images/hero/herodos.jpg.jpg"  // <- revisa: antes tenías .jpg.jpg
             alt="Daniel Reyna – Psicólogo"
             width={520}
             height={380}
