@@ -5,6 +5,7 @@ import RecursosDestacados from "@/components/recursosdestacados";
 import LatestBlog from "@/components/LatestBlog";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Separator from "@/components/ui/Separator";
+import Opiniones from "@/components/Opiniones";
 
 export default function HomePage() {
   return (
@@ -71,6 +72,18 @@ export default function HomePage() {
           <RecursosDestacados />
         </div>
       </section>
+
+      {/* SEPARADOR */}
+      <Separator className="my-8 md:my-10" />
+
+      {/* Opiniones (mix terapia + ebooks) */}
+        <Opiniones
+          title="Opiniones"
+          subtitle="Resultados reales con enfoque claro y práctico"
+          variant="all"
+          limit={6}
+        />
+
 
       {/* SEPARADOR */}
       <Separator className="my-8 md:my-10" />
