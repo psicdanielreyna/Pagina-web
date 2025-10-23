@@ -1,4 +1,6 @@
 // components/Opiniones.tsx
+"use client";
+
 import Stars from "@/components/ui/Stars";
 import { opiniones as allOpiniones, Opinion } from "@/lib/opiniones";
 import { Fragment, useMemo } from "react";

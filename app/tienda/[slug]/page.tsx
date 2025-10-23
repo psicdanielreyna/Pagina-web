@@ -2,9 +2,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import CopyButton from "@/components/CopyButton";
-import Opiniones from "@/components/Opiniones";
 import { getManual } from "@/data/manuals";
+import dynamic from "next/dynamic";
+const CopyButton = dynamic(() => import("@/components/CopyButton"), { ssr: false });
+const Opiniones = dynamic(() => import("@/components/Opiniones"), { ssr: false });
 
 const BANK_NAME   = process.env.NEXT_PUBLIC_BANK_NAME   || "Hey Banco (BANREGIO)";
 const BANK_HOLDER = process.env.NEXT_PUBLIC_BANK_HOLDER || "DANIEL OSVALDO GONZÁLEZ REYNA";
