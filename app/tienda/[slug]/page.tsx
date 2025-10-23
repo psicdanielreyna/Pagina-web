@@ -36,7 +36,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       openGraph: {
         title,
         description,
-        type: "product",
+        // type: "product",  // ❌
+        type: "website",    // ✅ compatible con Next 14
         url: `/tienda/${viewSlug}`,
       },
     };
@@ -56,8 +57,6 @@ export default function ProductoPage({ params }: { params: { slug: string } }) {
   const manual = getManual(params.slug);
   if (!manual) return notFound();
 
-  // Usa la portada según lo que venga en la URL (alias o real);
-  // si no existe, cae a la del slug real; si no, al fallback.
   const viewSlug = params.slug;
   const cover =
     COVERS[viewSlug] ??
@@ -73,7 +72,7 @@ export default function ProductoPage({ params }: { params: { slug: string } }) {
   const WHATSAPP    = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "5218117649180";
 
   const paypalHref  = `https://paypal.me/${PAYPAL_ME}/${manual.price}`;
-  const concepto    = resolveManualSlug(viewSlug); // concepto consistente con el slug real
+  const concepto    = resolveManualSlug(viewSlug);
   const whatsappHref = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
     `Hola, te comparto mi comprobante del manual "${manual.title}".`
   )}`;
