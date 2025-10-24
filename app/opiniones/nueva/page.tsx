@@ -13,24 +13,24 @@ export default function NuevaOpinionPage() {
         Gracias por compartir tu experiencia. Publicaremos solo iniciales y el texto, tras una breve revisión.
       </p>
 
-      {/* Netlify Forms */}
+      {/* Formspree */}
       <form
-        name="opiniones"
         method="POST"
-        data-netlify="true"
-        netlify-honeypot="bot-field"
-        action="/opiniones/gracias"
+        action="https://formspree.io/f/mblznpjl"
         className="mt-8 space-y-5"
       >
-        {/* Necesario para Netlify Forms */}
-        <input type="hidden" name="form-name" value="opiniones" />
-        {/* Honeypot */}
-        <input type="text" name="bot-field" className="hidden" aria-hidden="true" />
+        {/* redirige a la página de gracias al terminar */}
+        <input type="hidden" name="_redirect" value="/opiniones/gracias" />
+        {/* honeypot anti-spam */}
+        <input type="text" name="_gotcha" className="hidden" aria-hidden="true" />
 
         <div>
           <label className="block text-sm font-medium">Iniciales (ej. A. C.)</label>
-          <input name="initials" required
-                 className="mt-1 w-full rounded-md border px-3 py-2" />
+          <input
+            name="initials"
+            required
+            className="mt-1 w-full rounded-md border px-3 py-2"
+          />
         </div>
 
         <div>
@@ -63,8 +63,12 @@ export default function NuevaOpinionPage() {
 
         <div>
           <label className="block text-sm font-medium">Tu opinión</label>
-          <textarea name="text" required rows={5}
-                    className="mt-1 w-full rounded-md border px-3 py-2" />
+          <textarea
+            name="text"
+            required
+            rows={5}
+            className="mt-1 w-full rounded-md border px-3 py-2"
+          />
         </div>
 
         <div className="flex items-start gap-2">
@@ -74,11 +78,10 @@ export default function NuevaOpinionPage() {
           </label>
         </div>
 
-        {/* reCAPTCHA opcional: habilitar en Netlify → Forms */}
-        {/* <div data-netlify-recaptcha="true"></div> */}
-
-        <button type="submit"
-                className="rounded-md bg-emerald-700 px-5 py-2.5 text-white font-medium hover:bg-emerald-800">
+        <button
+          type="submit"
+          className="rounded-md bg-emerald-700 px-5 py-2.5 text-white font-medium hover:bg-emerald-800"
+        >
           Enviar
         </button>
       </form>
