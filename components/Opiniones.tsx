@@ -2,8 +2,9 @@
 "use client";
 
 import Stars from "@/components/ui/Stars";
-import { opiniones as allOpiniones, Opinion } from "@/lib/opiniones";
-import { Fragment, useMemo } from "react";
+// ⬇️ ahora leemos de data/ en lugar de lib/
+import { opiniones as allOpiniones, Opinion } from "@/data/opiniones";
+import { useMemo } from "react";
 
 type Props = {
   title?: string;
@@ -35,7 +36,9 @@ export default function Opiniones({
     if (variant === "therapy") {
       arr = arr.filter((o) => o.type === "therapy");
     } else if (typeof variant === "object" && "ebookSlug" in variant) {
-      arr = arr.filter((o) => o.type === "ebook" && o.productSlug === variant.ebookSlug);
+      arr = arr.filter(
+        (o) => o.type === "ebook" && o.ebookSlug === variant.ebookSlug
+      );
     }
     // más recientes primero
     arr = [...arr].sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -50,7 +53,8 @@ export default function Opiniones({
   // JSON-LD para SEO
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product", // o "Service" para terapia, puedes parametrizarlo si quieres
+    "@type":
+      typeof variant === "object" ? "Product" : variant === "therapy" ? "Service" : "WebPage",
     name:
       typeof variant === "object"
         ? `Ebook: ${variant.ebookSlug}`
@@ -67,7 +71,7 @@ export default function Opiniones({
     review: opiniones.map((o) => ({
       "@type": "Review",
       reviewRating: { "@type": "Rating", ratingValue: o.rating, bestRating: 5 },
-      reviewBody: o.comment,
+      reviewBody: o.text, // ⬅️ antes: comment
       author: { "@type": "Person", name: o.initials },
       datePublished: o.date,
     })),
@@ -76,10 +80,10 @@ export default function Opiniones({
   return (
     <section className="bg-[#F3EBDD] py-12 md:py-14">
       {/* JSON-LD */}
-        <script
+      <script
         type="application/ld+json"
-         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container mx-auto max-w-6xl px-4">
         <header className="mb-6 text-center">
           <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-emerald-900">
@@ -99,9 +103,9 @@ export default function Opiniones({
           </p>
         ) : (
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {opiniones.map((op) => (
+            {opiniones.map((op, i) => (
               <li
-                key={op.id}
+                key={`${op.initials}-${op.date}-${i}`} // ⬅️ antes usabas op.id
                 className="rounded-xl border border-emerald-900/10 bg-white p-4 shadow-sm"
               >
                 <div className="flex items-center justify-between">
@@ -115,8 +119,8 @@ export default function Opiniones({
                   </div>
                   <Stars value={op.rating} />
                 </div>
-                <p className="mt-3 text-sm text-emerald-900/90">{op.comment}</p>
-                {op.type === "ebook" && op.productSlug && (
+                <p className="mt-3 text-sm text-emerald-900/90">{op.text}</p>
+                {op.type === "ebook" && op.ebookSlug && (
                   <div className="mt-3">
                     <span className="inline-block rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-900/80">
                       Ebook
