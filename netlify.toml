@@ -10,10 +10,8 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# (lo demás igual que ya lo tienes)
-
-
 [functions]
+  directory = "netlify/functions"   # 👈 NUEVO: carpeta de functions
   node_bundler = "esbuild"
   included_files = ["private/**"]
 
