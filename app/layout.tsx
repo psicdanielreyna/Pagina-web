@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
+import Analytics from "@/app/analytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://danielreyna.com"),
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body>
+        <Analytics />
         <SiteHeader />
         <main className="min-h-[60vh]">{children}</main>
         <Footer />
