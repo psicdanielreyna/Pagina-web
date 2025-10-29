@@ -9,7 +9,6 @@ export const metadata = {
 };
 
 function Inner() {
-  // Si llega con query ?t=individual|paquete|pareja, solo mostramos el embed normal igualmente
   return (
     <section className="py-16 md:py-20">
       <div className="container">
@@ -29,6 +28,11 @@ function Inner() {
               title="Calendly Daniel Reyna"
               src="https://calendly.com/psic-danielreyna/espacios-disponibles"
               className="w-full h-[900px] rounded-2xl"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allow="clipboard-write; fullscreen"
+              frameBorder={0}
+              scrolling="yes"
             />
           </div>
 
@@ -45,7 +49,7 @@ function Inner() {
 
 export default function AgendaPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<p className="text-center py-10">Cargando agenda…</p>}>
       <Inner />
     </Suspense>
   );

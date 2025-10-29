@@ -1,16 +1,21 @@
 // app/checkout/[slug]/page.tsx
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { getManualAny, manualSlugsForBuild } from "@/data/manuals";
-import CopyButton from "@/components/CopyButton";
-import WhatsAppButton from "./WhatsAppButton";
 
-const BANK_NAME   = process.env.NEXT_PUBLIC_BANK_NAME!;
-const BANK_HOLDER = process.env.NEXT_PUBLIC_BANK_HOLDER!;
-const BANK_CLABE  = process.env.NEXT_PUBLIC_BANK_CLABE!;
-const PAYPAL_ME   = process.env.NEXT_PUBLIC_PAYPAL_ME!;
+// ✅ Componentes cliente como dynamic (evita CSR bailout en SSG)
+const CopyButton = dynamic(() => import("@/components/CopyButton"), { ssr: false, loading: () => null });
+const WhatsAppButton = dynamic(() => import("./WhatsAppButton"), { ssr: false, loading: () => null });
 
-export default function Page({ params }: { params: { slug: string } }) {
-  const manual = getManualAny(params.slug);
+// ✅ Fallbacks seguros para build
+const BANK_NAME   = process.env.NEXT_PUBLIC_BANK_NAME   || "Hey Banco (BANREGIO)";
+const BANK_HOLDER = process.env.NEXT_PUBLIC_BANK_HOLDER || "DANIEL OSVALDO GONZÁLEZ REYNA";
+const BANK_CLABE  = process.env.NEXT_PUBLIC_BANK_CLABE  || "058597000028423030";
+const PAYPAL_ME   = process.env.NEXT_PUBLIC_PAYPAL_ME   || "dangzzreyna";
+
+function Inner({ slug }: { slug: string }) {
+  const manual = getManualAny(slug);
   if (!manual) return notFound();
 
   const concepto = manual.slug;
@@ -21,7 +26,9 @@ export default function Page({ params }: { params: { slug: string } }) {
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
           {manual.title}
         </h1>
-        <p className="mt-2 text-slate-600">{manual.description}</p>
+        {manual.description && (
+          <p className="mt-2 text-slate-600">{manual.description}</p>
+        )}
 
         <div className="mt-8 rounded-2xl border border-slate-100 bg-white p-6">
           <dl className="grid gap-3">
@@ -58,6 +65,7 @@ export default function Page({ params }: { params: { slug: string } }) {
               <a
                 href={`https://paypal.me/${PAYPAL_ME}/${manual.price}`}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-full px-6 py-3 bg-yellow-400 text-black hover:bg-yellow-500"
               >
                 Pagar con PayPal
@@ -76,7 +84,15 @@ export default function Page({ params }: { params: { slug: string } }) {
   );
 }
 
-/** ← Esto asegura que /checkout/* exista en el build (incluye alias) */
+export default function Page({ params }: { params: { slug: string } }) {
+  return (
+    <Suspense fallback={<div className="py-16 text-center text-sm text-zinc-600">Cargando…</div>}>
+      <Inner slug={params.slug} />
+    </Suspense>
+  );
+}
+
+/** ← Asegura que /checkout/* exista en el build (incluye alias) */
 export function generateStaticParams() {
   return manualSlugsForBuild().map((slug) => ({ slug }));
 }

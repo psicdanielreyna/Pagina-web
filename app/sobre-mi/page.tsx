@@ -1,5 +1,6 @@
 // app/sobre-mi/page.tsx
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import HeroAbout from "@/components/ui/HeroAbout";
 import Link from "next/link";
 
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
     "Psicólogo clínico cognitivo-conductual. Acompaño a adolescentes y adultos en México con enfoque claro y práctico.",
 };
 
-export default function SobreMiPage() {
+function Inner() {
   return (
     <main>
       <HeroAbout
@@ -89,5 +90,13 @@ export default function SobreMiPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function SobreMiPage() {
+  return (
+    <Suspense fallback={<div className="py-16 text-center text-sm text-zinc-600">Cargando…</div>}>
+      <Inner />
+    </Suspense>
   );
 }

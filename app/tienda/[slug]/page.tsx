@@ -3,12 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import { getManual, resolveManualSlug, manualSlugsForBuild } from "@/data/manuals";
 
 const CopyButton = dynamic(() => import("@/components/CopyButton"), { ssr: false });
-const Opiniones  = dynamic(() => import("@/components/Opiniones"), { ssr: false });
+const Opiniones  = dynamic(() => import("@/components/Opiniones"), { ssr: false, loading: () => null });
 
-export const dynamicParams = true; // acepta rutas no listadas
+export const dynamicParams = true;
 
 // ✅ Pre-genera slugs reales y alias
 export function generateStaticParams() {
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         robots: { index: false },
       };
     }
-    const viewSlug = params.slug; // podría ser alias
+    const viewSlug = params.slug;
     const title = `${manual.title} · Ebook | Daniel Reyna`;
     const description = manual.description ?? `Ebook de ${manual.title} por Daniel Reyna.`;
     return {
@@ -36,8 +37,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       openGraph: {
         title,
         description,
-        // type: "product",  // ❌
-        type: "website",    // ✅ compatible con Next 14
+        type: "website",
         url: `/tienda/${viewSlug}`,
       },
     };
@@ -53,11 +53,11 @@ const COVERS: Record<string, { src: string; alt: string }> = {
   "el-arte-de-creer-en-ti":     { src: "/images/tienda/el-arte-de-creer-en-ti.png", alt: "Portada «El Arte de Creer en Ti»" },
 };
 
-export default function ProductoPage({ params }: { params: { slug: string } }) {
-  const manual = getManual(params.slug);
+function Inner({ slug }: { slug: string }) {
+  const manual = getManual(slug);
   if (!manual) return notFound();
 
-  const viewSlug = params.slug;
+  const viewSlug = slug;
   const cover =
     COVERS[viewSlug] ??
     COVERS[resolveManualSlug(viewSlug)] ?? {
@@ -159,5 +159,13 @@ export default function ProductoPage({ params }: { params: { slug: string } }) {
         </div>
       </section>
     </>
+  );
+}
+
+export default function ProductoPage({ params }: { params: { slug: string } }) {
+  return (
+    <Suspense fallback={<div className="py-16 text-center text-sm text-zinc-600">Cargando…</div>}>
+      <Inner slug={params.slug} />
+    </Suspense>
   );
 }

@@ -1,5 +1,6 @@
 // app/talleres/page.tsx
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import HeroBanner from "@/components/HeroBanner";
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/talleres" },
 };
 
-export default function TalleresPage() {
+function Inner() {
   return (
     <main>
       <HeroBanner
@@ -68,5 +69,13 @@ export default function TalleresPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function TalleresPage() {
+  return (
+    <Suspense fallback={<div className="py-16 text-center text-sm text-neutral-600">Cargando…</div>}>
+      <Inner />
+    </Suspense>
   );
 }

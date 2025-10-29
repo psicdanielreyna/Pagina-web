@@ -1,8 +1,15 @@
 // app/blog/[slug]/page.tsx
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { getAllSlugs, getPostBySlug } from "@/lib/posts";
-import PostView from "@/components/PostView";
+
+// ✅ Carga cliente para evitar CSR bailout si dentro hay hooks de cliente
+const PostView = dynamic(() => import("@/components/PostView"), {
+  ssr: false,
+  loading: () => null,
+});
 
 type Props = { params: { slug: string } };
 
@@ -19,10 +26,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const title =
       meta.title || "Artículo de psicología";
     const description =
-      meta.excerpt ||
-      "Ansiedad, duelo, autoestima y terapia cognitivo-conductual.";
+      meta.excerpt || "Ansiedad, duelo, autoestima y terapia cognitivo-conductual.";
 
-    // Si usas cover como OG (opcional)
+    // Fallback OG por si no hay cover
     const ogImage = meta.cover ?? `/og/blog/${meta.slug}.jpg`;
 
     return {
@@ -42,19 +48,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
         images: [ogImage],
       },
-      // Si en el futuro añades noindex/nofollow al frontmatter, lo mapearíamos aquí
-      // robots: { index: !meta.noindex, follow: !meta.nofollow },
     };
   } catch {
     return {};
   }
 }
 
-export default function BlogPostPage({ params }: Props) {
+function Inner({ slug }: { slug: string }) {
   try {
-    const { meta, content } = getPostBySlug(params.slug);
+    const { meta, content } = getPostBySlug(slug);
     return <PostView meta={meta} content={content} />;
   } catch {
     return notFound();
   }
+}
+
+export default function BlogPostPage({ params }: Props) {
+  return (
+    <Suspense fallback={<div className="py-16 text-center text-sm text-zinc-600">Cargando…</div>}>
+      <Inner slug={params.slug} />
+    </Suspense>
+  );
 }

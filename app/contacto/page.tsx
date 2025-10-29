@@ -1,4 +1,6 @@
+// app/contacto/page.tsx
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import HeroBanner from "@/components/HeroBanner";
 import ContactForm from "@/components/contact/ContactForm";
 
@@ -54,7 +56,9 @@ export default function ContactoPage() {
             <p className="mb-6 text-sm text-gray-600">
               Completa tus datos y se abrirá tu correo con el mensaje listo para enviar.
             </p>
-            <ContactForm />
+            <Suspense fallback={<p className="text-sm text-gray-600">Cargando formulario…</p>}>
+              <ContactForm />
+            </Suspense>
           </div>
 
           {/* Datos / FAQ */}
@@ -76,10 +80,7 @@ export default function ContactoPage() {
                   línea y presencial.
                 </li>
                 <li className="flex gap-3">
-                  <a
-                    className="text-green-800 hover:underline"
-                    href="/servicios"
-                  >
+                  <a className="text-green-800 hover:underline" href="/servicios">
                     Ver servicios
                   </a>
                   <span>·</span>

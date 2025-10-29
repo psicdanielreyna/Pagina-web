@@ -1,18 +1,34 @@
 // app/newsletter/page.tsx
 import Image from "next/image";
 import type { Metadata } from "next";
-import { SubscribeForm } from "./subscribe-form"; // importamos el client componentr
+import { SubscribeForm } from "./subscribe-form"; // componente cliente
+
 export const metadata: Metadata = {
   title: "Newsletter | Daniel Reyna – Psicólogo",
   description:
-    "Únete a mi newsletter y recibe ideas y recursos prácticos sobre ansiedad, estrés, autoestima y más.",
+    "Únete a mi newsletter y recibe ideas y recursos prácticas sobre ansiedad, estrés, autoestima y bienestar emocional.",
   alternates: { canonical: "/newsletter" },
   openGraph: {
     title: "Newsletter de Daniel Reyna",
     description:
-      "Ideas y recursos prácticos sobre salud mental. Suscríbete gratis.",
-    url: "/newsletter",
+      "Recibe ideas breves, prácticas y recursos sobre bienestar mental. Suscríbete gratis.",
+    url: "https://danielreyna.com/newsletter",
     type: "website",
+    images: [
+      {
+        url: "/newsletter/hero.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Newsletter de Daniel Reyna",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Newsletter de Daniel Reyna",
+    description:
+      "Recibe ideas prácticas sobre salud mental y bienestar. Suscríbete gratis.",
+    images: ["/newsletter/hero.jpg"],
   },
 };
 
@@ -20,18 +36,18 @@ export default function NewsletterPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <div className="grid items-stretch gap-8 rounded-xl border bg-background p-4 shadow-sm md:grid-cols-2 md:p-6">
-        {/* Foto (izquierda) */}
+        {/* Imagen lateral */}
         <div className="relative aspect-[4/5] overflow-hidden rounded-lg md:aspect-auto md:h-[560px]">
           <Image
-            src="/newsletter/hero.jpg" // coloca la imagen en public/newsletter/hero.jpg
-            alt="Daniel Reyna en exterior"
+            src="/newsletter/hero.jpg"
+            alt="Daniel Reyna escribiendo newsletter"
             fill
             className="object-cover"
             priority
           />
         </div>
 
-        {/* Formulario (derecha) */}
+        {/* Formulario */}
         <div className="flex w-full flex-col justify-center p-1 md:p-6">
           <header className="mb-6">
             <p className="text-sm text-muted-foreground">El newsletter de</p>
@@ -40,7 +56,8 @@ export default function NewsletterPage() {
             </h1>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
               Únete y recibe <strong>ideas breves y accionables</strong> sobre
-              ansiedad, estrés y bienestar, además de recursos descargables.
+              ansiedad, estrés y bienestar, además de recursos descargables y
+              reflexiones exclusivas.
             </p>
           </header>
 
@@ -48,7 +65,10 @@ export default function NewsletterPage() {
 
           <p className="mt-4 text-xs text-muted-foreground">
             Puedes darte de baja cuando quieras. Al suscribirte aceptas la{" "}
-            <a className="underline hover:no-underline" href="/legal#privacidad">
+            <a
+              className="underline hover:no-underline"
+              href="/legal#privacidad"
+            >
               política de privacidad
             </a>
             .

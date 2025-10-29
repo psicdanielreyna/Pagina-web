@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   description:
     "Gestiona tu suscripción y deja de recibir correos cuando quieras.",
   alternates: { canonical: "/unsubscribe" },
+  robots: { index: false, follow: false },
   openGraph: {
     title: "Darse de baja del newsletter",
     description: "Gestiona tu suscripción cuando lo necesites.",
@@ -25,10 +26,9 @@ export default function UnsubscribePage({
 
   return (
     <main className="mx-auto max-w-lg px-4 py-12 text-center">
-      <h1 className="text-3xl font-extrabold">Darse de baja</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight">Darse de baja</h1>
       <p className="mt-2 text-muted-foreground">
-        Lamentamos verte partir 😔. Ingresa tu correo para dejar de recibir
-        mensajes.
+        Lamentamos verte partir 😔. Ingresa tu correo para dejar de recibir mensajes.
       </p>
 
       <div className="mt-6">
@@ -37,10 +37,7 @@ export default function UnsubscribePage({
 
       <p className="mt-6 text-xs text-muted-foreground">
         Si cambias de opinión, puedes volver a{" "}
-        <a href="/newsletter" className="underline">
-          suscribirte aquí
-        </a>
-        .
+        <a href="/newsletter" className="underline">suscribirte aquí</a>.
       </p>
     </main>
   );
