@@ -14,11 +14,13 @@ export type PostMeta = {
   cover?: string | null;
   excerpt?: string;
   tags?: string[];
-  // NEW
+  // SEO opcional
   seoTitle?: string;
   seoDescription?: string;
   noindex?: boolean;
   nofollow?: boolean;
+  // NUEVO
+  draft?: boolean;
 };
 
 /* ----------------------------- helpers ----------------------------- */
@@ -71,6 +73,13 @@ function sortByDateDesc(a?: string, b?: string) {
   return sb - sa; // más reciente primero
 }
 
+// ¿está publicado? (no draft y fecha no futura)
+function isPublished(meta: PostMeta) {
+  if (meta?.draft) return false;
+  if (!meta?.date) return true;
+  return new Date(meta.date) <= new Date();
+}
+
 /* ------------------------------ core ------------------------------- */
 
 export function getAllPostsMeta(): PostMeta[] {
@@ -96,6 +105,13 @@ export function getAllPostsMeta(): PostMeta[] {
       tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
       // description (Decap) → excerpt; fallback al body
       excerpt: toPlainExcerpt(data?.excerpt ?? data?.description ?? content),
+      // NUEVO: estado de borrador
+      draft: Boolean(data?.draft),
+      // Si quieres mapear SEO opcional, lee y pasa en el meta:
+      seoTitle: data?.seoTitle ?? undefined,
+      seoDescription: data?.seoDescription ?? undefined,
+      noindex: typeof data?.noindex === "boolean" ? data.noindex : undefined,
+      nofollow: typeof data?.nofollow === "boolean" ? data.nofollow : undefined,
     };
   });
 
@@ -105,6 +121,14 @@ export function getAllPostsMeta(): PostMeta[] {
 
 export function getAllSlugs(): string[] {
   return getAllPostsMeta().map((p) => p.slug);
+}
+
+export function getPublishedPosts(): PostMeta[] {
+  return getAllPostsMeta().filter((p) => isPublished(p));
+}
+
+export function getPublishedSlugs(): string[] {
+  return getPublishedPosts().map((p) => p.slug);
 }
 
 export function getPostBySlug(slug: string): { meta: PostMeta; content: string } {
@@ -129,6 +153,11 @@ export function getPostBySlug(slug: string): { meta: PostMeta; content: string }
         cover: normalizeAsset(data?.cover ?? data?.image) ?? null,
         tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
         excerpt: toPlainExcerpt(data?.excerpt ?? data?.description ?? content),
+        draft: Boolean(data?.draft),
+        seoTitle: data?.seoTitle ?? undefined,
+        seoDescription: data?.seoDescription ?? undefined,
+        noindex: typeof data?.noindex === "boolean" ? data.noindex : undefined,
+        nofollow: typeof data?.nofollow === "boolean" ? data.nofollow : undefined,
       };
 
       return { meta, content };
@@ -150,6 +179,11 @@ export function getPostBySlug(slug: string): { meta: PostMeta; content: string }
         cover: normalizeAsset(data?.cover ?? data?.image) ?? null,
         tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
         excerpt: toPlainExcerpt(data?.excerpt ?? data?.description ?? content),
+        draft: Boolean(data?.draft),
+        seoTitle: data?.seoTitle ?? undefined,
+        seoDescription: data?.seoDescription ?? undefined,
+        noindex: typeof data?.noindex === "boolean" ? data.noindex : undefined,
+        nofollow: typeof data?.nofollow === "boolean" ? data.nofollow : undefined,
       };
       return { meta, content };
     }

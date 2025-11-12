@@ -1,14 +1,15 @@
 // components/LatestBlog.tsx
 import Link from "next/link";
-import { getAllPostsMeta } from "@/lib/posts";
+import { getPublishedPosts } from "@/lib/posts";
+
+export const revalidate = 1800; // 30min
 
 export default async function LatestBlog() {
-  const posts = await getAllPostsMeta();
+  const posts = await getPublishedPosts();
   if (!posts || posts.length === 0) return null;
 
   const [featured, ...rest] = posts;
   const others = rest.slice(0, 3);
-
   const coverFeatured = featured.cover ?? undefined;
 
   return (

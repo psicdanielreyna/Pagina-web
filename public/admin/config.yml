@@ -1,34 +1,40 @@
 backend:
   name: github
-  repo: psicdanielreyna/Pagina-web           # ← cambia esto
+  repo: psicdanielreyna/Pagina-web
   branch: main
 
-# Opcional para editar local sin tocar Git remoto:
+# Si quieres probar en local sin tocar Git:
 # local_backend: true
 
-media_folder: "public/uploads"         # dónde guarda los archivos en el repo
-public_folder: "/uploads"              # cómo se referencian en el sitio
+media_folder: "public/uploads"   # dónde guarda archivos en el repo
+public_folder: "/uploads"        # cómo se referencian en el sitio
 
-publish_mode: simple                   # "simple" = publica directo a main
-# publish_mode: editorial_workflow     # usa Draft/Review/Publish (si lo prefieres)
+# Activa Draft → Review → Publish
+publish_mode: editorial_workflow
+# (si prefieres publicar directo a main, usa: publish_mode: simple)
 
 collections:
   - name: "blog"
     label: "Blog"
     folder: "content/blog"
     create: true
-    extension: "mdx"                   # tus helpers soportan .md y .mdx
+    extension: "mdx"
     format: "frontmatter"
     slug: "{{slug}}"
 
     fields:
       - { label: "Título", name: "title", widget: "string" }
       - { label: "Slug (opcional)", name: "slug", widget: "string", required: false, hint: "Si lo dejas vacío, se usa el filename" }
+
+      # Fecha editable (sirve para programar). Sin hora.
       - { label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD", dateFormat: "YYYY-MM-DD", timeFormat: false }
+
+      # Se mapea a 'cover' en tu sitio
       - { label: "Imagen (OG/cover)", name: "image", widget: "image", required: false, hint: "Se mapea a cover en el sitio" }
+
       - { label: "Extracto", name: "excerpt", widget: "text", required: false, hint: "Si se omite, se genera automático del contenido" }
 
-      # SEO opcional (tu lib puede mapearlos si agregas los campos sugeridos)
+      # SEO opcional
       - { label: "SEO Title", name: "seoTitle", widget: "string", required: false }
       - { label: "SEO Description", name: "seoDescription", widget: "text", required: false }
       - { label: "No index", name: "noindex", widget: "boolean", required: false, default: false }
@@ -40,8 +46,3 @@ collections:
         name: "body"
         widget: "markdown"
         hint: "Acepta MDX"
-
-# Opcional: previsualizaciones
-# load_config_file: false
-# editor:
-#   preview: true

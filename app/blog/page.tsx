@@ -1,7 +1,9 @@
 // app/blog/page.tsx
 import HeroBanner from "@/components/HeroBanner";
-import { getAllPostsMeta } from "@/lib/posts";
+import { getPublishedPosts } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
+
+export const revalidate = 1800; // 30min
 
 export const metadata = {
   title: "Blog",
@@ -15,7 +17,7 @@ export default async function BlogPage({ searchParams }: { searchParams?: BlogSe
   const page = Number(searchParams?.page ?? 1);
   const PAGE_SIZE = 10;
 
-  const posts = (await getAllPostsMeta()).filter((p) => {
+  const posts = (await getPublishedPosts()).filter((p) => {
     if (!q) return true;
     const byTitle = (p.title ?? "").toLowerCase().includes(q);
     const byTags = ((p.tags ?? []).join(" ").toLowerCase()).includes(q);
@@ -32,7 +34,7 @@ export default async function BlogPage({ searchParams }: { searchParams?: BlogSe
         badge="Blog"
         title="Blog de Psicología"
         subtitle="Psicología aplicada a tu vida, en un solo lugar."
-        imageUrl="/hero-blog.jpg" // cámbiala si usas otra ruta en /public
+        imageUrl="/hero-blog.jpg"
       />
 
       {/* Bloque descriptivo bajo el hero */}
