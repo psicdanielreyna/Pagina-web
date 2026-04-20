@@ -1,8 +1,7 @@
-// components/LatestBlog.tsx
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/posts";
 
-export const revalidate = 1800; // 30min
+export const revalidate = 1800;
 
 export default async function LatestBlog() {
   const posts = await getPublishedPosts();
@@ -10,76 +9,64 @@ export default async function LatestBlog() {
 
   const [featured, ...rest] = posts;
   const others = rest.slice(0, 3);
-  const coverFeatured = featured.cover ?? undefined;
 
   return (
-    <section className="container mx-auto max-w-6xl px-4 md:px-6 mt-12">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Destacado */}
-        <article className="md:col-span-2 rounded-2xl bg-white/60 shadow-sm ring-1 ring-black/5 p-4 md:p-6">
-          <Link href={`/blog/${featured.slug}`} className="block group">
-            {coverFeatured && (
-              <img
-                src={coverFeatured}
-                alt={featured.title}
-                className="w-full h-64 md:h-80 object-cover rounded-xl"
-                loading="lazy"
-              />
-            )}
-            <h3 className="mt-4 text-2xl md:text-3xl font-extrabold text-evergreen group-hover:underline">
-              {featured.title}
-            </h3>
-            {featured.date ? (
-              <p className="mt-1 text-sm text-gray-600">
+    <section className="mx-auto max-w-6xl px-4 md:px-6">
+      {/* Artículo destacado */}
+      <Link href={`/blog/${featured.slug}`} className="block group mb-4">
+        <div className="rounded-2xl bg-emerald-700 p-6 md:p-8 grid md:grid-cols-[1fr_auto] gap-6 items-center">
+          <div>
+            {featured.date && (
+              <p className="text-xs font-medium text-emerald-300 uppercase tracking-wide mb-3">
                 {new Date(featured.date).toLocaleDateString("es-MX", {
                   year: "numeric",
                   month: "long",
-                  day: "numeric",
                 })}
               </p>
-            ) : null}
-            {featured.excerpt ? (
-              <p className="mt-3 text-gray-800">{featured.excerpt}</p>
-            ) : null}
-          </Link>
-        </article>
-
-        {/* Lista lateral */}
-        <div className="space-y-4">
-          {others.map((p) => {
-            const cover = p.cover ?? undefined;
-            return (
-              <article key={p.slug} className="rounded-xl bg-white/60 shadow-sm ring-1 ring-black/5 p-4">
-                <Link href={`/blog/${p.slug}`} className="block group">
-                  <div className="flex gap-3">
-                    {cover && (
-                      <img
-                        src={cover}
-                        alt=""
-                        className="w-28 h-20 object-cover rounded-lg shrink-0"
-                        loading="lazy"
-                      />
-                    )}
-                    <div className="min-w-0">
-                      <h4 className="font-bold text-evergreen leading-snug group-hover:underline">
-                        {p.title}
-                      </h4>
-                      {p.date ? (
-                        <p className="mt-1 text-xs text-gray-600">
-                          {new Date(p.date).toLocaleDateString("es-MX", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </p>
-                      ) : null}
-                    </div>
-                  </div>
-                </Link>
-              </article>
-            );
-          })}
+            )}
+            <h3 className="text-xl md:text-2xl font-medium text-white leading-snug group-hover:underline">
+              {featured.title}
+            </h3>
+            {featured.excerpt && (
+              <p className="mt-2 text-sm text-emerald-200 line-clamp-2">{featured.excerpt}</p>
+            )}
+            <span className="mt-4 inline-block text-xs text-emerald-300">Leer artículo →</span>
+          </div>
+          {featured.cover && (
+            <img
+              src={featured.cover}
+              alt={featured.title}
+              className="w-24 h-28 md:w-28 md:h-32 object-cover rounded-xl shrink-0"
+              loading="lazy"
+            />
+          )}
         </div>
+      </Link>
+
+      {/* Lista de otros artículos */}
+      <div className="divide-y divide-black/8 border-t border-black/8">
+        {others.map((p, i) => (
+          <Link
+            key={p.slug}
+            href={`/blog/${p.slug}`}
+            className="flex items-center gap-4 py-4 group hover:bg-zinc-50 px-1 rounded-lg transition-colors"
+          >
+            <span className="text-xs font-medium text-zinc-400 min-w-[24px]">
+              {String(i + 2).padStart(2, "0")}
+            </span>
+            <span className="flex-1 text-sm text-zinc-800 group-hover:underline leading-snug">
+              {p.title}
+            </span>
+            {p.date && (
+              <span className="text-xs text-zinc-400 whitespace-nowrap">
+                {new Date(p.date).toLocaleDateString("es-MX", {
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            )}
+          </Link>
+        ))}
       </div>
     </section>
   );

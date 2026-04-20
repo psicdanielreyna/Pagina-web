@@ -1,4 +1,3 @@
-// components/recursosdestacados.tsx
 import Image from "next/image";
 import Link from "next/link";
 import { recursosDestacados, type Recurso } from "@/lib/recursosDestacados";
@@ -6,43 +5,37 @@ import { recursosDestacados, type Recurso } from "@/lib/recursosDestacados";
 export default function RecursosDestacados() {
   return (
     <div className="mx-auto max-w-6xl px-4">
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         {recursosDestacados.map((recurso: Recurso, index: number) => (
           <article
             key={index}
-            className="rounded-xl border border-emerald-900/10 bg-white shadow-sm hover:shadow-md transition-shadow"
+            className="rounded-2xl border border-black/8 bg-white hover:shadow-sm transition-shadow flex gap-4 p-4 items-start"
           >
-            <Link href={recurso.enlace} className="block">
-              <div className="relative h-72 w-full overflow-hidden rounded-t-xl bg-emerald-900/5">
-                <Image
-                  src={recurso.imagen}
-                  alt={recurso.titulo}
-                  fill
-                  className="object-contain p-8"
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                />
-              </div>
-            </Link>
-
-            <div className="p-5">
-              <Link href={recurso.enlace} className="block">
-                <h3 className="font-semibold text-emerald-900 hover:underline">
+            <div className="relative h-16 w-12 shrink-0 bg-emerald-50 rounded-lg overflow-hidden">
+              <Image
+                src={recurso.imagen}
+                alt={recurso.titulo}
+                fill
+                className="object-contain p-1"
+                sizes="48px"
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <Link href={recurso.enlace}>
+                <h3 className="font-medium text-zinc-900 text-sm leading-snug hover:underline">
                   {recurso.titulo}
                 </h3>
               </Link>
-
-              <p className="mt-2 text-sm text-emerald-900/80">{recurso.descripcion}</p>
-
-              <div className="mt-3 text-sm font-semibold text-emerald-900">
-                ${recurso.precio} {recurso.moneda}
-              </div>
-
-              <div className="mt-4">
+              <p className="mt-1 text-xs text-zinc-500 line-clamp-2">{recurso.descripcion}</p>
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-sm font-medium text-zinc-900">
+                  ${recurso.precio} {recurso.moneda}
+                </span>
                 <Link
                   href={recurso.enlace}
-                  className="inline-flex items-center rounded-md bg-emerald-700 px-3 py-2 text-white hover:bg-emerald-800"
+                  className="text-xs text-emerald-700 hover:underline font-medium"
                 >
-                  Ver recurso
+                  Ver recurso →
                 </Link>
               </div>
             </div>

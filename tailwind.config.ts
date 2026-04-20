@@ -12,12 +12,12 @@ module.exports = {
     "text-center",
   ],
   theme: {
-    extend: {
-      colors: {
-        almond: "#F6E9D9",
-        evergreen: "#043222",
-      },
+  extend: {
+    colors: {
+      evergreen: "#043222",
+      almond: "#F4EDE2",
     },
   },
+},
   plugins: [require("@tailwindcss/typography")],
 };

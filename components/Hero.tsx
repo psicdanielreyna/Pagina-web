@@ -1,51 +1,66 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="relative bg-[#F6E9D9]">
-      <div className="container mx-auto flex flex-col-reverse items-center gap-8 px-4 py-16 md:flex-row md:gap-12">
+    <section className="border-b border-black/8">
+      <div className="mx-auto max-w-6xl grid md:grid-cols-2 min-h-[420px]">
         {/* Texto */}
-        <div className="flex-1 text-center md:text-left">
-          <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-[#043222] md:text-5xl">
-            Psicología clara y práctica
+        <div className="flex flex-col justify-center px-6 py-14 md:pr-12 md:border-r border-black/8">
+          <span className="inline-block rounded-full bg-emerald-100 text-emerald-800 text-xs font-medium px-3 py-1 mb-6 w-fit">
+            Psicólogo · Monterrey
+          </span>
+          <h1 className="text-4xl md:text-[2.6rem] font-medium leading-[1.15] tracking-tight text-zinc-900">
+            Ansiedad y estrés,<br />con claridad.
           </h1>
-          <p className="mt-4 text-lg font-medium text-[#043222]">
-            Pequeños cambios que transforman tu bienestar.
+          <p className="mt-4 text-base text-zinc-500 leading-relaxed max-w-md">
+            Terapia práctica y directa. Sin rodeos, con resultados reales para tu día a día.
           </p>
-          <p className="mt-2 text-base text-gray-700">
-            Herramientas simples que puedes aplicar en tu día a día.
-          </p>
-
-          <div className="mt-6 flex flex-col items-center gap-4 md:flex-row md:items-start">
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/agenda"
-              className="rounded-md bg-[#043222] px-6 py-3 text-white shadow hover:bg-[#065c3b] transition"
+              href="/servicios"
+              className="rounded-full bg-zinc-900 text-white text-sm px-5 py-2.5 hover:bg-zinc-700 transition-colors"
             >
-              Agenda una cita
+              Agendar sesión
             </Link>
             <Link
               href="/tienda"
-              className="rounded-md border border-[#043222] px-6 py-3 text-[#043222] hover:bg-[#043222] hover:text-white transition"
+              className="text-sm text-zinc-500 px-2 py-2.5 hover:text-zinc-900 transition-colors"
             >
-              Ver recursos
+              Ver recursos →
             </Link>
           </div>
         </div>
 
-        {/* Imagen más grande */}
-        <div className="flex-1">
+        {/* Imagen */}
+        <div className="bg-emerald-100 flex items-center justify-center min-h-[280px] md:min-h-0">
           <Image
-            src="/hero.png"
-            alt="Sesión de terapia"
-            width={700}
-            height={500}
-            className="rounded-lg shadow-lg object-cover w-full h-auto"
+            src="/images/hero/herodos.jpg.jpg"
+            alt="Daniel Reyna – Psicólogo"
+            width={520}
+            height={380}
+            className="object-cover w-full h-full"
             priority
           />
         </div>
+      </div>
+
+      {/* Stats bar */}
+      <div className="mx-auto max-w-6xl grid grid-cols-3 border-t border-black/8">
+        {[
+          { n: "+500", l: "Pacientes atendidos" },
+          { n: "50K+", l: "Suscriptores newsletter" },
+          { n: "8 años", l: "Experiencia clínica" },
+        ].map((s, i) => (
+          <div
+            key={i}
+            className={`py-5 text-center ${i < 2 ? "border-r border-black/8" : ""}`}
+          >
+            <span className="block text-xl font-medium text-zinc-900">{s.n}</span>
+            <span className="text-xs text-zinc-400">{s.l}</span>
+          </div>
+        ))}
       </div>
     </section>
   );
