@@ -5,7 +5,8 @@
 
 /* ===== Base ===== */
 html, body {
-  @apply bg-almond text-evergreen;
+  background: #F8F5F0;
+  @apply text-evergreen;
 }
 
 /* Contenedor utilitario (si lo usas fuera del layout) */

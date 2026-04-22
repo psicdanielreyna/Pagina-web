@@ -2,9 +2,6 @@ import RecursosDestacados from "@/components/recursosdestacados";
 import LatestBlog from "@/components/LatestBlog";
 import Hero from "@/components/Hero";
 import NewsletterSection from "@/components/NewsletterSection";
-import dynamic from "next/dynamic";
-
-const Opiniones = dynamic(() => import("@/components/Opiniones"), { ssr: false });
 
 export default function HomePage() {
   return (
@@ -17,16 +14,6 @@ export default function HomePage() {
           Recursos destacados
         </h2>
         <RecursosDestacados />
-      </section>
-
-      {/* OPINIONES */}
-      <section className="py-12 md:py-16 border-b border-black/8">
-        <Opiniones
-          title="Opiniones"
-          subtitle="Resultados reales con enfoque claro y práctico"
-          variant="all"
-          limit={6}
-        />
       </section>
 
       {/* BLOG */}
