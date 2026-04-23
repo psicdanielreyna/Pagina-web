@@ -1,6 +1,45 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+
+function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?: string; prefix?: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const duration = 1500;
+          const steps = 40;
+          const increment = target / steps;
+          let current = 0;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              setCount(target);
+              clearInterval(timer);
+            } else {
+              setCount(Math.floor(current));
+            }
+          }, duration / steps);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [target]);
+
+  return (
+    <div ref={ref} className="block text-2xl font-medium text-zinc-900">
+      {prefix}{count}{suffix}
+    </div>
+  );
+}
 
 export default function Hero() {
   return (
@@ -33,11 +72,8 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Imagen — full height, foto centrada con padding */}
-        <div
-          className="flex items-center justify-center p-12"
-          style={{ background: "#EEE9E0" }}
-        >
+        {/* Imagen */}
+        <div className="flex items-center justify-center p-12" style={{ background: "#EEE9E0" }}>
           <Image
             src="/images/hero/herodos.jpg.jpg"
             alt="Daniel Reyna – Psicólogo"
@@ -49,19 +85,19 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Stats bar */}
-      <div className="mx-auto max-w-6xl grid grid-cols-3 border-t border-black/8">
+      {/* Stats bar — ancho completo */}
+      <div className="w-full grid grid-cols-3 border-t border-black/8">
         {[
-          { n: "+500", l: "Pacientes atendidos" },
-          { n: "10K+", l: "Suscriptores newsletter" },
-          { n: "+5 años", l: "Experiencia en atención" },
+          { target: 500, prefix: "+", suffix: "", label: "Pacientes atendidos" },
+          { target: 10, prefix: "", suffix: "K+", label: "Suscriptores newsletter" },
+          { target: 5, prefix: "+", suffix: " años", label: "Experiencia en atención" },
         ].map((s, i) => (
           <div
             key={i}
-            className={`py-5 text-center ${i < 2 ? "border-r border-black/8" : ""}`}
+            className={`py-6 text-center ${i < 2 ? "border-r border-black/8" : ""}`}
           >
-            <span className="block text-xl font-medium text-zinc-900">{s.n}</span>
-            <span className="text-xs text-zinc-400">{s.l}</span>
+            <CountUp target={s.target} prefix={s.prefix} suffix={s.suffix} />
+            <span className="text-xs text-zinc-400 mt-1 block">{s.label}</span>
           </div>
         ))}
       </div>
