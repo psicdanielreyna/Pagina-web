@@ -18,72 +18,113 @@ const socials = [
   { name: "X",         href: "https://x.com/psicdanreyna", icon: Twitter },
 ];
 
+const navLinks = [
+  { href: "/blog", label: "Blog" },
+  { href: "/servicios", label: "Servicios" },
+  { href: "/talleres", label: "Talleres" },
+  { href: "/sobre-mi", label: "Sobre mí" },
+  { href: "/newsletter", label: "Newsletter" },
+  { href: "/faq", label: "Preguntas frecuentes" },
+  { href: "/contacto", label: "Contacto" },
+];
+
 export default function SiteHeader() {
   return (
-    <header className="sticky top-0 z-[60] w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/70">
-      <div className="container mx-auto max-w-6xl flex items-center justify-between px-4 h-14 md:h-16">
+    <header
+      className="sticky top-0 z-[60] w-full border-b border-black/8 backdrop-blur"
+      style={{ background: "rgba(248,245,240,0.92)" }}
+    >
+      <div className="mx-auto max-w-6xl flex items-center justify-between px-4 h-14 md:h-16">
+
         {/* Hamburguesa */}
         <Sheet>
           <SheetTrigger
             aria-label="Abrir menú"
-            className="inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black/10"
+            className="inline-flex items-center justify-center rounded-lg p-2 hover:bg-black/5 transition-colors focus:outline-none"
           >
-            <MenuIcon className="h-6 w-6" />
+            <MenuIcon className="h-5 w-5 text-zinc-700" />
           </SheetTrigger>
 
-          <SheetContent side="left" className="w-[320px] max-w-[85vw] p-0">
-            <div className="flex items-center justify-between px-4 py-3 border-b bg-white">
-              <SheetTitle className="text-base font-medium">Menú</SheetTitle>
-              <SheetClose aria-label="Cerrar" className="rounded-md p-2 hover:bg-gray-100">
-                <XIcon className="h-5 w-5" />
+          <SheetContent side="left" className="w-[300px] max-w-[85vw] p-0 border-r border-black/8" style={{ background: "#F8F5F0" }}>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-black/8">
+              <SheetTitle className="text-sm font-medium text-zinc-500 tracking-wide uppercase">
+                Menú
+              </SheetTitle>
+              <SheetClose aria-label="Cerrar" className="rounded-lg p-1.5 hover:bg-black/5 transition-colors">
+                <XIcon className="h-4 w-4 text-zinc-500" />
               </SheetClose>
             </div>
 
-            <nav className="px-4 py-4">
-              <ul className="space-y-3">
-                <li><SheetClose asChild><Link href="/blog" className="block rounded-md px-2 py-2 hover:bg-gray-100">Blog</Link></SheetClose></li>
-                <li><SheetClose asChild><Link href="/servicios" className="block rounded-md px-2 py-2 hover:bg-gray-100">Servicios</Link></SheetClose></li>
-                <li><SheetClose asChild><Link href="/talleres" className="block rounded-md px-2 py-2 hover:bg-gray-100">Talleres</Link></SheetClose></li>
-                <li><SheetClose asChild><Link href="/sobre-mi" className="block rounded-md px-2 py-2 hover:bg-gray-100">Sobre mí</Link></SheetClose></li>
-
-                {/* ➕ añadidos */}
-                <li><SheetClose asChild><Link href="/newsletter" className="block rounded-md px-2 py-2 hover:bg-gray-100">Newsletter</Link></SheetClose></li>
-                <li><SheetClose asChild><Link href="/faq" className="block rounded-md px-2 py-2 hover:bg-gray-100">Preguntas frecuentes</Link></SheetClose></li>
-
-                <li><SheetClose asChild><Link href="/contacto" className="block rounded-md px-2 py-2 hover:bg-gray-100">Contacto</Link></SheetClose></li>
+            <nav className="px-3 py-4">
+              <ul className="space-y-0.5">
+                {navLinks.map(({ href, label }) => (
+                  <li key={href}>
+                    <SheetClose asChild>
+                      <Link
+                        href={href}
+                        className="block rounded-lg px-3 py-2.5 text-sm text-zinc-700 hover:bg-black/5 hover:text-zinc-900 transition-colors"
+                      >
+                        {label}
+                      </Link>
+                    </SheetClose>
+                  </li>
+                ))}
               </ul>
             </nav>
+
+            {/* Redes en el drawer móvil */}
+            <div className="absolute bottom-8 left-0 right-0 px-5">
+              <p className="text-xs text-zinc-400 mb-3 uppercase tracking-wide">Redes sociales</p>
+              <div className="flex gap-3">
+                {socials.map(({ name, href, icon: Icon }) => (
+                  
+                    key={name}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={name}
+                    className="inline-flex items-center justify-center rounded-lg p-2 hover:bg-black/5 transition-colors"
+                  >
+                    <Icon className="h-4 w-4 text-zinc-600" />
+                  </a>
+                ))}
+              </div>
+            </div>
           </SheetContent>
         </Sheet>
 
         {/* Logo centrado */}
-        <Link href="/" aria-label="Ir al inicio" className="absolute left-1/2 -translate-x-1/2 select-none">
+        <Link
+          href="/"
+          aria-label="Ir al inicio"
+          className="absolute left-1/2 -translate-x-1/2 select-none"
+        >
           <Image
             src="/logo.png"
             alt="Daniel Reyna — Psicólogo"
             width={180}
             height={36}
-            className="h-7 w-auto md:h-9"
+            className="h-7 w-auto md:h-8"
             priority
           />
         </Link>
 
-        {/* Redes solo en la parte derecha */}
-        <div className="ml-auto hidden sm:flex items-center gap-5 pr-1">
+        {/* Redes sociales — derecha */}
+        <div className="flex items-center gap-1">
           {socials.map(({ name, href, icon: Icon }) => (
-            <a
-              key={`top-${name}`}
+            
+              key={name}
               href={href}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={name}
-              className="inline-flex items-center justify-center rounded-md p-1.5 hover:bg-gray-100"
-              title={name}
+              className="inline-flex items-center justify-center rounded-lg p-2 hover:bg-black/5 transition-colors"
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-4 w-4 text-zinc-600" />
             </a>
           ))}
         </div>
+
       </div>
     </header>
   );
