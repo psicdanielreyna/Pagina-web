@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function Hero() {
   return (
     <section className="border-b border-black/8" style={{ background: "#F8F5F0" }}>
-      <div className="mx-auto max-w-6xl grid md:grid-cols-2 min-h-[420px]">
+      <div className="mx-auto max-w-6xl grid md:grid-cols-2" style={{ minHeight: "calc(100vh - 64px)" }}>
         {/* Texto */}
         <div className="flex flex-col justify-center px-6 py-14 md:pr-12 md:border-r border-black/8">
           <span className="inline-block rounded-full bg-emerald-100 text-emerald-800 text-sm font-medium px-4 py-1.5 mb-6 w-fit">
@@ -33,14 +33,17 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Imagen más chica — centrada con padding */}
-        <div className="flex items-center justify-center py-10 px-8" style={{ background: "#EEE9E0" }}>
+        {/* Imagen — full height, foto centrada con padding */}
+        <div
+          className="flex items-center justify-center p-12"
+          style={{ background: "#EEE9E0" }}
+        >
           <Image
             src="/images/hero/herodos.jpg.jpg"
             alt="Daniel Reyna – Psicólogo"
-            width={320}
-            height={380}
-            className="rounded-2xl object-cover w-full max-w-[300px] h-auto"
+            width={340}
+            height={420}
+            className="rounded-2xl object-cover w-full max-w-[320px] h-auto shadow-sm"
             priority
           />
         </div>
@@ -50,8 +53,8 @@ export default function Hero() {
       <div className="mx-auto max-w-6xl grid grid-cols-3 border-t border-black/8">
         {[
           { n: "+500", l: "Pacientes atendidos" },
-          { n: "50K+", l: "Suscriptores newsletter" },
-          { n: "8 años", l: "Experiencia clínica" },
+          { n: "10K+", l: "Suscriptores newsletter" },
+          { n: "+5 años", l: "Experiencia en atención" },
         ].map((s, i) => (
           <div
             key={i}
