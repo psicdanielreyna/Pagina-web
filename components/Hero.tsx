@@ -13,19 +13,19 @@ function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?
       ([entry]) => {
         if (entry.isIntersecting && !started.current) {
           started.current = true;
-          const duration = 1500;
-          const steps = 40;
-          const increment = target / steps;
-          let current = 0;
-          const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-              setCount(target);
-              clearInterval(timer);
-            } else {
-              setCount(Math.floor(current));
-            }
-          }, duration / steps);
+          const duration = 2000;
+          const startTime = performance.now();
+
+          const animate = (now: number) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setCount(Math.floor(eased * target));
+            if (progress < 1) requestAnimationFrame(animate);
+            else setCount(target);
+          };
+
+          requestAnimationFrame(animate);
         }
       },
       { threshold: 0.3 }
@@ -45,6 +45,7 @@ export default function Hero() {
   return (
     <section className="border-b border-black/8" style={{ background: "#F8F5F0" }}>
       <div className="mx-auto max-w-6xl grid md:grid-cols-2" style={{ minHeight: "calc(100vh - 64px)" }}>
+
         {/* Texto */}
         <div className="flex flex-col justify-center px-6 py-14 md:pr-12 md:border-r border-black/8">
           <span className="inline-block rounded-full bg-emerald-100 text-emerald-800 text-sm font-medium px-4 py-1.5 mb-6 w-fit">
@@ -85,7 +86,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Stats bar — ancho completo */}
+      {/* Stats bar — full width */}
       <div className="w-full grid grid-cols-3 border-t border-black/8">
         {[
           { target: 500, prefix: "+", suffix: "", label: "Pacientes atendidos" },
@@ -94,7 +95,7 @@ export default function Hero() {
         ].map((s, i) => (
           <div
             key={i}
-            className={`py-6 text-center ${i < 2 ? "border-r border-black/8" : ""}`}
+            className={`py-8 text-center ${i < 2 ? "border-r border-black/8" : ""}`}
           >
             <CountUp target={s.target} prefix={s.prefix} suffix={s.suffix} />
             <span className="text-xs text-zinc-400 mt-1 block">{s.label}</span>
