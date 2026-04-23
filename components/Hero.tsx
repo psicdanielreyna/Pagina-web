@@ -86,22 +86,22 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Stats bar — full width */}
-      <div className="w-full grid grid-cols-3 border-t border-black/8">
-        {[
-          { target: 500, prefix: "+", suffix: "", label: "Pacientes atendidos" },
-          { target: 10, prefix: "", suffix: "K+", label: "Suscriptores newsletter" },
-          { target: 5, prefix: "+", suffix: " años", label: "Experiencia en atención" },
-        ].map((s, i) => (
-          <div
-            key={i}
-            className={`py-8 text-center ${i < 2 ? "border-r border-black/8" : ""}`}
-          >
-            <CountUp target={s.target} prefix={s.prefix} suffix={s.suffix} />
-            <span className="text-xs text-zinc-400 mt-1 block">{s.label}</span>
-          </div>
-        ))}
-      </div>
+    {/* Stats bar — full width */}
+<div className="w-full grid grid-cols-3 border-t border-black/8">
+  {[
+    { target: 500, prefix: "+", suffix: "", label: "Pacientes atendidos" },
+    { target: 10, prefix: "", suffix: "K+", label: "Suscriptores newsletter" },
+    { target: 5, prefix: "+", suffix: " años", label: "Experiencia en atención" },
+  ].map((s, i) => (
+    <div
+      key={i}
+      className={`py-12 text-center ${i < 2 ? "border-r border-black/8" : ""}`}
+    >
+      <CountUp target={s.target} prefix={s.prefix} suffix={s.suffix} />
+      <span className="text-sm text-zinc-400 mt-2 block">{s.label}</span>
+    </div>
+  ))}
+</div>
     </section>
   );
 }
