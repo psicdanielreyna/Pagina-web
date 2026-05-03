@@ -3,14 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 type Producto = {
-  slug: string;        // slug para /tienda/<slug>
-  manualSlug: string;  // slug real del manual para /checkout/<manualSlug>
+  slug: string;
+  manualSlug: string;
   title: string;
   price: string;
   short: string;
-  long: string;
   img: string;
   alt: string;
+  badge?: string;
 };
 
 const productos: Producto[] = [
@@ -20,10 +20,9 @@ const productos: Producto[] = [
     title: "Cómo Apagar tu Mente",
     price: "$249 MXN",
     short: "Técnicas efectivas para calmar el sobrepensamiento.",
-    long:
-      "Método paso a paso para identificar gatillos, regular la activación y salir del bucle rumiativo.",
     img: "/images/tienda/apagar-mente.png",
     alt: "Portada Cómo Apagar tu Mente",
+    badge: "Manual",
   },
   {
     slug: "el-arte-de-creer-en-ti",
@@ -31,69 +30,184 @@ const productos: Producto[] = [
     title: "El Arte de Creer en Ti",
     price: "$249 MXN",
     short: "Estrategias para fortalecer tu autoestima y confianza.",
-    long:
-      "Pequeños cambios diarios, ejercicios prácticos y plantillas para consolidar tu autoconfianza.",
     img: "/images/tienda/el-arte-de-creer-en-ti.png",
     alt: "Portada El Arte de Creer en Ti",
+    badge: "Manual",
   },
 ];
 
+const bundle = {
+  title: "Pack completo — los 2 manuales",
+  desc: "Ahorra $100 MXN comprando los dos juntos. Entrega inmediata por correo.",
+  priceOld: "$498 MXN",
+  price: "$398 MXN",
+  manualSlug: "bundle-completo",
+};
+
 export default function TiendaPage() {
   return (
-    <section className="py-10 md:py-14">
-      <div className="container mx-auto px-4">
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            Tienda
-          </h1>
-          <p className="mt-2 text-slate-600">
-            Recursos descargables para que avances a tu ritmo.
-          </p>
-        </header>
+    <main style={{ background: "#F8F5F0" }} className="min-h-screen">
 
-        <div className="grid gap-6 sm:grid-cols-2">
+     {/* Header */}
+<div
+  className="border-b border-black/8 px-6 pt-12 pb-8"
+  style={{ background: "#F8F5F0" }}
+>
+  <div className="mx-auto max-w-6xl flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div>
+      <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">
+        Tienda
+      </p>
+      <h1 className="text-3xl font-medium text-zinc-900 tracking-tight">
+        Recursos para tu bienestar
+      </h1>
+      <p className="text-sm text-zinc-500 mt-1">
+        Manuales prácticos en PDF · Entrega inmediata por correo
+      </p>
+    </div>
+    <div className="flex gap-2">
+      {["Todos", "Manuales", "Bundles"].map((f) => (
+        <span
+          key={f}
+          className={`text-xs px-4 py-2 rounded-full border border-black/8 cursor-pointer ${
+            f === "Todos"
+              ? "bg-zinc-900 text-white border-zinc-900"
+              : "bg-white text-zinc-500"
+          }`}
+        >
+          {f}
+        </span>
+      ))}
+    </div>
+  </div>
+</div>
+      {/* Grid de productos */}
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           {productos.map((p) => (
             <div
               key={p.slug}
-              className="rounded-2xl border border-slate-100 bg-white overflow-hidden"
+              className="bg-white rounded-2xl border border-black/8 overflow-hidden flex flex-col hover:shadow-sm transition-shadow"
             >
-              <div className="relative aspect-[4/3] bg-slate-50">
+              {/* Imagen */}
+              <div className="relative h-52 bg-emerald-50 flex items-center justify-center">
+                <span className="absolute top-3 left-3 text-xs font-medium bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">
+                  {p.badge}
+                </span>
                 <Image
                   src={p.img}
                   alt={p.alt}
                   fill
-                  className="object-contain"
-                  sizes="(max-width: 640px) 100vw, 600px"
+                  className="object-contain p-6"
+                  sizes="(max-width: 640px) 100vw, 340px"
                 />
               </div>
 
-              <div className="p-5 space-y-2">
-                <h2 className="text-lg font-semibold text-slate-900">
+              {/* Info */}
+              <div className="p-4 flex flex-col flex-1">
+                <h2 className="text-sm font-medium text-zinc-900 mb-1 leading-snug">
                   {p.title}
                 </h2>
-                <p className="text-sm text-slate-600">{p.short}</p>
-                <p className="text-sm text-slate-500">{p.long}</p>
-                <p className="mt-2 font-semibold text-slate-900">{p.price}</p>
-
-                <div className="mt-3 flex gap-3">
-                  <Link
-                    href={`/checkout/${p.manualSlug}`}
-                    className="inline-flex items-center justify-center rounded-full px-5 py-2 bg-blue-600 text-white hover:bg-blue-700"
-                  >
-                    Comprar
-                  </Link>
-                  <Link
-                    href={`/tienda/${p.slug}`}
-                    className="inline-flex items-center justify-center rounded-full px-5 py-2 border border-slate-300 text-slate-700 hover:bg-slate-50"
-                  >
-                    Ver más
-                  </Link>
+                <p className="text-xs text-zinc-500 leading-relaxed flex-1">
+                  {p.short}
+                </p>
+                <div className="flex items-center justify-between mt-4">
+                  <span className="text-sm font-medium text-zinc-900">
+                    {p.price}
+                  </span>
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/tienda/${p.slug}`}
+                      className="text-xs text-zinc-500 px-3 py-1.5 rounded-full border border-black/8 hover:bg-black/5 transition-colors"
+                    >
+                      Ver más
+                    </Link>
+                    <Link
+                      href={`/checkout/${p.manualSlug}`}
+                      className="text-xs text-white bg-zinc-900 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors"
+                    >
+                      Comprar
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
+
+          {/* Card próximamente */}
+          <div className="bg-white rounded-2xl border border-black/8 overflow-hidden flex flex-col opacity-50">
+            <div className="relative h-52 bg-zinc-50 flex items-center justify-center">
+              <span className="absolute top-3 right-3 text-xs font-medium bg-zinc-100 text-zinc-400 px-3 py-1 rounded-full">
+                Próximamente
+              </span>
+              <div className="w-14 h-20 rounded-lg border-2 border-dashed border-zinc-200" />
+            </div>
+            <div className="p-4 flex flex-col flex-1">
+              <h2 className="text-sm font-medium text-zinc-400 mb-1">
+                Nuevo manual
+              </h2>
+              <p className="text-xs text-zinc-300 flex-1">Disponible pronto.</p>
+              <div className="flex items-center justify-between mt-4">
+                <span className="text-sm font-medium text-zinc-300">—</span>
+                <button className="text-xs text-zinc-400 bg-zinc-100 px-3 py-1.5 rounded-full">
+                  Avisar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bundle */}
+        <div
+          className="rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+          style={{ background: "#1D9E75" }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="flex">
+              <div
+                className="w-12 h-16 rounded-lg"
+                style={{ background: "rgba(255,255,255,0.3)" }}
+              />
+              <div
+                className="w-12 h-16 rounded-lg -ml-3"
+                style={{ background: "rgba(255,255,255,0.18)" }}
+              />
+            </div>
+            <div>
+              <span
+                className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-2"
+                style={{ background: "rgba(255,255,255,0.18)", color: "#fff" }}
+              >
+                Bundle
+              </span>
+              <h3 className="text-sm font-medium text-white mb-1">
+                {bundle.title}
+              </h3>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>
+                {bundle.desc}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <span
+              className="text-xs line-through"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
+              {bundle.priceOld}
+            </span>
+            <span className="text-2xl font-medium text-white">
+              {bundle.price}
+            </span>
+            <Link
+              href={`/checkout/${bundle.manualSlug}`}
+              className="text-xs font-medium bg-white px-5 py-2 rounded-full hover:bg-emerald-50 transition-colors"
+              style={{ color: "#0F6E56" }}
+            >
+              Comprar bundle
+            </Link>
+          </div>
         </div>
       </div>
-    </section>
+    </main>
   );
 }
