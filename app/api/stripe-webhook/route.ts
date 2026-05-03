@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
 
     // Links de descarga por archivo
     const links = archivos
-      .map((a) => `<li><a href="${siteUrl}/descargar/${a}">${a.replace(".pdf", "")}</a></li>`)
-      .join("");
+  .map((a) => `<li><a href="${siteUrl}/api/download-manual?archivo=${a}" style="color:#1D9E75;">${a.replace(".pdf", "").replace(/-/g, " ")}</a></li>`)
+  .join("");
 
     await resend.emails.send({
       from: process.env.FROM_EMAIL!,
