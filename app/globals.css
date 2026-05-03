@@ -6,7 +6,8 @@
 /* ===== Base ===== */
 html, body {
   background: #F8F5F0;
-  @apply text-evergreen;
+  color: #043222;
+  font-family: var(--font-dm-sans), sans-serif;
 }
 
 /* Contenedor utilitario (si lo usas fuera del layout) */

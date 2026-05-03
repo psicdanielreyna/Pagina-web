@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Instagram, Facebook, Youtube, Twitter } from "lucide-react";
 import { useState } from "react";
 

@@ -1,11 +1,19 @@
 // app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
+import { DM_Sans } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import Analytics from "./analytics";
-import TrackCTAs from "@/components/TrackCTAs"; // si lo tienes
-import { Suspense } from "react";
+import TrackCTAs from "@/components/TrackCTAs";
+import { Suspense, type ReactNode } from "react";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://danielreyna.com"),
@@ -35,12 +43,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <body>
+    <html lang="es" className={dmSans.variable}>
+      <body className={dmSans.className}>
         <SiteHeader />
         <main className="min-h-[60vh]">{children}</main>
         <Footer />
-        {/* <- Requisito de Next: envolver cualquier uso de useSearchParams en Suspense */}
         <Suspense fallback={null}>
           <Analytics />
           <TrackCTAs />

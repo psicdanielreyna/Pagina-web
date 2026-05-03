@@ -14,22 +14,16 @@
     "jsx": "preserve",
     "incremental": true,
     "plugins": [{ "name": "next" }],
-
-       "paths": { "@/*": ["./*"] },
-
-    // 👇 clave para process/crypto, etc.
+    "paths": { "@/*": ["./*"] },
     "types": ["node"],
-
-    // Opcionales pero útiles:
     "forceConsistentCasingInFileNames": true
-    // Si NO usas un folder ./types, elimina estas dos:
-    // "typeRoots": ["./types", "./node_modules/@types"]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.mdx",
+    "**/*.css",
     "types/**/*.d.ts",
     ".next/types/**/*.ts"
   ],
