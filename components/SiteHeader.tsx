@@ -77,7 +77,7 @@ export default function SiteHeader() {
               <p className="text-xs text-zinc-400 mb-3 uppercase tracking-wide">Redes sociales</p>
               <div className="flex gap-3">
                 {socials.map(({ name, href, icon: Icon }) => (
-                  
+                  <a
                     key={name}
                     href={href}
                     target="_blank"
@@ -112,7 +112,7 @@ export default function SiteHeader() {
         {/* Redes sociales — derecha */}
         <div className="flex items-center gap-1">
           {socials.map(({ name, href, icon: Icon }) => (
-            
+            <a
               key={name}
               href={href}
               target="_blank"
