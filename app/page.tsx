@@ -1,7 +1,6 @@
 import RecursosDestacados from "@/components/recursosdestacados";
 import LatestBlog from "@/components/LatestBlog";
 import Hero from "@/components/Hero";
-import NewsletterSection from "@/components/NewsletterSection";
 
 export default function HomePage() {
   return (
@@ -24,8 +23,7 @@ export default function HomePage() {
         <LatestBlog />
       </section>
 
-      {/* NEWSLETTER */}
-      <NewsletterSection />
+      
     </main>
   );
 }
