@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import HeroBanner from "@/components/HeroBanner";
-import Opiniones from "@/components/Opiniones";
 
 export const metadata: Metadata = {
   title: "Servicios",
@@ -10,145 +9,128 @@ export const metadata: Metadata = {
   alternates: { canonical: "/servicios" },
 };
 
+const servicios = [
+  {
+    title: "Terapia individual",
+    desc: "Sesión de 50 minutos. Enfoque TCC breve: ansiedad, depresión, duelo y autoestima. Incluye materiales y ejercicios prácticos.",
+    price: "MXN $499",
+  },
+  {
+    title: "Paquete mensual (sesiones ilimitadas)",
+    desc: "Acompañamiento continuo durante un mes. Agenda cuantas sesiones necesites dentro del periodo para avanzar en tus objetivos.",
+    price: "MXN $1,900",
+  },
+  {
+    title: "Terapia de pareja",
+    desc: "Sesión de 60 minutos. Comunicación, manejo de conflictos y acuerdos prácticos y realistas.",
+    price: "MXN $749",
+  },
+];
+
+const extras = [
+  {
+    title: "Cartas y constancias psicológicas",
+    desc: "Entrevista clínica y emisión de constancia/carta para certificar la atención o apoyo psicológico requerido por instituciones, escuelas o empleos.",
+    items: ["Entrevista: MXN $500", "Carta/constancia: MXN $1,000"],
+    cta: { label: "Agendar entrevista", href: "/agenda" },
+    sec: { label: "Solicitar información", href: "/contacto" },
+  },
+  {
+    title: "Supervisión y asesoría de casos",
+    desc: "Servicio dirigido a psicólogos que buscan retroalimentación y acompañamiento profesional en la atención de sus pacientes.",
+    price: "MXN $600 por sesión",
+    cta: { label: "Agendar", href: "/agenda" },
+    sec: { label: "Más información", href: "/contacto" },
+  },
+];
+
 export default function ServiciosPage() {
   return (
     <>
       <HeroBanner
         badge="Servicios"
-        title="Agenda tu proceso con Terapia Cognitivo-Conductual"
-        subtitle="Atención en línea y presencial (Monterrey). Herramientas prácticas y enfocadas a objetivos."
-        imageUrl="/hero-servicios.jpg"
+        title="Terapia Cognitivo-Conductual"
+        subtitle="Atención en línea y presencial en Monterrey. Herramientas prácticas enfocadas a objetivos."
+        accentText="Agenda tu proceso"
+        accentSub="Primera sesión sin compromiso. En línea o presencial en Monterrey."
       />
 
-      {/* Intro beige */}
-      <section className="bg-[#FEEDCB] py-10">
-        <div className="container mx-auto max-w-3xl px-4 text-center space-y-6">
-          <p className="text-base md:text-lg text-gray-800">
-            Trabajo con <strong>Terapia Cognitivo-Conductual (TCC)</strong> breve para
+      {/* Intro */}
+      <section className="border-b border-black/8 py-12" style={{ background: "#F8F5F0" }}>
+        <div className="mx-auto max-w-3xl px-4 text-center space-y-4">
+          <p className="text-base text-zinc-700 leading-relaxed">
+            Trabajo con <strong className="text-zinc-900">Terapia Cognitivo-Conductual (TCC)</strong> breve para
             ansiedad, depresión, duelo y autoestima. Esta terapia se centra en cómo
-            tus pensamientos influyen en tus emociones y comportamientos, ayudándote
-            a identificar y cambiar patrones poco útiles.
+            tus pensamientos influyen en tus emociones y comportamientos.
           </p>
-          <p className="text-base md:text-lg text-gray-800">
+          <p className="text-base text-zinc-700 leading-relaxed">
             Acompañamiento claro, práctico y con ejercicios entre sesiones para que
             veas avances en tu día a día.
           </p>
         </div>
       </section>
 
-      {/* Servicios */}
+      {/* Servicios principales */}
       <section className="py-14">
         <div className="mx-auto max-w-6xl px-4">
-          <h2 className="mb-8 text-2xl font-semibold tracking-tight text-gray-900">
+          <h2 className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-8">
             Opciones de atención
           </h2>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {/* Terapia individual */}
-            <article className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-emerald-900">Terapia individual</h3>
-              <p className="mt-2 text-sm text-gray-700">
-                Sesión de 50 minutos. Enfoque TCC breve: ansiedad, depresión, duelo y
-                autoestima. Incluye materiales y ejercicios prácticos.
-              </p>
-              <p className="mt-4 text-sm font-semibold text-gray-900">MXN $499</p>
-              <div className="mt-5 flex gap-3">
-                <Link href="/agenda" className="btn-primary">Agendar</Link>
-                <Link href="/agenda" className="link-secondary">Ver disponibilidad</Link>
-              </div>
-            </article>
-
-            {/* Paquete mensual */}
-            <article className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-emerald-900">
-                Paquete mensual (sesiones ilimitadas)
-              </h3>
-              <p className="mt-2 text-sm text-gray-700">
-                Acompañamiento continuo durante un mes. Agenda cuantas sesiones
-                necesites dentro del periodo para avanzar en tus objetivos.
-              </p>
-              <p className="mt-4 text-sm font-semibold text-gray-900">MXN $1,900</p>
-              <div className="mt-5 flex gap-3">
-                <Link href="/agenda" className="btn-primary">Agendar</Link>
-                <Link href="/agenda" className="link-secondary">Ver disponibilidad</Link>
-              </div>
-            </article>
-
-            {/* Terapia de pareja */}
-            <article className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-emerald-900">Terapia de pareja</h3>
-              <p className="mt-2 text-sm text-gray-700">
-                Sesión de 60 minutos. Comunicación, manejo de conflictos y
-                acuerdos prácticos y realistas.
-              </p>
-              <p className="mt-4 text-sm font-semibold text-gray-900">MXN $749</p>
-              <div className="mt-5 flex gap-3">
-                <Link href="/agenda" className="btn-primary">Agendar</Link>
-                <Link href="/agenda" className="link-secondary">Ver disponibilidad</Link>
-              </div>
-            </article>
+          <div className="grid gap-4 md:grid-cols-3">
+            {servicios.map((s) => (
+              <article
+                key={s.title}
+                className="rounded-2xl border border-black/8 bg-white p-6 flex flex-col"
+              >
+                <h3 className="text-sm font-medium text-zinc-900 mb-2">{s.title}</h3>
+                <p className="text-sm text-zinc-500 leading-relaxed flex-1">{s.desc}</p>
+                <p className="mt-4 text-base font-medium text-zinc-900">{s.price}</p>
+                <Link
+                  href="/agenda"
+                  className="mt-4 inline-block rounded-full bg-zinc-900 text-white text-xs px-4 py-2 text-center hover:bg-zinc-700 transition-colors w-fit"
+                >
+                  Agendar
+                </Link>
+              </article>
+            ))}
           </div>
 
-          {/* Extra services */}
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            {/* Cartas y constancias */}
-            <article className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-emerald-900">
-                Cartas y constancias psicológicas
-              </h3>
-              <p className="mt-2 text-sm text-gray-700">
-                Entrevista clínica y emisión de constancia/carta (física y digital) para
-                certificar la atención o apoyo psicológico requerido por instituciones,
-                escuelas o empleos.
-              </p>
-              <ul className="mt-4 space-y-1 text-sm text-gray-700">
-                <li>• Entrevista: <span className="font-semibold">MXN $500</span></li>
-                <li>• Carta/constancia: <span className="font-semibold">MXN $1,000</span></li>
-              </ul>
-              <div className="mt-5 flex gap-3">
-                <Link href="/agenda" className="btn-primary">Agendar entrevista</Link>
-                <Link href="/contacto" className="link-secondary">Solicitar información</Link>
-              </div>
-            </article>
-
-            {/* Supervisión de casos */}
-            <article className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-emerald-900">
-                Supervisión y asesoría de casos
-              </h3>
-              <p className="mt-2 text-sm text-gray-700">
-                Servicio dirigido a psicólogos que buscan retroalimentación y
-                acompañamiento profesional en la atención de sus pacientes.
-              </p>
-              <p className="mt-4 text-sm font-semibold text-gray-900">
-                MXN $600 por sesión
-              </p>
-              <div className="mt-5 flex gap-3">
-                <Link href="/agenda" className="btn-primary">Agendar</Link>
-                <Link href="/contacto" className="link-secondary">Más información</Link>
-              </div>
-            </article>
+          {/* Extras */}
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {extras.map((s) => (
+              <article
+                key={s.title}
+                className="rounded-2xl border border-black/8 bg-white p-6 flex flex-col"
+              >
+                <h3 className="text-sm font-medium text-zinc-900 mb-2">{s.title}</h3>
+                <p className="text-sm text-zinc-500 leading-relaxed flex-1">{s.desc}</p>
+                {s.items && (
+                  <ul className="mt-3 space-y-1">
+                    {s.items.map((item) => (
+                      <li key={item} className="text-sm text-zinc-700">• {item}</li>
+                    ))}
+                  </ul>
+                )}
+                {s.price && (
+                  <p className="mt-3 text-base font-medium text-zinc-900">{s.price}</p>
+                )}
+                <div className="mt-4 flex gap-3">
+                  <Link
+                    href={s.cta.href}
+                    className="rounded-full bg-zinc-900 text-white text-xs px-4 py-2 hover:bg-zinc-700 transition-colors"
+                  >
+                    {s.cta.label}
+                  </Link>
+                  <Link
+                    href={s.sec.href}
+                    className="rounded-full border border-black/8 text-zinc-600 text-xs px-4 py-2 hover:bg-black/5 transition-colors"
+                  >
+                    {s.sec.label}
+                  </Link>
+                </div>
+              </article>
+            ))}
           </div>
-        </div>
-      </section>
-
-      {/* Opiniones (misma paleta beige) */}
-      <section className="bg-[#F3EBDD] py-14">
-        <div className="mx-auto max-w-6xl px-4">
-          <header className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-emerald-900">
-              Opiniones sobre la terapia
-            </h2>
-            <p className="mt-1 text-sm md:text-base text-gray-700">
-              Lo que dicen quienes ya trabajaron conmigo (valoración promedio 4.9/5).
-            </p>
-          </header>
-
-          {/* Si tu componente acepta props como { source: 'therapy' }, pásalas.
-             Si no, dejar <Opiniones /> tal cual (usa sus defaults). */}
-          <Opiniones />
-          {/* Ejemplo alternativo si soporta props:
-              <Opiniones source="therapy" limit={6} /> */}
         </div>
       </section>
     </>

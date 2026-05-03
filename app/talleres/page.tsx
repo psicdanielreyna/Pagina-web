@@ -10,6 +10,21 @@ export const metadata: Metadata = {
   alternates: { canonical: "/talleres" },
 };
 
+const talleres = [
+  {
+    title: "Mini guía anti-estrés (en vivo)",
+    desc: "Aprende técnicas prácticas para manejar el estrés en tu día a día.",
+  },
+  {
+    title: "Hábitos que sí se quedan",
+    desc: "Estrategias de TCC para construir y mantener hábitos saludables.",
+  },
+  {
+    title: "Ansiedad: del bloqueo a la acción",
+    desc: "Técnicas para transformar la ansiedad en energía para avanzar.",
+  },
+];
+
 function Inner() {
   return (
     <main>
@@ -17,55 +32,34 @@ function Inner() {
         badge="Talleres"
         title="Aprende y practica en vivo"
         subtitle="Sesiones prácticas para sentirte mejor en tu día a día. Modalidad online y presencial."
-        imageUrl="/talleres-hero.jpg?v=1" // asegúrate que el archivo esté en /public
+        accentText="Próximas fechas"
+        accentSub="Únete a la lista y sé el primero en enterarte cuando se abran nuevas fechas."
       />
 
-      <section className="container mx-auto max-w-5xl px-4 py-12">
-        <p className="mb-8 text-lg text-neutral-700">
+      <section className="mx-auto max-w-5xl px-4 py-14">
+        <p className="text-sm text-zinc-500 leading-relaxed mb-10 max-w-2xl">
           Aquí encontrarás mis próximos talleres, masterclasses y grupos prácticos.
           Si no alcanzas lugar, únete a la lista para enterarte primero cuando se
           abran nuevas fechas.
         </p>
 
-        <h2 className="text-2xl font-bold text-neutral-900 mb-6">
+        <h2 className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-6">
           Próximos talleres
         </h2>
 
-        {/* Cards de talleres */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg border p-5 shadow-sm hover:shadow-md transition">
-            <h3 className="text-lg font-semibold mb-2">
-              Mini guía anti-estrés (en vivo)
-            </h3>
-            <p className="text-sm text-neutral-600 mb-3">
-              Aprende técnicas prácticas para manejar el estrés en tu día a día.
-            </p>
-            <button className="rounded bg-green-600 px-4 py-2 text-white text-sm hover:bg-green-700">
-              Registrarme
-            </button>
-          </div>
-
-          <div className="rounded-lg border p-5 shadow-sm hover:shadow-md transition">
-            <h3 className="text-lg font-semibold mb-2">Hábitos que sí se quedan</h3>
-            <p className="text-sm text-neutral-600 mb-3">
-              Estrategias de TCC para construir y mantener hábitos saludables.
-            </p>
-            <button className="rounded bg-green-600 px-4 py-2 text-white text-sm hover:bg-green-700">
-              Registrarme
-            </button>
-          </div>
-
-          <div className="rounded-lg border p-5 shadow-sm hover:shadow-md transition">
-            <h3 className="text-lg font-semibold mb-2">
-              Ansiedad: del bloqueo a la acción
-            </h3>
-            <p className="text-sm text-neutral-600 mb-3">
-              Técnicas para transformar la ansiedad en energía para avanzar.
-            </p>
-            <button className="rounded bg-green-600 px-4 py-2 text-white text-sm hover:bg-green-700">
-              Registrarme
-            </button>
-          </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {talleres.map((t) => (
+            <article
+              key={t.title}
+              className="rounded-2xl border border-black/8 bg-white p-6 flex flex-col hover:shadow-sm transition-shadow"
+            >
+              <h3 className="text-sm font-medium text-zinc-900 mb-2">{t.title}</h3>
+              <p className="text-sm text-zinc-500 leading-relaxed flex-1">{t.desc}</p>
+              <button className="mt-5 rounded-full bg-zinc-900 text-white text-xs px-4 py-2 hover:bg-zinc-700 transition-colors w-fit">
+                Registrarme
+              </button>
+            </article>
+          ))}
         </div>
       </section>
     </main>
@@ -74,7 +68,7 @@ function Inner() {
 
 export default function TalleresPage() {
   return (
-    <Suspense fallback={<div className="py-16 text-center text-sm text-neutral-600">Cargando…</div>}>
+    <Suspense fallback={<div className="py-16 text-center text-sm text-zinc-400">Cargando…</div>}>
       <Inner />
     </Suspense>
   );

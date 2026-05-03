@@ -3,7 +3,7 @@ import HeroBanner from "@/components/HeroBanner";
 import { getPublishedPosts } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
 
-export const revalidate = 1800; // 30min
+export const revalidate = 1800;
 
 export const metadata = {
   title: "Blog",
@@ -29,41 +29,27 @@ export default async function BlogPage({ searchParams }: { searchParams?: BlogSe
 
   return (
     <>
-      {/* Hero con imagen */}
       <HeroBanner
         badge="Blog"
         title="Blog de Psicología"
-        subtitle="Psicología aplicada a tu vida, en un solo lugar."
-        imageUrl="/hero-blog.jpg"
+        subtitle="Ideas claras y aplicables sobre ansiedad, estrés y bienestar emocional."
+        accentText="Nuevo cada semana"
+        accentSub="Cada lunes a las 10am un artículo nuevo para cuidar tu mente."
       />
 
-      {/* Bloque descriptivo bajo el hero */}
-      <section className="bg-[#F5E7D9] py-12">
-        <div className="container mx-auto max-w-3xl px-4 text-center">
-          <p className="text-lg text-zinc-700">
-            Aquí encontrarás artículos diseñados para acompañarte en tu camino de
-            autoconocimiento, manejar tus emociones y construir relaciones más sanas.
-          </p>
-
-          <div className="mt-6 inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm">
-            Nuevo artículo cada semana, Lunes a las 10:00am
-          </div>
-        </div>
-      </section>
-
-      {/* Lista y buscador */}
       <main className="mx-auto max-w-4xl px-4 py-10">
         <form className="mb-6">
           <input
             defaultValue={q}
             name="q"
             placeholder="Buscar en el blog…"
-            className="w-full rounded-md border px-3 py-2"
+            className="w-full rounded-xl border border-black/8 px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-emerald-400"
+            style={{ background: "#F8F5F0" }}
           />
         </form>
 
         {slice.length === 0 ? (
-          <p className="text-zinc-600">No se encontraron artículos.</p>
+          <p className="text-zinc-500 text-sm">No se encontraron artículos.</p>
         ) : (
           <ul className="space-y-8">
             {slice.map((meta) => (
@@ -74,16 +60,16 @@ export default async function BlogPage({ searchParams }: { searchParams?: BlogSe
           </ul>
         )}
 
-        <div className="mt-8 flex items-center justify-between">
+        <div className="mt-8 flex items-center justify-between text-sm text-zinc-500">
           {page > 1 ? (
-            <a className="underline" href={`/blog?page=${page - 1}&q=${encodeURIComponent(q)}`}>
+            <a className="hover:text-zinc-900 transition-colors" href={`/blog?page=${page - 1}&q=${encodeURIComponent(q)}`}>
               ← Anterior
             </a>
           ) : (
             <span />
           )}
           {page * PAGE_SIZE < total ? (
-            <a className="underline" href={`/blog?page=${page + 1}&q=${encodeURIComponent(q)}`}>
+            <a className="hover:text-zinc-900 transition-colors" href={`/blog?page=${page + 1}&q=${encodeURIComponent(q)}`}>
               Siguiente →
             </a>
           ) : (
