@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
+import { createClient } from "@supabase/supabase-js";
 import { jwtVerify } from "jose";
-import path from "path";
 
 export const runtime = "nodejs";
 
@@ -11,6 +10,9 @@ const ARCHIVOS_PERMITIDOS = [
 ];
 
 export async function GET(req: NextRequest) {
+  console.log("SUPABASE_URL:", process.env.SUPABASE_URL ? "OK" : "MISSING");
+  console.log("SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY ? "OK" : "MISSING");
+
   const { searchParams } = new URL(req.url);
   const token = searchParams.get("token");
 
@@ -32,20 +34,31 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const filePath = path.join(process.cwd(), "private", archivo);
-    const file = await readFile(filePath);
-    const buffer = Buffer.from(file);
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
-    return new NextResponse(buffer, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${archivo}"`,
-        "Cache-Control": "no-store",
-        "X-Robots-Tag": "noindex, nofollow",
-      },
-    });
-  } catch {
-    return NextResponse.json({ error: "Error al leer el archivo" }, { status: 500 });
+    console.log("Intentando acceder al archivo:", archivo);
+
+    const { data, error } = await supabase.storage
+      .from("ebook")
+      .createSignedUrl(archivo, 60 * 60);
+
+    if (error) {
+      console.error("Supabase error:", error);
+      return NextResponse.json({ error: "Error al generar el enlace", detail: error.message }, { status: 500 });
+    }
+
+    if (!data?.signedUrl) {
+      return NextResponse.json({ error: "No se pudo generar el link" }, { status: 500 });
+    }
+
+    console.log("SignedUrl generado correctamente");
+    return NextResponse.redirect(data.signedUrl);
+
+  } catch (err) {
+    console.error("Error inesperado:", err);
+    return NextResponse.json({ error: "Error al leer el archivo", detail: String(err) }, { status: 500 });
   }
 }
