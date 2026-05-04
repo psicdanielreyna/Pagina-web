@@ -1,5 +1,6 @@
 "use client";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useRef } from "react";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 export function SubscribeForm() {
   const [email, setEmail] = useState("");
@@ -7,15 +8,22 @@ export function SubscribeForm() {
   const [loading, setLoading] = useState(false);
   const [ok, setOk] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<any>(null);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!turnstileToken) {
+      setErr("Por favor completa la verificación de seguridad.");
+      return;
+    }
     setLoading(true);
     setErr(null);
     try {
       const fd = new FormData();
       fd.set("email", email.trim().toLowerCase());
       fd.set("firstName", firstName.trim());
+      fd.set("turnstileToken", turnstileToken);
       const res = await fetch("/api/subscribe", { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || "No se pudo suscribir.");
@@ -24,6 +32,7 @@ export function SubscribeForm() {
       setFirstName("");
     } catch (e: any) {
       setErr(e?.message || "Ocurrió un error. Intenta de nuevo.");
+      turnstileRef.current?.reset();
     } finally {
       setLoading(false);
     }
@@ -62,12 +71,20 @@ export function SubscribeForm() {
         style={{ background: "#F8F5F0" }}
       />
 
+      <Turnstile
+        ref={turnstileRef}
+        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+        onSuccess={(token) => setTurnstileToken(token)}
+        onExpire={() => setTurnstileToken(null)}
+        options={{ theme: "light" }}
+      />
+
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !turnstileToken}
         className="w-full rounded-full bg-zinc-900 text-white text-sm font-medium py-3 hover:bg-zinc-700 transition-colors disabled:opacity-60"
       >
-        {loading ? "Enviando..." : "Suscribirme gratis →"}
+        {loading ? "Verificando..." : "Suscribirme gratis →"}
       </button>
 
       {err && <p className="text-xs text-red-500 text-center">{err}</p>}
