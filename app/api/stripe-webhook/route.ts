@@ -1,31 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { Resend } from "resend";
+import { SignJWT } from "jose";
 
 export const runtime = "nodejs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
-const PRODUCTOS: Record<string, { nombre: string; archivo: string }> = {
+const PRODUCTOS: Record<string, { nombre: string; archivos: string[] }> = {
   "como-apagar-la-mente": {
     nombre: "Cómo Apagar tu Mente",
-    archivo: "como-apagar-la-mente.pdf",
+    archivos: ["como-apagar-la-mente.pdf"],
   },
   "el-arte-de-creer-en-ti": {
     nombre: "El Arte de Creer en Ti",
-    archivo: "el-arte-de-creer-en-ti.pdf",
+    archivos: ["el-arte-de-creer-en-ti.pdf"],
   },
   "bundle-completo": {
     nombre: "Pack Completo",
-    archivo: null!, // bundle manda los dos
+    archivos: ["como-apagar-la-mente.pdf", "el-arte-de-creer-en-ti.pdf"],
   },
 };
 
-const BUNDLE_ARCHIVOS = [
-  "como-apagar-la-mente.pdf",
-  "el-arte-de-creer-en-ti.pdf",
-];
+async function generarToken(archivo: string): Promise<string> {
+  const secret = new TextEncoder().encode(process.env.DOWNLOAD_TOKEN_SECRET!);
+  return new SignJWT({ archivo })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("48h")
+    .setIssuedAt()
+    .sign(secret);
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -52,34 +57,47 @@ export async function POST(req: NextRequest) {
     }
 
     const producto = PRODUCTOS[slug];
-    const isBundle = slug === "bundle-completo";
-    const archivos = isBundle ? BUNDLE_ARCHIVOS : [producto.archivo];
+    if (!producto) {
+      return NextResponse.json({ error: "Producto no encontrado" }, { status: 400 });
+    }
+
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!;
 
-    // Links de descarga por archivo
-    const links = archivos
-  .map((a) => `<li><a href="${siteUrl}/api/download-manual?archivo=${a}" style="color:#1D9E75;">${a.replace(".pdf", "").replace(/-/g, " ")}</a></li>`)
-  .join("");
+    // Genera un token por cada archivo
+    const linksHtml = await Promise.all(
+      producto.archivos.map(async (archivo) => {
+        const token = await generarToken(archivo);
+        const url = `${siteUrl}/api/download-manual?token=${encodeURIComponent(token)}`;
+        const nombre = archivo.replace(".pdf", "").replace(/-/g, " ");
+        return `<li style="margin-bottom:8px;">
+          <a href="${url}" style="color:#1D9E75;font-weight:500;">${nombre}</a>
+          <span style="color:#a1a1aa;font-size:12px;"> — válido 48 horas</span>
+        </li>`;
+      })
+    );
 
     await resend.emails.send({
       from: process.env.FROM_EMAIL!,
       to: email,
-      subject: `¡Tu compra está lista! — ${isBundle ? "Pack Completo" : producto.nombre}`,
+      subject: `¡Tu compra está lista! — ${producto.nombre}`,
       html: `
         <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px;">
-          <h1 style="font-size:22px;color:#18181b;">¡Gracias por tu compra!</h1>
-          <p style="color:#52525b;">Aquí están tus manuales. Haz clic para descargarlos:</p>
-          <ul style="color:#1D9E75;margin:16px 0;padding-left:20px;">
-            ${links}
+          <h1 style="font-size:22px;color:#18181b;margin-bottom:8px;">¡Gracias por tu compra!</h1>
+          <p style="color:#52525b;margin-bottom:20px;">
+            Aquí están tus enlaces de descarga. Son válidos por <strong>48 horas</strong>.
+          </p>
+          <ul style="padding-left:20px;margin-bottom:24px;">
+            ${linksHtml.join("")}
           </ul>
-          <p style="color:#52525b;font-size:13px;">
-            Si tienes algún problema, escríbeme a 
+          <p style="color:#71717a;font-size:13px;margin-bottom:4px;">
+            Si los enlaces expiran o tienes algún problema, escríbeme a 
             <a href="mailto:danielreyna@danielreyna.com" style="color:#1D9E75;">
               danielreyna@danielreyna.com
             </a>
           </p>
-          <p style="color:#a1a1aa;font-size:12px;margin-top:32px;">
-            Daniel Reyna · Psicólogo
+          <hr style="border:none;border-top:1px solid #f1f1f1;margin:24px 0;" />
+          <p style="color:#a1a1aa;font-size:12px;">
+            Daniel Reyna · Psicólogo · danielreyna.com
           </p>
         </div>
       `,

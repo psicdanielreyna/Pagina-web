@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
+import { jwtVerify } from "jose";
 import path from "path";
 
 export const runtime = "nodejs";
@@ -11,10 +12,23 @@ const ARCHIVOS_PERMITIDOS = [
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const archivo = searchParams.get("archivo");
+  const token = searchParams.get("token");
 
-  if (!archivo || !ARCHIVOS_PERMITIDOS.includes(archivo)) {
-    return NextResponse.json({ error: "Archivo no encontrado" }, { status: 404 });
+  if (!token) {
+    return NextResponse.json({ error: "Token requerido" }, { status: 401 });
+  }
+
+  let archivo: string;
+  try {
+    const secret = new TextEncoder().encode(process.env.DOWNLOAD_TOKEN_SECRET!);
+    const { payload } = await jwtVerify(token, secret);
+    archivo = payload.archivo as string;
+  } catch {
+    return NextResponse.json({ error: "Token inválido o expirado" }, { status: 401 });
+  }
+
+  if (!ARCHIVOS_PERMITIDOS.includes(archivo)) {
+    return NextResponse.json({ error: "Archivo no permitido" }, { status: 403 });
   }
 
   try {
@@ -28,6 +42,7 @@ export async function GET(req: NextRequest) {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="${archivo}"`,
         "Cache-Control": "no-store",
+        "X-Robots-Tag": "noindex, nofollow",
       },
     });
   } catch {
