@@ -3,46 +3,105 @@ backend:
   repo: psicdanielreyna/Pagina-web
   branch: main
 
-# Si quieres probar en local sin tocar Git:
-# local_backend: true
+media_folder: "public/uploads"
+public_folder: "/uploads"
 
-media_folder: "public/uploads"   # dónde guarda archivos en el repo
-public_folder: "/uploads"        # cómo se referencian en el sitio
+publish_mode: simple
 
-# Activa Draft → Review → Publish
-publish_mode: editorial_workflow
-# (si prefieres publicar directo a main, usa: publish_mode: simple)
+locale: es
 
 collections:
-  - name: "blog"
-    label: "Blog"
-    folder: "content/blog"
+  - name: blog
+    label: Blog
+    label_singular: Post
+    folder: content/blog
     create: true
-    extension: "mdx"
-    format: "frontmatter"
-    slug: "{{slug}}"
+    extension: mdx
+    format: frontmatter
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: /blog/{{slug}}
 
     fields:
-      - { label: "Título", name: "title", widget: "string" }
-      - { label: "Slug (opcional)", name: "slug", widget: "string", required: false, hint: "Si lo dejas vacío, se usa el filename" }
 
-      # Fecha editable (sirve para programar). Sin hora.
-      - { label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD", dateFormat: "YYYY-MM-DD", timeFormat: false }
+      # ── Metadatos esenciales ──────────────────────────────────────
+      - label: Título
+        name: title
+        widget: string
 
-      # Se mapea a 'cover' en tu sitio
-      - { label: "Imagen (OG/cover)", name: "image", widget: "image", required: false, hint: "Se mapea a cover en el sitio" }
+      - label: Slug (URL)
+        name: slug
+        widget: string
+        required: false
+        hint: "Se genera automático. Solo edita si quieres una URL específica. Ej: burnout-por-que-estamos-cansados"
 
-      - { label: "Extracto", name: "excerpt", widget: "text", required: false, hint: "Si se omite, se genera automático del contenido" }
+      - label: Fecha de publicación
+        name: date
+        widget: datetime
+        format: "YYYY-MM-DD"
+        dateFormat: "DD/MM/YYYY"
+        timeFormat: false
 
-      # SEO opcional
-      - { label: "SEO Title", name: "seoTitle", widget: "string", required: false }
-      - { label: "SEO Description", name: "seoDescription", widget: "text", required: false }
-      - { label: "No index", name: "noindex", widget: "boolean", required: false, default: false }
-      - { label: "No follow", name: "nofollow", widget: "boolean", required: false, default: false }
+      - label: Categoría
+        name: category
+        widget: select
+        options:
+          - { label: "Psicología y salud mental", value: "psicologia" }
+          - { label: "Cultura y entretenimiento", value: "cultura" }
+          - { label: "Lifestyle y bienestar", value: "lifestyle" }
 
-      - { label: "Tags", name: "tags", widget: "list", required: false, default: [] }
+      - label: Tags
+        name: tags
+        widget: list
+        required: false
+        default: []
+        hint: "Palabras clave del post. Ej: burnout, trabajo, salud"
 
-      - label: "Contenido"
-        name: "body"
-        widget: "markdown"
-        hint: "Acepta MDX"
+      # ── Imagen y extracto ─────────────────────────────────────────
+      - label: Imagen de portada (OG/cover)
+        name: image
+        widget: image
+        required: false
+        hint: "⚠️ Mínimo 1200×630px para redes sociales y Google."
+
+      - label: Extracto
+        name: excerpt
+        widget: text
+        required: false
+        hint: "1–2 oraciones que resumen el post. Máximo ~160 caracteres."
+
+      # ── SEO ───────────────────────────────────────────────────────
+      - label: SEO
+        name: seo
+        widget: object
+        collapsed: true
+        hint: "Opcional. Solo edita si quieres personalizar cómo aparece en Google."
+        fields:
+          - label: Título SEO
+            name: seoTitle
+            widget: string
+            required: false
+            hint: "Máximo 60 caracteres."
+
+          - label: Descripción SEO
+            name: seoDescription
+            widget: text
+            required: false
+            hint: "Máximo 160 caracteres."
+
+          - label: No indexar
+            name: noindex
+            widget: boolean
+            default: false
+            required: false
+
+          - label: No seguir enlaces
+            name: nofollow
+            widget: boolean
+            default: false
+            required: false
+
+      # ── Contenido ─────────────────────────────────────────────────
+      - label: Contenido
+        name: body
+        widget: markdown
+        hint: "Acepta MDX."
