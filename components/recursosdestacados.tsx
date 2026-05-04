@@ -9,31 +9,36 @@ export default function RecursosDestacados() {
         {recursosDestacados.map((recurso: Recurso, index: number) => (
           <article
             key={index}
-            className="rounded-2xl border border-black/8 bg-white hover:shadow-sm transition-shadow flex gap-4 p-4 items-start"
+            className="rounded-2xl border border-black/8 bg-white hover:shadow-sm transition-shadow overflow-hidden"
           >
-            <div className="relative h-16 w-12 shrink-0 bg-emerald-50 rounded-lg overflow-hidden">
+            {/* Imagen grande arriba */}
+            <div className="relative h-52 bg-emerald-50 flex items-center justify-center">
               <Image
                 src={recurso.imagen}
                 alt={recurso.titulo}
                 fill
-                className="object-contain p-1"
-                sizes="48px"
+                className="object-contain p-8"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
-            <div className="min-w-0 flex-1">
+
+            {/* Info abajo */}
+            <div className="p-5">
               <Link href={recurso.enlace}>
-                <h3 className="font-medium text-zinc-900 text-sm leading-snug hover:underline">
+                <h3 className="font-medium text-zinc-900 text-base leading-snug hover:underline mb-1">
                   {recurso.titulo}
                 </h3>
               </Link>
-              <p className="mt-1 text-xs text-zinc-500 line-clamp-2">{recurso.descripcion}</p>
-              <div className="mt-2 flex items-center justify-between">
-                <span className="text-sm font-medium text-zinc-900">
+              <p className="text-sm text-zinc-500 leading-relaxed line-clamp-2 mb-4">
+                {recurso.descripcion}
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-base font-medium text-zinc-900">
                   ${recurso.precio} {recurso.moneda}
                 </span>
                 <Link
                   href={recurso.enlace}
-                  className="text-xs text-emerald-700 hover:underline font-medium"
+                  className="rounded-full bg-zinc-900 text-white text-xs px-4 py-2 hover:bg-zinc-700 transition-colors"
                 >
                   Ver recurso →
                 </Link>

@@ -1,138 +1,138 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import HeroBanner from "@/components/HeroBanner";
 
 export const metadata: Metadata = {
   title: "Servicios",
-  description:
-    "Enfoque TCC breve para ansiedad, depresión, duelo y autoestima. Atención en línea y presencial (Monterrey).",
+  description: "Enfoque TCC breve para ansiedad, depresión, duelo y autoestima. Atención en línea y presencial (Monterrey).",
   alternates: { canonical: "/servicios" },
 };
 
-const servicios = [
+const serviciosPrincipales = [
   {
+    badge: "Individual",
     title: "Terapia individual",
-    desc: "Sesión de 50 minutos. Enfoque TCC breve: ansiedad, depresión, duelo y autoestima. Incluye materiales y ejercicios prácticos.",
-    price: "MXN $499",
+    desc: "Sesión de 50 min. TCC para ansiedad, depresión y autoestima.",
+    price: "$499",
+    unit: "MXN · por sesión",
+    popular: false,
   },
   {
-    title: "Paquete mensual (sesiones ilimitadas)",
-    desc: "Acompañamiento continuo durante un mes. Agenda cuantas sesiones necesites dentro del periodo para avanzar en tus objetivos.",
-    price: "MXN $1,900",
+    badge: "Mensual",
+    title: "Paquete mensual",
+    desc: "Sesiones ilimitadas durante un mes completo.",
+    price: "$1,900",
+    unit: "MXN · por mes",
+    popular: true,
   },
   {
+    badge: "Pareja",
     title: "Terapia de pareja",
-    desc: "Sesión de 60 minutos. Comunicación, manejo de conflictos y acuerdos prácticos y realistas.",
-    price: "MXN $749",
+    desc: "Sesión de 60 min. Comunicación y manejo de conflictos.",
+    price: "$749",
+    unit: "MXN · por sesión",
+    popular: false,
   },
 ];
 
-const extras = [
+const serviciosExtra = [
   {
-    title: "Cartas y constancias psicológicas",
-    desc: "Entrevista clínica y emisión de constancia/carta para certificar la atención o apoyo psicológico requerido por instituciones, escuelas o empleos.",
-    items: ["Entrevista: MXN $500", "Carta/constancia: MXN $1,000"],
-    cta: { label: "Agendar entrevista", href: "/agenda" },
-    sec: { label: "Solicitar información", href: "/contacto" },
+    title: "Cartas y constancias",
+    precio: "Desde $500 MXN",
+    href: "/contacto",
   },
   {
-    title: "Supervisión y asesoría de casos",
-    desc: "Servicio dirigido a psicólogos que buscan retroalimentación y acompañamiento profesional en la atención de sus pacientes.",
-    price: "MXN $600 por sesión",
-    cta: { label: "Agendar", href: "/agenda" },
-    sec: { label: "Más información", href: "/contacto" },
+    title: "Supervisión de casos",
+    precio: "$600 MXN por sesión",
+    href: "/contacto",
   },
 ];
 
 export default function ServiciosPage() {
   return (
-    <>
-      <HeroBanner
-        badge="Servicios"
-        title="Terapia Cognitivo-Conductual"
-        subtitle="Atención en línea y presencial en Monterrey. Herramientas prácticas enfocadas a objetivos."
-        accentText="Agenda tu proceso"
-        accentSub="Primera sesión sin compromiso. En línea o presencial en Monterrey."
-      />
+    <main style={{ background: "#F8F5F0" }} className="min-h-screen">
 
-      {/* Intro */}
-      <section className="border-b border-black/8 py-12" style={{ background: "#F8F5F0" }}>
-        <div className="mx-auto max-w-3xl px-4 text-center space-y-4">
-          <p className="text-base text-zinc-700 leading-relaxed">
-            Trabajo con <strong className="text-zinc-900">Terapia Cognitivo-Conductual (TCC)</strong> breve para
-            ansiedad, depresión, duelo y autoestima. Esta terapia se centra en cómo
-            tus pensamientos influyen en tus emociones y comportamientos.
-          </p>
-          <p className="text-base text-zinc-700 leading-relaxed">
-            Acompañamiento claro, práctico y con ejercicios entre sesiones para que
-            veas avances en tu día a día.
+      {/* Header */}
+      <div className="border-b border-black/8 px-6 py-12" style={{ background: "#F8F5F0" }}>
+        <div className="mx-auto max-w-6xl">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">Servicios</p>
+          <h1 className="text-3xl font-medium text-zinc-900 tracking-tight mb-2">
+            Terapia Cognitivo-Conductual
+          </h1>
+          <p className="text-sm text-zinc-500">
+            Atención en línea y presencial en Monterrey.
           </p>
         </div>
-      </section>
+      </div>
 
       {/* Servicios principales */}
-      <section className="py-14">
-        <div className="mx-auto max-w-6xl px-4">
-          <h2 className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-8">
-            Opciones de atención
-          </h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            {servicios.map((s) => (
-              <article
-                key={s.title}
-                className="rounded-2xl border border-black/8 bg-white p-6 flex flex-col"
-              >
-                <h3 className="text-sm font-medium text-zinc-900 mb-2">{s.title}</h3>
-                <p className="text-sm text-zinc-500 leading-relaxed flex-1">{s.desc}</p>
-                <p className="mt-4 text-base font-medium text-zinc-900">{s.price}</p>
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-6">
+          Opciones de atención
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          {serviciosPrincipales.map((s) => (
+            <div
+              key={s.title}
+              className="bg-white rounded-2xl overflow-hidden flex flex-col"
+              style={{ border: s.popular ? "2px solid #1D9E75" : "0.5px solid rgba(0,0,0,0.08)" }}
+            >
+              {/* Badge más popular */}
+              {s.popular && (
+                <div
+                  className="text-center py-1.5 text-xs font-medium"
+                  style={{ background: "#1D9E75", color: "#fff" }}
+                >
+                  Más popular
+                </div>
+              )}
+
+              <div className="p-5 flex flex-col flex-1">
+                {/* Badge categoría */}
+                <span
+                  className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4 w-fit"
+                  style={{ background: "#E1F5EE", color: "#0F6E56" }}
+                >
+                  {s.badge}
+                </span>
+
+                <h2 className="text-sm font-medium text-zinc-900 mb-2">{s.title}</h2>
+                <p className="text-xs text-zinc-500 leading-relaxed flex-1 mb-4">{s.desc}</p>
+
+                <div className="text-2xl font-medium text-zinc-900">{s.price}</div>
+                <div className="text-xs text-zinc-400 mb-5">{s.unit}</div>
+
                 <Link
                   href="/agenda"
-                  className="mt-4 inline-block rounded-full bg-zinc-900 text-white text-xs px-4 py-2 text-center hover:bg-zinc-700 transition-colors w-fit"
+                  className="rounded-full bg-zinc-900 text-white text-xs font-medium px-4 py-2.5 text-center hover:bg-zinc-700 transition-colors w-fit"
                 >
                   Agendar
                 </Link>
-              </article>
-            ))}
-          </div>
-
-          {/* Extras */}
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {extras.map((s) => (
-              <article
-                key={s.title}
-                className="rounded-2xl border border-black/8 bg-white p-6 flex flex-col"
-              >
-                <h3 className="text-sm font-medium text-zinc-900 mb-2">{s.title}</h3>
-                <p className="text-sm text-zinc-500 leading-relaxed flex-1">{s.desc}</p>
-                {s.items && (
-                  <ul className="mt-3 space-y-1">
-                    {s.items.map((item) => (
-                      <li key={item} className="text-sm text-zinc-700">• {item}</li>
-                    ))}
-                  </ul>
-                )}
-                {s.price && (
-                  <p className="mt-3 text-base font-medium text-zinc-900">{s.price}</p>
-                )}
-                <div className="mt-4 flex gap-3">
-                  <Link
-                    href={s.cta.href}
-                    className="rounded-full bg-zinc-900 text-white text-xs px-4 py-2 hover:bg-zinc-700 transition-colors"
-                  >
-                    {s.cta.label}
-                  </Link>
-                  <Link
-                    href={s.sec.href}
-                    className="rounded-full border border-black/8 text-zinc-600 text-xs px-4 py-2 hover:bg-black/5 transition-colors"
-                  >
-                    {s.sec.label}
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </section>
-    </>
+
+        {/* Servicios extra — compactos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {serviciosExtra.map((s) => (
+            <div
+              key={s.title}
+              className="bg-white rounded-2xl border border-black/8 px-5 py-4 flex items-center justify-between gap-4"
+            >
+              <div>
+                <p className="text-sm font-medium text-zinc-900">{s.title}</p>
+                <p className="text-xs text-zinc-400">{s.precio}</p>
+              </div>
+              <Link
+                href={s.href}
+                className="rounded-full border border-black/8 text-zinc-500 text-xs px-4 py-2 hover:bg-black/5 transition-colors whitespace-nowrap shrink-0"
+              >
+                Ver más
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
   );
 }
