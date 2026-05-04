@@ -67,38 +67,40 @@ collections:
         name: excerpt
         widget: text
         required: false
-        hint: "1–2 oraciones que resumen el post. Máximo ~160 caracteres."
+        hint: "1–2 oraciones que resumen el post. Máximo ~160 caracteres. Si se omite, se genera automático del contenido."
 
-      # ── SEO ───────────────────────────────────────────────────────
-      - label: SEO
-        name: seo
-        widget: object
-        collapsed: true
-        hint: "Opcional. Solo edita si quieres personalizar cómo aparece en Google."
-        fields:
-          - label: Título SEO
-            name: seoTitle
-            widget: string
-            required: false
-            hint: "Máximo 60 caracteres."
+      # ── SEO (campos sueltos — requerido por lib/posts.ts) ─────────
+      # IMPORTANTE: estos nombres (seoTitle, seoDescription, noindex, nofollow)
+      # deben coincidir exactamente con lo que lee lib/posts.ts
+      - label: "— SEO (opcional) —"
+        name: seo_divider
+        widget: hidden
+        required: false
 
-          - label: Descripción SEO
-            name: seoDescription
-            widget: text
-            required: false
-            hint: "Máximo 160 caracteres."
+      - label: Título SEO
+        name: seoTitle
+        widget: string
+        required: false
+        hint: "Diferente al título del post si quieres. Máximo 60 caracteres."
 
-          - label: No indexar
-            name: noindex
-            widget: boolean
-            default: false
-            required: false
+      - label: Descripción SEO
+        name: seoDescription
+        widget: text
+        required: false
+        hint: "Texto que aparece bajo el título en Google. Máximo 160 caracteres."
 
-          - label: No seguir enlaces
-            name: nofollow
-            widget: boolean
-            default: false
-            required: false
+      - label: No indexar
+        name: noindex
+        widget: boolean
+        default: false
+        required: false
+        hint: "Activa solo si NO quieres que Google indexe este post."
+
+      - label: No seguir enlaces
+        name: nofollow
+        widget: boolean
+        default: false
+        required: false
 
       # ── Contenido ─────────────────────────────────────────────────
       - label: Contenido
