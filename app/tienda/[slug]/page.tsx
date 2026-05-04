@@ -1,170 +1,133 @@
 // app/tienda/[slug]/page.tsx
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import { getManual, resolveManualSlug, manualSlugsForBuild } from "@/data/manuals";
-
-const CopyButton = dynamic(() => import("@/components/CopyButton"), { ssr: false });
-const Opiniones  = dynamic(() => import("@/components/Opiniones"), { ssr: false, loading: () => null });
+import BtnComprarProducto from "./BtnComprarProducto";
 
 export const dynamicParams = true;
 
-// ✅ Pre-genera slugs reales y alias
 export function generateStaticParams() {
   return manualSlugsForBuild().map((slug) => ({ slug }));
 }
 
-// ⚠️ Usa el slug “de vista” (el que viene en la URL) para canonical/OG
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  try {
-    const manual = getManual(params.slug);
-    if (!manual) {
-      return {
-        title: "Manual no encontrado",
-        description: "Este recurso no está disponible actualmente.",
-        robots: { index: false },
-      };
-    }
-    const viewSlug = params.slug;
-    const title = `${manual.title} · Ebook | Daniel Reyna`;
-    const description = manual.description ?? `Ebook de ${manual.title} por Daniel Reyna.`;
-    return {
-      title,
-      description,
-      alternates: { canonical: `/tienda/${viewSlug}` },
-      openGraph: {
-        title,
-        description,
-        type: "website",
-        url: `/tienda/${viewSlug}`,
-      },
-    };
-  } catch {
-    return { title: "Manual", description: "" };
-  }
+  const manual = getManual(params.slug);
+  if (!manual) return { title: "Manual no encontrado" };
+  return {
+    title: `${manual.title} · Manual PDF | Daniel Reyna`,
+    description: manual.description ?? `Manual ${manual.title} por Daniel Reyna.`,
+    alternates: { canonical: `/tienda/${params.slug}` },
+  };
 }
 
-// Portadas: incluye claves para alias y slug real
 const COVERS: Record<string, { src: string; alt: string }> = {
-  "apagar-mente":               { src: "/images/tienda/apagar-mente.png", alt: "Portada «Cómo Apagar tu Mente»" },
-  "como-apagar-la-mente":       { src: "/images/tienda/apagar-mente.png", alt: "Portada «Cómo Apagar tu Mente»" },
-  "el-arte-de-creer-en-ti":     { src: "/images/tienda/el-arte-de-creer-en-ti.png", alt: "Portada «El Arte de Creer en Ti»" },
+  "apagar-mente": { src: "/images/tienda/apagar-mente.png", alt: "Portada Cómo Apagar tu Mente" },
+  "como-apagar-la-mente": { src: "/images/tienda/apagar-mente.png", alt: "Portada Cómo Apagar tu Mente" },
+  "el-arte-de-creer-en-ti": { src: "/images/tienda/el-arte-de-creer-en-ti.png", alt: "Portada El Arte de Creer en Ti" },
 };
+
+const INCLUYE = [
+  "PDF descargable de alta calidad",
+  "Ejercicios prácticos aplicables desde el día 1",
+  "Técnicas basadas en Terapia Cognitivo-Conductual",
+  "Entrega inmediata por correo electrónico",
+];
 
 function Inner({ slug }: { slug: string }) {
   const manual = getManual(slug);
   if (!manual) return notFound();
 
-  const viewSlug = slug;
-  const cover =
-    COVERS[viewSlug] ??
-    COVERS[resolveManualSlug(viewSlug)] ?? {
-      src: "/images/tienda/apagar-mente.png",
-      alt: manual.title,
-    };
-
-  const BANK_NAME   = process.env.NEXT_PUBLIC_BANK_NAME   || "Hey Banco (BANREGIO)";
-  const BANK_HOLDER = process.env.NEXT_PUBLIC_BANK_HOLDER || "DANIEL OSVALDO GONZÁLEZ REYNA";
-  const BANK_CLABE  = process.env.NEXT_PUBLIC_BANK_CLABE  || "058597000028423030";
-  const PAYPAL_ME   = process.env.NEXT_PUBLIC_PAYPAL_ME   || "dangzzreyna";
-  const WHATSAPP    = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "5218117649180";
-
-  const paypalHref  = `https://paypal.me/${PAYPAL_ME}/${manual.price}`;
-  const concepto    = resolveManualSlug(viewSlug);
-  const whatsappHref = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-    `Hola, te comparto mi comprobante del manual "${manual.title}".`
-  )}`;
+  const manualSlug = resolveManualSlug(slug);
+  const cover = COVERS[slug] ?? COVERS[manualSlug] ?? {
+    src: "/images/tienda/apagar-mente.png",
+    alt: manual.title,
+  };
 
   return (
-    <>
-      <section className="py-10 md:py-14">
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-10 items-start">
-          <div className="rounded-2xl border border-slate-100 overflow-hidden bg-white">
-            <div className="relative aspect-[4/3] bg-slate-50">
-              <Image
-                src={cover.src}
-                alt={cover.alt}
-                fill
-                className="object-contain"
-                sizes="(max-width: 1024px) 100vw, 640px"
-                priority
-              />
-            </div>
-          </div>
+    <main style={{ background: "#F8F5F0" }} className="min-h-screen">
+      <div className="border-b border-black/8 px-6 py-4" style={{ background: "#F8F5F0" }}>
+        <div className="mx-auto max-w-6xl">
+          <p className="text-xs text-zinc-400">
+            <a href="/tienda" className="hover:text-zinc-700 transition-colors">Tienda</a>
+            <span className="mx-2">·</span>
+            <span className="text-zinc-600">{manual.title}</span>
+          </p>
+        </div>
+      </div>
 
+      <div className="mx-auto max-w-6xl px-6 py-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div className="rounded-2xl overflow-hidden border border-black/8 bg-emerald-50 flex items-center justify-center p-10">
+          <div className="relative w-full aspect-square">
+            <Image
+              src={cover.src}
+              alt={cover.alt}
+              fill
+              className="object-contain"
+              sizes="(max-width: 1024px) 100vw, 560px"
+              priority
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6">
           <div>
-            <div className="text-2xl font-bold text-slate-900 mb-2">${manual.price} MXN</div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{manual.title}</h1>
-            {manual.description && <p className="mt-2 text-slate-700">{manual.description}</p>}
+            <span className="inline-block text-xs font-medium bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full mb-4">
+              Manual PDF
+            </span>
+            <h1 className="text-3xl font-medium text-zinc-900 tracking-tight mb-2">
+              {manual.title}
+            </h1>
+            {manual.description && (
+              <p className="text-sm text-zinc-500 leading-relaxed">{manual.description}</p>
+            )}
+          </div>
 
-            <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 space-y-3">
-              <h2 className="font-semibold text-slate-900">Transferencia bancaria</h2>
-              <dl className="grid gap-2 text-slate-700 text-[15px]">
-                <div className="flex items-center justify-between gap-4">
-                  <dt className="font-medium">Banco</dt><dd>{BANK_NAME}</dd>
-                </div>
-                <div className="flex items-center justify-between gap-4">
-                  <dt className="font-medium">Titular</dt><dd className="text-right">{BANK_HOLDER}</dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="font-medium">CLABE</dt>
-                  <dd className="flex items-center gap-2">
-                    <code className="rounded bg-slate-50 px-2 py-1 text-slate-900">{BANK_CLABE}</code>
-                    <CopyButton text={BANK_CLABE} small />
-                  </dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="font-medium">Concepto</dt>
-                  <dd className="flex items-center gap-2">
-                    <code className="rounded bg-slate-50 px-2 py-1 text-slate-900">{concepto}</code>
-                    <CopyButton text={concepto} small />
-                  </dd>
-                </div>
-              </dl>
+          <div className="rounded-2xl border border-black/8 bg-white p-6">
+            <div className="flex items-baseline gap-2 mb-4">
+              <span className="text-3xl font-medium text-zinc-900">${manual.price}</span>
+              <span className="text-sm text-zinc-400">MXN</span>
             </div>
+            <BtnComprarProducto slug={manualSlug} />
+            <p className="text-xs text-zinc-400 text-center mt-3">
+              Pago seguro con Stripe · Tarjeta o transferencia bancaria
+            </p>
+          </div>
 
-            <div className="mt-4">
-              <Link href={paypalHref} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-full px-6 py-3 bg-yellow-400 text-slate-900 font-semibold hover:brightness-95">
-                Pagar con PayPal
-              </Link>
-            </div>
+          <div className="rounded-2xl border border-black/8 bg-white p-6">
+            <h3 className="text-sm font-medium text-zinc-900 mb-4">¿Qué incluye?</h3>
+            <ul className="space-y-3">
+              {INCLUYE.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-zinc-600">
+                  <span className="text-emerald-600 mt-0.5 shrink-0">✓</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            <div className="mt-3">
-              <Link href={whatsappHref} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-full px-6 py-3 bg-emerald-600 text-white hover:bg-emerald-700">
-                Enviar comprobante por WhatsApp
-              </Link>
-            </div>
-
-            <div className="mt-6">
-              <Link href={`/checkout/${resolveManualSlug(viewSlug)}`}
-                className="text-sm text-slate-600 underline underline-offset-4">
-                Prefiero ver el checkout interno
-              </Link>
+          <div className="rounded-2xl p-5 flex gap-4 items-start" style={{ background: "#E1F5EE" }}>
+            <span className="text-2xl">🔒</span>
+            <div>
+              <p className="text-sm font-medium text-emerald-900 mb-1">Compra segura y garantizada</p>
+              <p className="text-xs text-emerald-800 leading-relaxed">
+                Si tienes algún problema con tu compra, escríbeme a{" "}
+                <a href="mailto:danielreyna@danielreyna.com" className="underline">
+                  danielreyna@danielreyna.com
+                </a>{" "}
+                y lo resolvemos.
+              </p>
             </div>
           </div>
         </div>
-      </section>
-
-      <section className="py-8 md:py-12">
-        <div className="container mx-auto px-4">
-          <Opiniones
-            title="Opiniones del ebook"
-            subtitle="Qué dicen quienes ya lo leyeron"
-            variant={{ ebookSlug: resolveManualSlug(viewSlug) }}
-          />
-        </div>
-      </section>
-    </>
+      </div>
+    </main>
   );
 }
 
 export default function ProductoPage({ params }: { params: { slug: string } }) {
   return (
-    <Suspense fallback={<div className="py-16 text-center text-sm text-zinc-600">Cargando…</div>}>
+    <Suspense fallback={<div className="py-16 text-center text-sm text-zinc-400">Cargando…</div>}>
       <Inner slug={params.slug} />
     </Suspense>
   );
