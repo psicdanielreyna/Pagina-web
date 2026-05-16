@@ -15,7 +15,6 @@ function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?
           started.current = true;
           const duration = 2000;
           const startTime = performance.now();
-
           const animate = (now: number) => {
             const elapsed = now - startTime;
             const progress = Math.min(elapsed / duration, 1);
@@ -24,7 +23,6 @@ function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?
             if (progress < 1) requestAnimationFrame(animate);
             else setCount(target);
           };
-
           requestAnimationFrame(animate);
         }
       },
@@ -35,7 +33,7 @@ function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?
   }, [target]);
 
   return (
-    <div ref={ref} className="block text-2xl font-medium text-zinc-900">
+    <div ref={ref} className="block text-5xl font-medium tracking-tight" style={{ color: "var(--text-primary)" }}>
       {prefix}{count}{suffix}
     </div>
   );
@@ -43,30 +41,44 @@ function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?
 
 export default function Hero() {
   return (
-    <section className="border-b border-black/8" style={{ background: "#F8F5F0" }}>
+    <section style={{ background: "var(--bg-primary)", borderBottom: "0.5px solid var(--border)" }}>
       <div className="mx-auto max-w-6xl grid md:grid-cols-2" style={{ minHeight: "calc(100vh - 64px)" }}>
 
         {/* Texto */}
-        <div className="flex flex-col justify-center px-6 py-14 md:pr-12 md:border-r border-black/8">
-          <span className="inline-block rounded-full bg-emerald-100 text-emerald-800 text-sm font-medium px-4 py-1.5 mb-6 w-fit">
+        <div
+          className="flex flex-col justify-center px-6 py-14 md:pr-12"
+          style={{ borderRight: "0.5px solid var(--border)" }}
+        >
+          <span
+            className="inline-block rounded-full text-sm font-medium px-4 py-1.5 mb-6 w-fit"
+            style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
+          >
             Psicólogo · Monterrey
           </span>
-          <h1 className="text-4xl md:text-[2.75rem] font-medium leading-[1.15] tracking-tight text-zinc-900">
+          <h1
+            className="text-4xl md:text-[2.75rem] font-medium leading-[1.15] tracking-tight"
+            style={{ color: "var(--text-primary)" }}
+          >
             Ansiedad y estrés,<br />con claridad.
           </h1>
-          <p className="mt-4 text-base text-zinc-500 leading-relaxed max-w-md">
+          <p
+            className="mt-4 text-base leading-relaxed max-w-md"
+            style={{ color: "var(--text-secondary)" }}
+          >
             Terapia práctica y directa. Sin rodeos, con resultados reales para tu día a día.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/servicios"
-              className="rounded-full bg-zinc-900 text-white text-sm px-5 py-2.5 hover:bg-zinc-700 transition-colors"
+              className="rounded-full text-sm px-5 py-2.5 transition-colors"
+              style={{ background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }}
             >
               Agendar sesión
             </Link>
             <Link
               href="/tienda"
-              className="text-sm text-zinc-500 px-2 py-2.5 hover:text-zinc-900 transition-colors"
+              className="text-sm px-2 py-2.5 transition-colors"
+              style={{ color: "var(--text-secondary)" }}
             >
               Ver recursos →
             </Link>
@@ -74,7 +86,10 @@ export default function Hero() {
         </div>
 
         {/* Imagen */}
-        <div className="flex items-center justify-center p-12" style={{ background: "#EEE9E0" }}>
+        <div
+          className="flex items-center justify-center p-12"
+          style={{ background: "var(--bg-secondary)" }}
+        >
           <Image
             src="/images/hero/herodos.jpg.jpg"
             alt="Daniel Reyna – Psicólogo"
@@ -86,22 +101,25 @@ export default function Hero() {
         </div>
       </div>
 
-    {/* Stats bar — full width */}
-<div className="w-full grid grid-cols-3 border-t border-black/8">
-  {[
-    { target: 500, prefix: "+", suffix: "", label: "Pacientes atendidos" },
-    { target: 10, prefix: "", suffix: "K+", label: "Suscriptores newsletter" },
-    { target: 5, prefix: "+", suffix: " años", label: "Experiencia en atención" },
-  ].map((s, i) => (
-    <div
-      key={i}
-      className={`py-12 text-center ${i < 2 ? "border-r border-black/8" : ""}`}
-    >
-      <CountUp target={s.target} prefix={s.prefix} suffix={s.suffix} />
-      <span className="text-sm text-zinc-400 mt-2 block">{s.label}</span>
-    </div>
-  ))}
-</div>
+      {/* Stats bar */}
+      <div className="w-full grid grid-cols-3" style={{ borderTop: "0.5px solid var(--border)" }}>
+        {[
+          { target: 500, prefix: "+", suffix: "", label: "Pacientes atendidos" },
+          { target: 10, prefix: "", suffix: "K+", label: "Suscriptores newsletter" },
+          { target: 5, prefix: "+", suffix: " años", label: "Experiencia en atención" },
+        ].map((s, i) => (
+          <div
+            key={i}
+            className="py-12 text-center"
+            style={{ borderRight: i < 2 ? "0.5px solid var(--border)" : "none" }}
+          >
+            <CountUp target={s.target} prefix={s.prefix} suffix={s.suffix} />
+            <span className="text-sm mt-2 block" style={{ color: "var(--text-tertiary)" }}>
+              {s.label}
+            </span>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

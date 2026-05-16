@@ -1,44 +1,93 @@
-/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Base ===== */
-html, body {
-  background: #F8F5F0;
-  color: #043222;
-  font-family: var(--font-dm-sans), sans-serif;
+/* ===== Variables de tema ===== */
+:root {
+  --bg-primary: #F8F5F0;
+  --bg-secondary: #EEE9E0;
+  --bg-card: #ffffff;
+  --text-primary: #18181b;
+  --text-secondary: #71717a;
+  --text-tertiary: #a1a1aa;
+  --border: rgba(0, 0, 0, 0.08);
+  --accent: #1D9E75;
+  --accent-light: #E1F5EE;
+  --accent-text: #0F6E56;
+  --btn-primary-bg: #18181b;
+  --btn-primary-text: #ffffff;
+  --nl-bg: #F5F7FA;
+  --nl-accent: #14532d;
+  --nl-accent-contrast: #fff;
 }
 
-/* Contenedor utilitario (si lo usas fuera del layout) */
+[data-theme="dark"] {
+  --bg-primary: #0f0f1a;
+  --bg-secondary: #161625;
+  --bg-card: #1a1a2e;
+  --text-primary: #e2e8f0;
+  --text-secondary: #64748b;
+  --text-tertiary: #475569;
+  --border: rgba(255, 255, 255, 0.06);
+  --accent: #1D9E75;
+  --accent-light: rgba(29, 158, 117, 0.15);
+  --accent-text: #5DCAA5;
+  --btn-primary-bg: #1D9E75;
+  --btn-primary-text: #ffffff;
+  --nl-bg: #0b0f14;
+  --nl-accent: #1D9E75;
+  --nl-accent-contrast: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #161625;
+    --bg-card: #1a1a2e;
+    --text-primary: #e2e8f0;
+    --text-secondary: #64748b;
+    --text-tertiary: #475569;
+    --border: rgba(255, 255, 255, 0.06);
+    --accent: #1D9E75;
+    --accent-light: rgba(29, 158, 117, 0.15);
+    --accent-text: #5DCAA5;
+    --btn-primary-bg: #1D9E75;
+    --btn-primary-text: #ffffff;
+    --nl-bg: #0b0f14;
+    --nl-accent: #1D9E75;
+    --nl-accent-contrast: #fff;
+  }
+}
+
+/* ===== Base ===== */
+html, body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-dm-sans), sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
 .container { @apply mx-auto max-w-6xl; }
 
-/* Quitar scrollbar cuando el drawer está abierto */
 html:has([data-state="open"]) { overflow: hidden; }
+[data-state="open"].fixed.inset-0 { z-index: 90; }
+div[data-side="left"].fixed { z-index: 100; background: var(--bg-card); }
+.site-header { z-index: 30; }
 
-/* Asegurar capas correctas del Sheet (shadcn) y header */
-[data-state="open"].fixed.inset-0 { z-index: 90; } /* overlay */
-div[data-side="left"].fixed { z-index: 100; background: #fff; } /* panel */
-.site-header { z-index: 30; } /* header por debajo del overlay */
-
-/* No-scrollbar util */
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
-/* Botones “base” por si los necesitas en HTML suelto */
-.btn-primary { @apply inline-flex items-center justify-center rounded-lg bg-evergreen px-4 py-2 font-medium text-white shadow-sm transition hover:opacity-90; }
-.btn-secondary { @apply inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 font-medium text-evergreen ring-1 ring-black/10 transition hover:bg-gray-50; }
+.btn-primary { @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-medium transition hover:opacity-90; background: var(--btn-primary-bg); color: var(--btn-primary-text); }
+.btn-secondary { @apply inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 font-medium ring-1 ring-black/10 transition hover:bg-gray-50; }
 
-/* Prosa (markdown) – sin @apply a `.prose` para evitar bucles */
 .prose a { @apply underline; }
 .prose img { @apply rounded-xl; }
 .prose h1, .prose h2, .prose h3 { @apply font-semibold; }
 .prose ul { @apply list-disc pl-6; }
 .prose ol { @apply list-decimal pl-6; }
 
-/* Imágenes dentro de contenido de post */
 .post-content img {
   display: block;
   margin: 1.25rem auto;
@@ -47,6 +96,7 @@ div[data-side="left"].fixed { z-index: 100; background: #fff; } /* panel */
   height: auto;
   border-radius: 0.75rem;
 }
+
 .post-content iframe,
 .post-content video {
   display: block;
@@ -54,13 +104,4 @@ div[data-side="left"].fixed { z-index: 100; background: #fff; } /* panel */
   max-width: 960px;
   width: 100%;
   border-radius: 0.5rem;
-:root{
-  --nl-bg: #F5F7FA;           /* franja clara del banner */
-  --nl-accent: #14532d;       /* verde botón */
-  --nl-accent-contrast: #fff; /* texto botón */
-}
-.dark:root{
-  --nl-bg: #0b0f14;
-}
-
 }

@@ -14,10 +14,10 @@ export default async function LatestBlog() {
     <section className="mx-auto max-w-6xl px-4 md:px-6">
       {/* Artículo destacado */}
       <Link href={`/blog/${featured.slug}`} className="block group mb-4">
-        <div className="rounded-2xl bg-emerald-700 p-6 md:p-8 grid md:grid-cols-[1fr_auto] gap-6 items-center">
+        <div className="rounded-2xl p-6 md:p-8 grid md:grid-cols-[1fr_auto] gap-6 items-center" style={{ background: "var(--accent)" }}>
           <div>
             {featured.date && (
-              <p className="text-xs font-medium text-emerald-300 uppercase tracking-wide mb-3">
+              <p className="text-xs font-medium uppercase tracking-wide mb-3" style={{ color: "rgba(255,255,255,0.6)" }}>
                 {new Date(featured.date).toLocaleDateString("es-MX", {
                   year: "numeric",
                   month: "long",
@@ -28,9 +28,13 @@ export default async function LatestBlog() {
               {featured.title}
             </h3>
             {featured.excerpt && (
-              <p className="mt-2 text-sm text-emerald-200 line-clamp-2">{featured.excerpt}</p>
+              <p className="mt-2 text-sm line-clamp-2" style={{ color: "rgba(255,255,255,0.75)" }}>
+                {featured.excerpt}
+              </p>
             )}
-            <span className="mt-4 inline-block text-xs text-emerald-300">Leer artículo →</span>
+            <span className="mt-4 inline-block text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
+              Leer artículo →
+            </span>
           </div>
           {featured.cover && (
             <img
@@ -44,21 +48,22 @@ export default async function LatestBlog() {
       </Link>
 
       {/* Lista de otros artículos */}
-      <div className="divide-y divide-black/8 border-t border-black/8">
+      <div style={{ borderTop: "0.5px solid var(--border)" }}>
         {others.map((p, i) => (
           <Link
             key={p.slug}
             href={`/blog/${p.slug}`}
-            className="flex items-center gap-4 py-4 group hover:bg-zinc-50 px-1 rounded-lg transition-colors"
+            className="flex items-center gap-4 py-4 group px-1 rounded-lg transition-colors"
+            style={{ borderBottom: "0.5px solid var(--border)" }}
           >
-            <span className="text-xs font-medium text-zinc-400 min-w-[24px]">
+            <span className="text-xs font-medium min-w-[24px]" style={{ color: "var(--text-tertiary)" }}>
               {String(i + 2).padStart(2, "0")}
             </span>
-            <span className="flex-1 text-sm text-zinc-800 group-hover:underline leading-snug">
+            <span className="flex-1 text-sm group-hover:underline leading-snug" style={{ color: "var(--text-primary)" }}>
               {p.title}
             </span>
             {p.date && (
-              <span className="text-xs text-zinc-400 whitespace-nowrap">
+              <span className="text-xs whitespace-nowrap" style={{ color: "var(--text-tertiary)" }}>
                 {new Date(p.date).toLocaleDateString("es-MX", {
                   month: "short",
                   year: "numeric",

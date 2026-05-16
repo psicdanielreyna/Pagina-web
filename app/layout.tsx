@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Analytics from "./analytics";
 import TrackCTAs from "@/components/TrackCTAs";
 import { Suspense } from "react";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -53,13 +54,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={`${dmSans.variable} ${playfair.variable}`}>
       <body className={dmSans.className}>
-        <SiteHeader />
-        <main className="min-h-[60vh]">{children}</main>
-        <Footer />
-        <Suspense fallback={null}>
-          <Analytics />
-          <TrackCTAs />
-        </Suspense>
+        <ThemeProvider>
+          <SiteHeader />
+          <main className="min-h-[60vh]">{children}</main>
+          <Footer />
+          <Suspense fallback={null}>
+            <Analytics />
+            <TrackCTAs />
+          </Suspense>
+        </ThemeProvider>
       </body>
     </html>
   );
