@@ -9,20 +9,32 @@ export const metadata: Metadata = {
 
 export default function LegalPage() {
   return (
-    <main style={{ background: "#F8F5F0" }} className="min-h-screen">
-      <div className="border-b border-black/8 px-6 py-12" style={{ background: "#F8F5F0" }}>
+    <main style={{ background: "var(--bg-primary)" }} className="min-h-screen">
+      <div className="px-6 py-12" style={{ borderBottom: "0.5px solid var(--border)" }}>
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">Legal</p>
-          <h1 className="text-3xl font-medium text-zinc-900 tracking-tight">Aviso de privacidad</h1>
-          <p className="text-sm text-zinc-500 mt-2">Última actualización: mayo 2026</p>
+          <p className="text-xs font-medium uppercase tracking-widest mb-2" style={{ color: "var(--text-tertiary)" }}>
+            Legal
+          </p>
+          <h1 className="text-3xl font-medium tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Aviso de privacidad
+          </h1>
+          <p className="text-sm mt-2" style={{ color: "var(--text-secondary)" }}>
+            Última actualización: mayo 2026
+          </p>
         </div>
       </div>
 
       <div className="mx-auto max-w-3xl px-6 py-10">
-        <div className="rounded-2xl border border-black/8 bg-white p-8 prose prose-zinc prose-sm max-w-none">
-
+        <div
+          className="rounded-2xl p-8 prose prose-sm max-w-none"
+          style={{
+            border: "0.5px solid var(--border)",
+            background: "var(--bg-card)",
+            color: "var(--text-primary)",
+          }}
+        >
           <h2>Responsable del tratamiento</h2>
-          <p>Daniel Osvaldo González Reyna, Psicólogo. Correo de contacto: <a href="mailto:danielreyna@danielreyna.com">danielreyna@danielreyna.com</a></p>
+          <p>Daniel Osvaldo González Reyna, Psicólogo. Correo de contacto: <a href="mailto:danielreyna@danielreyna.com" style={{ color: "var(--accent-text)" }}>danielreyna@danielreyna.com</a></p>
 
           <h2>Datos que recopilamos</h2>
           <p>Recopilamos los siguientes datos personales:</p>
@@ -51,16 +63,16 @@ export default function LegalPage() {
           </ul>
 
           <h2>Tus derechos (ARCO)</h2>
-          <p>Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos. Para ejercer estos derechos, escríbeme a <a href="mailto:danielreyna@danielreyna.com">danielreyna@danielreyna.com</a>.</p>
+          <p>Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos. Para ejercer estos derechos, escríbeme a <a href="mailto:danielreyna@danielreyna.com" style={{ color: "var(--accent-text)" }}>danielreyna@danielreyna.com</a>.</p>
 
           <h2>Baja del newsletter</h2>
-          <p>Puedes darte de baja en cualquier momento usando el enlace al final de cada correo o visitando <a href="/unsubscribe">/unsubscribe</a>.</p>
+          <p>Puedes darte de baja en cualquier momento usando el enlace al final de cada correo o visitando <a href="/unsubscribe" style={{ color: "var(--accent-text)" }}>/unsubscribe</a>.</p>
 
           <h2>Cookies</h2>
           <p>Este sitio utiliza cookies técnicas necesarias para su funcionamiento y cookies de analítica anónima para mejorar la experiencia. No usamos cookies publicitarias.</p>
 
           <h2>Contacto</h2>
-          <p>Para cualquier duda sobre privacidad: <a href="mailto:danielreyna@danielreyna.com">danielreyna@danielreyna.com</a></p>
+          <p>Para cualquier duda sobre privacidad: <a href="mailto:danielreyna@danielreyna.com" style={{ color: "var(--accent-text)" }}>danielreyna@danielreyna.com</a></p>
         </div>
       </div>
     </main>

@@ -23,48 +23,52 @@ const BENEFICIOS = [
 
 export default function NewsletterPage() {
   return (
-    <main style={{ background: "#F8F5F0" }} className="min-h-screen">
+    <main style={{ background: "var(--bg-primary)" }} className="min-h-screen">
 
-      {/* Hero centrado */}
-      <div className="border-b border-black/8 px-6 py-16 text-center" style={{ background: "#F8F5F0" }}>
-        <span className="inline-block text-xs font-medium bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full mb-5">
+      <div className="px-6 py-16 text-center" style={{ borderBottom: "0.5px solid var(--border)" }}>
+        <span
+          className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-5"
+          style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
+        >
           Newsletter semanal
         </span>
-        <h1 className="text-4xl font-medium text-zinc-900 tracking-tight mb-3">
+        <h1 className="text-4xl font-medium tracking-tight mb-3" style={{ color: "var(--text-primary)" }}>
           Una idea práctica cada semana
         </h1>
-        <p className="text-sm text-zinc-500 leading-relaxed max-w-sm mx-auto mb-8">
+        <p className="text-sm leading-relaxed max-w-sm mx-auto mb-8" style={{ color: "var(--text-secondary)" }}>
           Únete a +10,000 personas. Recibes una{" "}
-          <strong className="text-zinc-700">mini guía anti-estrés</strong>{" "}
+          <strong style={{ color: "var(--text-primary)" }}>mini guía anti-estrés</strong>{" "}
           de bienvenida.
         </p>
-
-        {/* Formulario */}
         <div className="max-w-sm mx-auto">
           <SubscribeForm />
         </div>
       </div>
 
-      {/* Beneficios */}
       <div className="mx-auto max-w-md px-6 py-10">
-        <div className="rounded-2xl border border-black/8 bg-white p-6">
-          <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-widest mb-5 text-center">
+        <div
+          className="rounded-2xl p-6"
+          style={{ border: "0.5px solid var(--border)", background: "var(--bg-card)" }}
+        >
+          <h3
+            className="text-xs font-medium uppercase tracking-widest mb-5 text-center"
+            style={{ color: "var(--text-tertiary)" }}
+          >
             ¿Qué recibirás?
           </h3>
           <div className="grid grid-cols-2 gap-4">
             {BENEFICIOS.map((b) => (
-              <div key={b} className="flex items-start gap-2 text-sm text-zinc-600">
-                <span className="text-emerald-600 shrink-0 mt-0.5">✓</span>
+              <div key={b} className="flex items-start gap-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+                <span style={{ color: "var(--accent)" }} className="shrink-0 mt-0.5">✓</span>
                 {b}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Social proof */}
-        <p className="text-xs text-zinc-400 text-center mt-6 leading-relaxed">
+        <p className="text-xs text-center mt-6 leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
           Sin spam · Baja cuando quieras ·{" "}
-          <a href="/legal#privacidad" className="underline hover:text-zinc-600">
+          <a href="/legal#privacidad" className="underline hover:opacity-70">
             Privacidad
           </a>
         </p>

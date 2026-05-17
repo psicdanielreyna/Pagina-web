@@ -1,4 +1,3 @@
-// app/tienda/[slug]/BtnComprarProducto.tsx
 "use client";
 import { useState } from "react";
 
@@ -25,7 +24,8 @@ export default function BtnComprarProducto({ slug }: { slug: string }) {
     <button
       onClick={handleClick}
       disabled={loading}
-      className="w-full rounded-full bg-zinc-900 text-white text-sm font-medium py-3 hover:bg-zinc-700 transition-colors disabled:opacity-60"
+      className="w-full rounded-full text-sm font-medium py-3 transition-colors disabled:opacity-60"
+      style={{ background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }}
     >
       {loading ? "Redirigiendo..." : "Comprar ahora — tarjeta o transferencia"}
     </button>

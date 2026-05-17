@@ -1,4 +1,3 @@
-// app/tienda/[slug]/page.tsx
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -45,19 +44,28 @@ function Inner({ slug }: { slug: string }) {
   };
 
   return (
-    <main style={{ background: "#F8F5F0" }} className="min-h-screen">
-      <div className="border-b border-black/8 px-6 py-4" style={{ background: "#F8F5F0" }}>
+    <main style={{ background: "var(--bg-primary)" }} className="min-h-screen">
+
+      {/* Breadcrumb */}
+      <div className="px-6 py-4" style={{ borderBottom: "0.5px solid var(--border)" }}>
         <div className="mx-auto max-w-6xl">
-          <p className="text-xs text-zinc-400">
-            <a href="/tienda" className="hover:text-zinc-700 transition-colors">Tienda</a>
+          <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>
+            <a href="/tienda" className="hover:underline" style={{ color: "var(--text-tertiary)" }}>
+              Tienda
+            </a>
             <span className="mx-2">·</span>
-            <span className="text-zinc-600">{manual.title}</span>
+            <span style={{ color: "var(--text-secondary)" }}>{manual.title}</span>
           </p>
         </div>
       </div>
 
       <div className="mx-auto max-w-6xl px-6 py-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-        <div className="rounded-2xl overflow-hidden border border-black/8 bg-emerald-50 flex items-center justify-center p-10">
+
+        {/* Imagen */}
+        <div
+          className="rounded-2xl overflow-hidden flex items-center justify-center p-10"
+          style={{ border: "0.5px solid var(--border)", background: "var(--accent-light)" }}
+        >
           <div className="relative w-full aspect-square">
             <Image
               src={cover.src}
@@ -70,47 +78,71 @@ function Inner({ slug }: { slug: string }) {
           </div>
         </div>
 
+        {/* Info */}
         <div className="flex flex-col gap-6">
           <div>
-            <span className="inline-block text-xs font-medium bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full mb-4">
+            <span
+              className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
+              style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
+            >
               Manual PDF
             </span>
-            <h1 className="text-3xl font-medium text-zinc-900 tracking-tight mb-2">
+            <h1 className="text-3xl font-medium tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
               {manual.title}
             </h1>
             {manual.description && (
-              <p className="text-sm text-zinc-500 leading-relaxed">{manual.description}</p>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                {manual.description}
+              </p>
             )}
           </div>
 
-          <div className="rounded-2xl border border-black/8 bg-white p-6">
+          {/* Precio y compra */}
+          <div
+            className="rounded-2xl p-6"
+            style={{ border: "0.5px solid var(--border)", background: "var(--bg-card)" }}
+          >
             <div className="flex items-baseline gap-2 mb-4">
-              <span className="text-3xl font-medium text-zinc-900">${manual.price}</span>
-              <span className="text-sm text-zinc-400">MXN</span>
+              <span className="text-3xl font-medium" style={{ color: "var(--text-primary)" }}>
+                ${manual.price}
+              </span>
+              <span className="text-sm" style={{ color: "var(--text-tertiary)" }}>MXN</span>
             </div>
             <BtnComprarProducto slug={manualSlug} />
-            <p className="text-xs text-zinc-400 text-center mt-3">
+            <p className="text-xs text-center mt-3" style={{ color: "var(--text-tertiary)" }}>
               Pago seguro con Stripe · Tarjeta o transferencia bancaria
             </p>
           </div>
 
-          <div className="rounded-2xl border border-black/8 bg-white p-6">
-            <h3 className="text-sm font-medium text-zinc-900 mb-4">¿Qué incluye?</h3>
+          {/* Qué incluye */}
+          <div
+            className="rounded-2xl p-6"
+            style={{ border: "0.5px solid var(--border)", background: "var(--bg-card)" }}
+          >
+            <h3 className="text-sm font-medium mb-4" style={{ color: "var(--text-primary)" }}>
+              ¿Qué incluye?
+            </h3>
             <ul className="space-y-3">
               {INCLUYE.map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm text-zinc-600">
-                  <span className="text-emerald-600 mt-0.5 shrink-0">✓</span>
+                <li key={item} className="flex items-start gap-3 text-sm" style={{ color: "var(--text-secondary)" }}>
+                  <span style={{ color: "var(--accent)" }} className="mt-0.5 shrink-0">✓</span>
                   {item}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="rounded-2xl p-5 flex gap-4 items-start" style={{ background: "#E1F5EE" }}>
+          {/* Garantía */}
+          <div
+            className="rounded-2xl p-5 flex gap-4 items-start"
+            style={{ background: "var(--accent-light)" }}
+          >
             <span className="text-2xl">🔒</span>
             <div>
-              <p className="text-sm font-medium text-emerald-900 mb-1">Compra segura y garantizada</p>
-              <p className="text-xs text-emerald-800 leading-relaxed">
+              <p className="text-sm font-medium mb-1" style={{ color: "var(--accent-text)" }}>
+                Compra segura y garantizada
+              </p>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--accent-text)" }}>
                 Si tienes algún problema con tu compra, escríbeme a{" "}
                 <a href="mailto:danielreyna@danielreyna.com" className="underline">
                   danielreyna@danielreyna.com
@@ -127,7 +159,7 @@ function Inner({ slug }: { slug: string }) {
 
 export default function ProductoPage({ params }: { params: { slug: string } }) {
   return (
-    <Suspense fallback={<div className="py-16 text-center text-sm text-zinc-400">Cargando…</div>}>
+    <Suspense fallback={<div className="py-16 text-center text-sm" style={{ color: "var(--text-tertiary)" }}>Cargando…</div>}>
       <Inner slug={params.slug} />
     </Suspense>
   );

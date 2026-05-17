@@ -45,7 +45,17 @@ const bundle = {
   manualSlug: "bundle-completo",
 };
 
-function BtnComprar({ slug, className, children }: { slug: string; className?: string; children?: React.ReactNode }) {
+function BtnComprar({
+  slug,
+  className,
+  style,
+  children,
+}: {
+  slug: string;
+  className?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}) {
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
@@ -68,7 +78,8 @@ function BtnComprar({ slug, className, children }: { slug: string; className?: s
     <button
       onClick={handleClick}
       disabled={loading}
-      className={className ?? "text-xs text-white bg-zinc-900 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors disabled:opacity-60"}
+      className={className ?? "text-xs px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"}
+      style={style ?? (!className ? { background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" } : undefined)}
     >
       {loading ? "..." : (children ?? "Comprar")}
     </button>
@@ -77,23 +88,32 @@ function BtnComprar({ slug, className, children }: { slug: string; className?: s
 
 export default function TiendaPage() {
   return (
-    <main style={{ background: "#F8F5F0" }} className="min-h-screen">
+    <main style={{ background: "var(--bg-primary)" }} className="min-h-screen">
 
       {/* Header */}
-      <div className="border-b border-black/8 px-6 pt-12 pb-8" style={{ background: "#F8F5F0" }}>
+      <div className="px-6 pt-12 pb-8" style={{ borderBottom: "0.5px solid var(--border)" }}>
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">Tienda</p>
-            <h1 className="text-3xl font-medium text-zinc-900 tracking-tight">Recursos para tu bienestar</h1>
-            <p className="text-sm text-zinc-500 mt-1">Manuales prácticos en PDF · Entrega inmediata por correo</p>
+            <p className="text-xs font-medium uppercase tracking-widest mb-2" style={{ color: "var(--text-tertiary)" }}>
+              Tienda
+            </p>
+            <h1 className="text-3xl font-medium tracking-tight" style={{ color: "var(--text-primary)" }}>
+              Recursos para tu bienestar
+            </h1>
+            <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+              Manuales prácticos en PDF · Entrega inmediata por correo
+            </p>
           </div>
           <div className="flex gap-2">
             {["Todos", "Manuales", "Bundles"].map((f) => (
               <span
                 key={f}
-                className={`text-xs px-4 py-2 rounded-full border border-black/8 cursor-pointer ${
-                  f === "Todos" ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-500"
-                }`}
+                className="text-xs px-4 py-2 rounded-full cursor-pointer transition-colors"
+                style={{
+                  border: "0.5px solid var(--border)",
+                  background: f === "Todos" ? "var(--btn-primary-bg)" : "var(--bg-card)",
+                  color: f === "Todos" ? "var(--btn-primary-text)" : "var(--text-secondary)",
+                }}
               >
                 {f}
               </span>
@@ -108,10 +128,14 @@ export default function TiendaPage() {
           {productos.map((p) => (
             <div
               key={p.slug}
-              className="bg-white rounded-2xl border border-black/8 overflow-hidden flex flex-col hover:shadow-sm transition-shadow"
+              className="rounded-2xl overflow-hidden flex flex-col hover:shadow-sm transition-shadow"
+              style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)" }}
             >
-              <div className="relative h-52 bg-emerald-50 flex items-center justify-center">
-                <span className="absolute top-3 left-3 text-xs font-medium bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">
+              <div className="relative h-52 flex items-center justify-center" style={{ background: "var(--accent-light)" }}>
+                <span
+                  className="absolute top-3 left-3 text-xs font-medium px-3 py-1 rounded-full"
+                  style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
+                >
                   {p.badge}
                 </span>
                 <Image
@@ -123,14 +147,21 @@ export default function TiendaPage() {
                 />
               </div>
               <div className="p-4 flex flex-col flex-1">
-                <h2 className="text-sm font-medium text-zinc-900 mb-1 leading-snug">{p.title}</h2>
-                <p className="text-xs text-zinc-500 leading-relaxed flex-1">{p.short}</p>
+                <h2 className="text-sm font-medium mb-1 leading-snug" style={{ color: "var(--text-primary)" }}>
+                  {p.title}
+                </h2>
+                <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--text-secondary)" }}>
+                  {p.short}
+                </p>
                 <div className="flex items-center justify-between mt-4">
-                  <span className="text-sm font-medium text-zinc-900">{p.price}</span>
+                  <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                    {p.price}
+                  </span>
                   <div className="flex gap-2">
                     <Link
                       href={`/tienda/${p.slug}`}
-                      className="text-xs text-zinc-500 px-3 py-1.5 rounded-full border border-black/8 hover:bg-black/5 transition-colors"
+                      className="text-xs px-3 py-1.5 rounded-full transition-colors"
+                      style={{ border: "0.5px solid var(--border)", color: "var(--text-secondary)" }}
                     >
                       Ver más
                     </Link>
@@ -142,19 +173,34 @@ export default function TiendaPage() {
           ))}
 
           {/* Card próximamente */}
-          <div className="bg-white rounded-2xl border border-black/8 overflow-hidden flex flex-col opacity-50">
-            <div className="relative h-52 bg-zinc-50 flex items-center justify-center">
-              <span className="absolute top-3 right-3 text-xs font-medium bg-zinc-100 text-zinc-400 px-3 py-1 rounded-full">
+          <div
+            className="rounded-2xl overflow-hidden flex flex-col opacity-50"
+            style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)" }}
+          >
+            <div className="relative h-52 flex items-center justify-center" style={{ background: "var(--bg-secondary)" }}>
+              <span
+                className="absolute top-3 right-3 text-xs font-medium px-3 py-1 rounded-full"
+                style={{ background: "var(--bg-secondary)", color: "var(--text-tertiary)" }}
+              >
                 Próximamente
               </span>
-              <div className="w-14 h-20 rounded-lg border-2 border-dashed border-zinc-200" />
+              <div className="w-14 h-20 rounded-lg border-2 border-dashed" style={{ borderColor: "var(--border)" }} />
             </div>
             <div className="p-4 flex flex-col flex-1">
-              <h2 className="text-sm font-medium text-zinc-400 mb-1">Nuevo manual</h2>
-              <p className="text-xs text-zinc-300 flex-1">Disponible pronto.</p>
+              <h2 className="text-sm font-medium mb-1" style={{ color: "var(--text-tertiary)" }}>
+                Nuevo manual
+              </h2>
+              <p className="text-xs flex-1" style={{ color: "var(--text-tertiary)" }}>
+                Disponible pronto.
+              </p>
               <div className="flex items-center justify-between mt-4">
-                <span className="text-sm font-medium text-zinc-300">—</span>
-                <button className="text-xs text-zinc-400 bg-zinc-100 px-3 py-1.5 rounded-full">Avisar</button>
+                <span className="text-sm font-medium" style={{ color: "var(--text-tertiary)" }}>—</span>
+                <button
+                  className="text-xs px-3 py-1.5 rounded-full"
+                  style={{ background: "var(--bg-secondary)", color: "var(--text-tertiary)" }}
+                >
+                  Avisar
+                </button>
               </div>
             </div>
           </div>
@@ -163,7 +209,7 @@ export default function TiendaPage() {
         {/* Bundle */}
         <div
           className="rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
-          style={{ background: "#1D9E75" }}
+          style={{ background: "var(--accent)" }}
         >
           <div className="flex items-center gap-4">
             <div className="flex">
@@ -188,7 +234,8 @@ export default function TiendaPage() {
             <span className="text-2xl font-medium text-white">{bundle.price}</span>
             <BtnComprar
               slug={bundle.manualSlug}
-              className="text-xs font-medium bg-white px-5 py-2 rounded-full hover:bg-emerald-50 transition-colors disabled:opacity-60"
+              className="text-xs font-medium px-5 py-2 rounded-full hover:opacity-90 transition-colors disabled:opacity-60"
+              style={{ background: "var(--bg-card)", color: "var(--accent-text)" }}
             >
               Comprar bundle
             </BtnComprar>

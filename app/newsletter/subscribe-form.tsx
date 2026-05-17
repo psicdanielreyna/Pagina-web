@@ -1,6 +1,7 @@
 "use client";
 import { useState, FormEvent, useRef } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
+import { useTheme } from "@/components/ThemeProvider";
 
 export function SubscribeForm() {
   const [email, setEmail] = useState("");
@@ -10,6 +11,8 @@ export function SubscribeForm() {
   const [err, setErr] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<any>(null);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,10 +43,13 @@ export function SubscribeForm() {
 
   if (ok) {
     return (
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+      <div
+        className="rounded-2xl p-6 text-center"
+        style={{ background: "var(--accent-light)", border: "0.5px solid var(--accent)" }}
+      >
         <p className="text-lg mb-1">🎉</p>
-        <p className="text-sm font-medium text-emerald-800 mb-1">¡Listo! Revisa tu correo</p>
-        <p className="text-xs text-emerald-600">Ahí está tu mini guía anti-estrés.</p>
+        <p className="text-sm font-medium mb-1" style={{ color: "var(--accent-text)" }}>¡Listo! Revisa tu correo</p>
+        <p className="text-xs" style={{ color: "var(--accent-text)" }}>Ahí está tu mini guía anti-estrés.</p>
       </div>
     );
   }
@@ -57,8 +63,12 @@ export function SubscribeForm() {
         value={firstName}
         onChange={(e) => setFirstName(e.target.value)}
         placeholder="Tu nombre"
-        className="w-full rounded-full border border-black/8 px-5 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-emerald-400 transition-colors"
-        style={{ background: "#F8F5F0" }}
+        className="w-full rounded-full px-5 py-3 text-sm focus:outline-none transition-colors"
+        style={{
+          background: "var(--bg-primary)",
+          border: "0.5px solid var(--border)",
+          color: "var(--text-primary)",
+        }}
       />
 
       <input
@@ -67,8 +77,12 @@ export function SubscribeForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="tu@correo.com"
-        className="w-full rounded-full border border-black/8 px-5 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-emerald-400 transition-colors"
-        style={{ background: "#F8F5F0" }}
+        className="w-full rounded-full px-5 py-3 text-sm focus:outline-none transition-colors"
+        style={{
+          background: "var(--bg-primary)",
+          border: "0.5px solid var(--border)",
+          color: "var(--text-primary)",
+        }}
       />
 
       <Turnstile
@@ -76,13 +90,14 @@ export function SubscribeForm() {
         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
         onSuccess={(token) => setTurnstileToken(token)}
         onExpire={() => setTurnstileToken(null)}
-        options={{ theme: "light" }}
+        options={{ theme: isDark ? "dark" : "light" }}
       />
 
       <button
         type="submit"
         disabled={loading || !turnstileToken}
-        className="w-full rounded-full bg-zinc-900 text-white text-sm font-medium py-3 hover:bg-zinc-700 transition-colors disabled:opacity-60"
+        className="w-full rounded-full text-sm font-medium py-3 transition-colors disabled:opacity-60"
+        style={{ background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }}
       >
         {loading ? "Verificando..." : "Suscribirme gratis →"}
       </button>

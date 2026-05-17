@@ -40,38 +40,36 @@ function FaqJsonLd({ items }: { items: QA[] }) {
 
 export default function FAQPage() {
   return (
-    <main style={{ background: "#F8F5F0" }} className="min-h-screen">
+    <main style={{ background: "var(--bg-primary)" }} className="min-h-screen">
       <FaqJsonLd items={faqs} />
-      <div className="border-b border-black/8 px-6 py-12" style={{ background: "#F8F5F0" }}>
+      <div className="px-6 py-12" style={{ borderBottom: "0.5px solid var(--border)" }}>
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">FAQ</p>
-          <h1 className="text-3xl font-medium text-zinc-900 tracking-tight mb-2">Preguntas frecuentes</h1>
-          <p className="text-sm text-zinc-500">
+          <p className="text-xs font-medium uppercase tracking-widest mb-2" style={{ color: "var(--text-tertiary)" }}>FAQ</p>
+          <h1 className="text-3xl font-medium tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>Preguntas frecuentes</h1>
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
             Aquí encontrarás respuestas a las dudas más comunes. Si no ves la tuya,{" "}
-            <a href="/contacto" className="text-emerald-700 hover:underline">escríbeme aquí</a>.
+            <a href="/contacto" style={{ color: "var(--accent-text)" }} className="hover:underline">escríbeme aquí</a>.
           </p>
         </div>
       </div>
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="flex flex-col gap-2">
           {faqs.map((item) => (
-            <details key={item.q} className="group rounded-2xl border border-black/8 bg-white overflow-hidden">
+            <details key={item.q} className="group rounded-2xl overflow-hidden" style={{ border: "0.5px solid var(--border)", background: "var(--bg-card)" }}>
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4">
-                <h2 className="text-sm font-medium text-zinc-900">{item.q}</h2>
-                <span className="shrink-0 w-5 h-5 rounded-full border border-black/8 flex items-center justify-center text-zinc-400 text-xs transition-transform group-open:rotate-180">
-                  ▾
-                </span>
+                <h2 className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{item.q}</h2>
+                <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs transition-transform group-open:rotate-180" style={{ border: "0.5px solid var(--border)", color: "var(--text-tertiary)" }}>▾</span>
               </summary>
-              <div className="px-5 pb-4 text-sm text-zinc-500 leading-relaxed border-t border-black/8 pt-3">
+              <div className="px-5 pb-4 text-sm leading-relaxed pt-3" style={{ color: "var(--text-secondary)", borderTop: "0.5px solid var(--border)" }}>
                 {item.a}
               </div>
             </details>
           ))}
         </div>
-        <div className="mt-8 rounded-2xl border border-black/8 bg-white p-6">
-          <h3 className="text-sm font-medium text-zinc-900 mb-1">¿No encontraste lo que buscabas?</h3>
-          <p className="text-sm text-zinc-500 mb-4">Puedes contactarme directamente y te respondo a la brevedad.</p>
-          <a href="/contacto" className="inline-block rounded-full bg-zinc-900 text-white text-xs px-5 py-2.5 hover:bg-zinc-700 transition-colors">
+        <div className="mt-8 rounded-2xl p-6" style={{ border: "0.5px solid var(--border)", background: "var(--bg-card)" }}>
+          <h3 className="text-sm font-medium mb-1" style={{ color: "var(--text-primary)" }}>¿No encontraste lo que buscabas?</h3>
+          <p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>Puedes contactarme directamente y te respondo a la brevedad.</p>
+          <a href="/contacto" className="inline-block rounded-full text-xs px-5 py-2.5 transition-colors" style={{ background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }}>
             Contactarme →
           </a>
         </div>
