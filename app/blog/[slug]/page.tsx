@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { getPublishedSlugs, getPostBySlug } from "@/lib/posts";
+import GuiaForm from "@/components/GuiaForm";
 
 export const revalidate = 1800; // 30min
 
-// ✅ Carga cliente por si PostView usa hooks de cliente
 const PostView = dynamic(() => import("@/components/PostView"), {
   ssr: false,
   loading: () => null,
@@ -24,7 +24,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { meta } = getPostBySlug(params.slug);
 
-    // si es draft o futuro, no indexar por seguridad (aunque de todos modos 404)
     const isFuture = meta.date ? new Date(meta.date) > new Date() : false;
     const noindex = meta.draft || isFuture || meta.noindex;
 
@@ -68,7 +67,14 @@ function Inner({ slug }: { slug: string }) {
     if (meta.draft || isFuture) {
       return notFound();
     }
-    return <PostView meta={meta} content={content} />;
+    return (
+      <>
+        <PostView meta={meta} content={content} />
+        <section className="mx-auto max-w-2xl px-4 py-12">
+          <GuiaForm />
+        </section>
+      </>
+    );
   } catch {
     return notFound();
   }
