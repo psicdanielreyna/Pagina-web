@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import fs from "fs";
-import path from "path";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -16,10 +14,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Leer el PDF desde /public
-    const pdfPath = path.join(process.cwd(), "public", "guia-burnout-daniel-reyna.pdf");
-    const pdfBuffer = fs.readFileSync(pdfPath);
-    const pdfBase64 = pdfBuffer.toString("base64");
+    // Descargar el PDF desde la URL pública
+    const pdfUrl = "https://danielreyna.com/guia-burnout-daniel-reyna.pdf";
+    const pdfRes = await fetch(pdfUrl);
+
+    if (!pdfRes.ok) {
+      throw new Error("No se pudo obtener el PDF");
+    }
+
+    const pdfBuffer = await pdfRes.arrayBuffer();
+    const pdfBase64 = Buffer.from(pdfBuffer).toString("base64");
 
     await resend.emails.send({
       from: "Daniel Reyna <hola@danielreyna.com>",
