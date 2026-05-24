@@ -15,7 +15,7 @@ export default function NuevaOpinionPage() {
         Gracias por compartir tu experiencia. Publicaremos solo iniciales y el texto, tras una breve revisión.
       </p>
 
-      <OpinionForm />
+      <OpinionForm tipo="sesion" />
     </main>
   );
 }
