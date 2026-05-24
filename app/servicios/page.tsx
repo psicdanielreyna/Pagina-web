@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Opiniones from "@/components/Opiniones";
 
 export const metadata: Metadata = {
   title: "Servicios",
@@ -98,6 +99,14 @@ export default function ServiciosPage() {
           ))}
         </div>
       </div>
+
+      {/* Opiniones */}
+      <div className="border-t px-6 py-12" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl">
+          <Opiniones tipo="sesion" title="Opiniones de pacientes" />
+        </div>
+      </div>
+
     </main>
   );
 }

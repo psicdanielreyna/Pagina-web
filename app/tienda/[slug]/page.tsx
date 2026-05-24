@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getManual, resolveManualSlug, manualSlugsForBuild } from "@/data/manuals";
 import BtnComprarProducto from "./BtnComprarProducto";
+import Opiniones from "@/components/Opiniones";
 
 export const dynamicParams = true;
 
@@ -153,6 +154,17 @@ function Inner({ slug }: { slug: string }) {
           </div>
         </div>
       </div>
+
+      {/* Opiniones */}
+      <div
+        className="border-t px-6 py-12"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <div className="mx-auto max-w-6xl">
+          <Opiniones tipo="manual" slug={manualSlug} title="Opiniones del manual" />
+        </div>
+      </div>
+
     </main>
   );
 }

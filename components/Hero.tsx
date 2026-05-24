@@ -59,13 +59,13 @@ export default function Hero() {
             className="text-4xl md:text-[2.75rem] font-medium leading-[1.15] tracking-tight"
             style={{ color: "var(--text-primary)" }}
           >
-            Ansiedad y estrés,<br />con claridad.
+            La ansiedad no desaparece sola.
           </h1>
           <p
             className="mt-4 text-base leading-relaxed max-w-md"
             style={{ color: "var(--text-secondary)" }}
           >
-            Terapia práctica y directa. Sin rodeos, con resultados reales para tu día a día.
+            Pero con las herramientas correctas, deja de controlarte.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -80,7 +80,7 @@ export default function Hero() {
               className="text-sm px-2 py-2.5 transition-colors"
               style={{ color: "var(--text-secondary)" }}
             >
-              Ver recursos →
+              Ver tienda →
             </Link>
           </div>
         </div>

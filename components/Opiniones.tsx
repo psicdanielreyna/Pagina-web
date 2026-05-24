@@ -1,144 +1,136 @@
-// components/Opiniones.tsx
 "use client";
+import { useEffect, useState } from "react";
+import OpinionForm from "./OpinionForm";
 
-import Stars from "@/components/ui/Stars";
-// ⬇️ ahora leemos de data/ en lugar de lib/
-import { opiniones as allOpiniones, Opinion } from "@/data/opiniones";
-import { useMemo } from "react";
-
-type Props = {
-  title?: string;
-  subtitle?: string;
-  variant?: "all" | "therapy" | { ebookSlug: string };
-  limit?: number; // si quieres recortar la lista
+type Opinion = {
+  id: string;
+  nombre: string;
+  estrellas: number;
+  opinion: string;
+  created_at: string;
 };
 
-function formatDate(d: string) {
-  try {
-    return new Date(d).toLocaleDateString("es-MX", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  } catch {
-    return d;
-  }
+type Props = {
+  tipo: "manual" | "sesion";
+  slug?: string;
+  title?: string;
+};
+
+function Estrellas({ value, white = false }: { value: number; white?: boolean }) {
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span key={n} style={{ color: n <= value ? (white ? "#fff" : "#F59E0B") : "var(--border)", fontSize: "11px" }}>★</span>
+      ))}
+    </div>
+  );
 }
 
-export default function Opiniones({
-  title = "Opiniones",
-  subtitle = "Lo que dicen clientes y lectores",
-  variant = "all",
-  limit = 6,
-}: Props) {
-  const opiniones = useMemo(() => {
-    let arr: Opinion[] = allOpiniones;
-    if (variant === "therapy") {
-      arr = arr.filter((o) => o.type === "therapy");
-    } else if (typeof variant === "object" && "ebookSlug" in variant) {
-      arr = arr.filter(
-        (o) => o.type === "ebook" && o.ebookSlug === variant.ebookSlug
-      );
-    }
-    // más recientes primero
-    arr = [...arr].sort((a, b) => (a.date < b.date ? 1 : -1));
-    return limit ? arr.slice(0, limit) : arr;
-  }, [variant, limit]);
+function Avatar({ nombre }: { nombre: string }) {
+  const initials = nombre.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+  return (
+    <div
+      className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium shrink-0"
+      style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
+    >
+      {initials}
+    </div>
+  );
+}
 
-  const avg =
-    opiniones.length > 0
-      ? opiniones.reduce((s, o) => s + o.rating, 0) / opiniones.length
-      : 0;
+export default function Opiniones({ tipo, slug, title = "Opiniones" }: Props) {
+  const [opiniones, setOpiniones] = useState<Opinion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
 
-  // JSON-LD para SEO
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type":
-      typeof variant === "object" ? "Product" : variant === "therapy" ? "Service" : "WebPage",
-    name:
-      typeof variant === "object"
-        ? `Ebook: ${variant.ebookSlug}`
-        : variant === "therapy"
-        ? "Servicio de terapia psicológica"
-        : "Recursos y terapia — Daniel Reyna",
-    aggregateRating: opiniones.length
-      ? {
-          "@type": "AggregateRating",
-          ratingValue: avg.toFixed(1),
-          reviewCount: opiniones.length,
-        }
-      : undefined,
-    review: opiniones.map((o) => ({
-      "@type": "Review",
-      reviewRating: { "@type": "Rating", ratingValue: o.rating, bestRating: 5 },
-      reviewBody: o.text, // ⬅️ antes: comment
-      author: { "@type": "Person", name: o.initials },
-      datePublished: o.date,
-    })),
-  };
+  useEffect(() => {
+    const params = new URLSearchParams({ tipo });
+    if (slug) params.set("slug", slug);
+    fetch(`/api/opiniones?${params}`)
+      .then((r) => r.json())
+      .then((d) => setOpiniones(d.opiniones ?? []))
+      .finally(() => setLoading(false));
+  }, [tipo, slug]);
+
+  const [destacada, ...resto] = opiniones;
 
   return (
-    <section className="bg-[#F3EBDD] py-12 md:py-14">
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <div className="container mx-auto max-w-6xl px-4">
-        <header className="mb-6 text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-emerald-900">
-            {title}
-          </h2>
-          {subtitle && (
-            <p className="mt-1 text-sm md:text-base text-emerald-900/80">
-              {subtitle}
-            </p>
-          )}
-          <div className="mx-auto mt-4 h-px w-24 rounded bg-emerald-900/20" />
-        </header>
+    <div className="flex flex-col gap-6">
 
-        {opiniones.length === 0 ? (
-          <p className="text-center text-sm text-emerald-900/70">
-            Aún no hay opiniones para mostrar.
-          </p>
-        ) : (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {opiniones.map((op, i) => (
-              <li
-                key={`${op.initials}-${op.date}-${i}`} // ⬅️ antes usabas op.id
-                className="rounded-xl border border-emerald-900/10 bg-white p-4 shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-900 font-semibold">
-                      {op.initials}
-                    </div>
-                    <div className="text-xs text-emerald-900/70">
-                      {formatDate(op.date)}
-                    </div>
-                  </div>
-                  <Stars value={op.rating} />
-                </div>
-                <p className="mt-3 text-sm text-emerald-900/90">{op.text}</p>
-                {op.type === "ebook" && op.ebookSlug && (
-                  <div className="mt-3">
-                    <span className="inline-block rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-900/80">
-                      Ebook
-                    </span>
-                  </div>
-                )}
-                {op.type === "therapy" && (
-                  <div className="mt-3">
-                    <span className="inline-block rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-900/80">
-                      Terapia
-                    </span>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-medium" style={{ color: "var(--text-primary)" }}>{title}</h2>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="rounded-full text-xs px-4 py-2 transition-colors"
+          style={{ border: "0.5px solid var(--border)", color: "var(--text-secondary)" }}
+        >
+          {showForm ? "Cancelar" : "Dejar opinión"}
+        </button>
       </div>
-    </section>
+
+      {/* Formulario */}
+      {showForm && (
+        <div className="rounded-2xl p-6" style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)" }}>
+          <OpinionForm tipo={tipo} slug={slug} />
+        </div>
+      )}
+
+      {/* Lista */}
+      {loading ? (
+        <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>Cargando opiniones...</p>
+      ) : opiniones.length === 0 ? (
+        <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>Aún no hay opiniones. ¡Sé el primero!</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          {/* Columna izquierda */}
+          <div className="flex flex-col gap-4">
+            {/* Destacada en verde */}
+            {destacada && (
+              <div className="rounded-2xl p-5" style={{ background: "var(--accent)" }}>
+                <Estrellas value={destacada.estrellas} white />
+                <p className="text-sm leading-relaxed mt-3 italic" style={{ color: "rgba(255,255,255,0.9)" }}>
+                  "{destacada.opinion}"
+                </p>
+                <p className="text-xs mt-4" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  — {destacada.nombre}
+                </p>
+              </div>
+            )}
+            {/* Resto columna izquierda */}
+            {resto.filter((_, i) => i % 2 === 1).map((o) => (
+              <div key={o.id} className="rounded-2xl p-4" style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)" }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Avatar nombre={o.nombre} />
+                  <div>
+                    <p className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>{o.nombre}</p>
+                    <Estrellas value={o.estrellas} />
+                  </div>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>{o.opinion}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Columna derecha */}
+          <div className="flex flex-col gap-4">
+            {resto.filter((_, i) => i % 2 === 0).map((o) => (
+              <div key={o.id} className="rounded-2xl p-4" style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)" }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Avatar nombre={o.nombre} />
+                  <div>
+                    <p className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>{o.nombre}</p>
+                    <Estrellas value={o.estrellas} />
+                  </div>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>{o.opinion}</p>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      )}
+    </div>
   );
 }
