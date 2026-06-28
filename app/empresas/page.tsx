@@ -12,7 +12,9 @@ export default function EmpresasPage() {
       {/* ── NAV ── */}
       <nav className="empresas-nav">
         <Link href="/" className="empresas-nav-logo">
-          <span>daniel</span>reyna.com
+          Daniel Reyna
+          <span className="empresas-nav-logo-sep"> · </span>
+          <span className="empresas-nav-logo-tag">Empresas</span>
         </Link>
         <div className="empresas-nav-links">
           <a href="#metodologia">Metodología</a>
@@ -288,9 +290,20 @@ export default function EmpresasPage() {
           color: var(--fg);
           text-decoration: none;
           letter-spacing: -0.01em;
+          display: flex;
+          align-items: baseline;
+          gap: 0;
         }
-        .empresas-nav-logo span {
+        .empresas-nav-logo-sep {
+          color: var(--muted);
+          font-weight: 400;
+          margin: 0 4px;
+        }
+        .empresas-nav-logo-tag {
           color: var(--teal);
+          font-weight: 500;
+          font-size: 13px;
+          letter-spacing: 0.01em;
         }
         .empresas-nav-links {
           display: flex;
