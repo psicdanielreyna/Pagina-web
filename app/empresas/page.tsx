@@ -7,151 +7,135 @@ const EMAIL = "empresas@danielreyna.com";
 
 export default function EmpresasPage() {
   return (
-    <main className="empresas-root">
+    <main className="ep-root">
 
       {/* ── NAV ── */}
-      <nav className="empresas-nav">
-        <Link href="/" className="empresas-nav-logo">
+      <nav className="ep-nav">
+        <Link href="/" className="ep-logo">
           Daniel Reyna
-          <span className="empresas-nav-logo-sep"> · </span>
-          <span className="empresas-nav-logo-tag">Empresas</span>
+          <span className="ep-logo-sep"> · </span>
+          <span className="ep-logo-tag">Empresas</span>
         </Link>
-        <div className="empresas-nav-links">
+        <div className="ep-nav-links">
           <a href="#metodologia">Metodología</a>
           <a href="#planes">Planes</a>
-          <a
-            href={CALENDLY_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="empresas-nav-cta"
-          >
+          <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer" className="ep-nav-cta">
             Agendar llamada
           </a>
         </div>
       </nav>
 
-      {/* ── HERO ── */}
-      <section className="empresas-hero">
-        <div className="empresas-hero-copy">
-          <p className="empresas-eyebrow">Consultoría organizacional · Monterrey, NL</p>
-          <h1 className="empresas-h1">
-            Tu empresa tiene un problema.<br />
-            <em>RAÍZ tiene la metodología.</em>
-          </h1>
-          <p className="empresas-hero-sub">
-            Diagnóstico real, intervención basada en evidencia y acompañamiento
-            continuo. No charlas motivacionales — resultados medibles en
-            rotación, clima laboral y cumplimiento NOM-035.
-          </p>
-          <div className="empresas-hero-actions">
-            <a
-              href={CALENDLY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="empresas-btn-primary"
-            >
-              Agendar diagnóstico gratuito
-            </a>
-            <a href="#planes" className="empresas-btn-ghost">
-              Ver planes
-            </a>
-          </div>
-        </div>
-
-        <div className="empresas-hero-stats">
-          <div className="empresas-stat">
-            <span className="empresas-stat-num">NOM-035</span>
-            <span className="empresas-stat-label">
-              Cumplimiento normativo incluido en todos los planes
-            </span>
-          </div>
-          <hr className="empresas-stat-divider" />
-          <div className="empresas-stat">
-            <span className="empresas-stat-num">4 fases</span>
-            <span className="empresas-stat-label">
-              Metodología estructurada, no intervenciones aisladas
-            </span>
-          </div>
-          <hr className="empresas-stat-divider" />
-          <div className="empresas-stat">
-            <span className="empresas-stat-num">Retainer</span>
-            <span className="empresas-stat-label">
-              Aliado estratégico continuo, no consultor de visita única
-            </span>
-          </div>
-          <hr className="empresas-stat-divider" />
-          <div className="empresas-stat">
-            <span className="empresas-stat-num">Cédula 14822054</span>
-            <span className="empresas-stat-label">
-              Psicólogo clínico licenciado — criterio clínico + metodología
-            </span>
-          </div>
+      {/* ── HERO CENTRADO ── */}
+      <section className="ep-hero">
+        <p className="ep-eyebrow">Psicología organizacional · Monterrey, NL</p>
+        <h1 className="ep-h1">
+          Problemas de clima, rotación y NOM-035<br />
+          <em>resueltos con metodología.</em>
+        </h1>
+        <p className="ep-hero-sub">
+          Soy Daniel Reyna, psicólogo clínico con enfoque organizacional. Trabajo con
+          empresas que quieren resultados reales — no talleres de motivación que no
+          cambian nada.
+        </p>
+        <div className="ep-hero-actions">
+          <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer" className="ep-btn-primary">
+            Agendar llamada gratuita
+          </a>
+          <a href="#metodologia" className="ep-btn-secondary">
+            Ver metodología RAÍZ
+          </a>
         </div>
       </section>
 
-      {/* ── METODOLOGÍA RAÍZ ── */}
-      <section className="empresas-method" id="metodologia">
-        <div className="empresas-method-step">
-          <span className="empresas-step-letter">R — Reconocimiento</span>
-          <span className="empresas-step-name">Diagnóstico</span>
-          <span className="empresas-step-desc">
-            Entrevistas, instrumentos NOM-035 y mapeo de riesgo psicosocial por área.
-          </span>
+      {/* ── PROOF BAR ── */}
+      <div className="ep-proof-bar">
+        <div className="ep-proof-item">
+          <span className="ep-proof-num">NOM-035</span>
+          <span className="ep-proof-label">Cumplimiento normativo en todos los planes</span>
         </div>
-        <div className="empresas-method-step">
-          <span className="empresas-step-letter">A — Análisis</span>
-          <span className="empresas-step-name">Causas raíz</span>
-          <span className="empresas-step-desc">
-            Reporte ejecutivo con semáforo de riesgo y prioridades de intervención.
-          </span>
+        <div className="ep-proof-item">
+          <span className="ep-proof-num">4 fases</span>
+          <span className="ep-proof-label">Metodología estructurada con entregables claros</span>
         </div>
-        <div className="empresas-method-step">
-          <span className="empresas-step-letter">I — Intervención</span>
-          <span className="empresas-step-name">Acción</span>
-          <span className="empresas-step-desc">
-            Talleres, sesiones grupales e intervención en rotación de personal.
-          </span>
+        <div className="ep-proof-item">
+          <span className="ep-proof-num">Retainer</span>
+          <span className="ep-proof-label">Aliado estratégico, no consultor de visita</span>
         </div>
-        <div className="empresas-method-step last">
-          <span className="empresas-step-letter">Z — Zona de cambio</span>
-          <span className="empresas-step-name">Seguimiento</span>
-          <span className="empresas-step-desc">
-            Retainer mensual. Métricas reales. Presencia continua.
-          </span>
+        <div className="ep-proof-item last">
+          <span className="ep-proof-num">Cédula</span>
+          <span className="ep-proof-label">Profesional licenciado — 14822054</span>
+        </div>
+      </div>
+
+      {/* ── METODOLOGÍA ── */}
+      <section className="ep-method" id="metodologia">
+        <p className="ep-section-label">Metodología RAÍZ</p>
+        <div className="ep-method-table">
+
+          <div className="ep-method-row">
+            <span className="ep-method-letter">R — Reconocimiento</span>
+            <span className="ep-method-name">Diagnóstico de entrada</span>
+            <span className="ep-method-desc">
+              Entrevistas con dirección, aplicación de instrumentos y mapeo de riesgo
+              psicosocial por área. Entregable: reporte ejecutivo con semáforo de riesgo.
+            </span>
+          </div>
+
+          <div className="ep-method-row">
+            <span className="ep-method-letter">A — Análisis</span>
+            <span className="ep-method-name">Causas raíz</span>
+            <span className="ep-method-desc">
+              Identificación de las 3 causas principales con evidencia. Distinción entre
+              burnout, liderazgo tóxico y cultura de queja — porque cada una tiene una
+              intervención distinta.
+            </span>
+          </div>
+
+          <div className="ep-method-row">
+            <span className="ep-method-letter">I — Intervención</span>
+            <span className="ep-method-name">Acción basada en datos</span>
+            <span className="ep-method-desc">
+              Talleres, sesiones grupales, intervención en rotación y formación de líderes.
+              Todo diseñado a partir del diagnóstico, no de plantillas genéricas.
+            </span>
+          </div>
+
+          <div className="ep-method-row last">
+            <span className="ep-method-letter">Z — Zona de cambio</span>
+            <span className="ep-method-name">Seguimiento continuo</span>
+            <span className="ep-method-desc">
+              Retainer mensual con métricas de impacto reales. Presencia constante como
+              aliado estratégico — no desaparezco después de la primera intervención.
+            </span>
+          </div>
+
         </div>
       </section>
 
       {/* ── PLANES ── */}
-      <section className="empresas-tiers" id="planes">
-        <p className="empresas-section-label">Planes</p>
-        <div className="empresas-tiers-grid">
+      <section className="ep-tiers" id="planes">
+        <p className="ep-section-label">Planes</p>
+        <div className="ep-tiers-grid">
 
-          {/* Diagnóstico */}
-          <div className="empresas-tier-card">
-            <div>
-              <p className="empresas-tier-name">Diagnóstico RAÍZ</p>
-              <p className="empresas-tier-target">Entrada · proyecto único</p>
-              <p className="empresas-tier-price">Pago único · precio según empresa</p>
-            </div>
-            <hr className="empresas-tier-divider" />
-            <ul className="empresas-tier-items">
-              <li><CheckIcon />Entrevista con dirección / RRHH</li>
+          <div className="ep-card">
+            <p className="ep-card-name">Diagnóstico RAÍZ</p>
+            <p className="ep-card-target">Entrada · proyecto único</p>
+            <p className="ep-card-price">Pago único · precio según empresa</p>
+            <hr className="ep-card-divider" />
+            <ul className="ep-card-items">
               <li><CheckIcon />Instrumentos NOM-035 y clima organizacional</li>
               <li><CheckIcon />Reporte ejecutivo con semáforo de riesgo</li>
-              <li><CheckIcon />Sesión de presentación de resultados</li>
+              <li><CheckIcon />Sesión de presentación con dirección</li>
               <li><CheckIcon />Propuesta de intervención priorizada</li>
             </ul>
           </div>
 
-          {/* Esencial */}
-          <div className="empresas-tier-card">
-            <div>
-              <p className="empresas-tier-name">Membresía Esencial</p>
-              <p className="empresas-tier-target">PyMEs · 10–80 colaboradores</p>
-              <p className="empresas-tier-price">$12,000–$18,000 MXN / mes</p>
-            </div>
-            <hr className="empresas-tier-divider" />
-            <ul className="empresas-tier-items">
+          <div className="ep-card">
+            <p className="ep-card-name">Membresía Esencial</p>
+            <p className="ep-card-target">PyMEs · 10–80 colaboradores</p>
+            <p className="ep-card-price">$12,000–$18,000 MXN / mes</p>
+            <hr className="ep-card-divider" />
+            <ul className="ep-card-items">
               <li><CheckIcon />1 taller mensual in-company (3 hrs)</li>
               <li><CheckIcon />Seguimiento de indicadores clave</li>
               <li><CheckIcon />Sesión mensual con dirección / RRHH</li>
@@ -160,35 +144,28 @@ export default function EmpresasPage() {
             </ul>
           </div>
 
-          {/* Integral */}
-          <div className="empresas-tier-card featured">
-            <div>
-              <span className="empresas-tier-badge">Más completo</span>
-              <p className="empresas-tier-name">Membresía Integral</p>
-              <p className="empresas-tier-target">Empresas medianas · 80–300 col.</p>
-              <p className="empresas-tier-price">$22,000–$35,000 MXN / mes</p>
-            </div>
-            <hr className="empresas-tier-divider" />
-            <ul className="empresas-tier-items">
+          <div className="ep-card featured">
+            <span className="ep-badge">Más completo</span>
+            <p className="ep-card-name">Membresía Integral</p>
+            <p className="ep-card-target">Empresas medianas · 80–300 col.</p>
+            <p className="ep-card-price">$22,000–$35,000 MXN / mes</p>
+            <hr className="ep-card-divider" />
+            <ul className="ep-card-items">
               <li><CheckIcon />Todo lo de Esencial</li>
               <li><CheckIcon />Sesiones grupales con empleados (2/mes)</li>
               <li><CheckIcon />2 talleres o conferencias mensuales</li>
               <li><CheckIcon />Reporte trimestral con métricas de impacto</li>
-              <li><CheckIcon />Asesoría en cumplimiento NOM-035</li>
               <li><CheckIcon />Diagnóstico RAÍZ incluido en mes 1</li>
             </ul>
           </div>
 
-          {/* Aliado */}
-          <div className="empresas-tier-card">
-            <div>
-              <span className="empresas-tier-badge premium">Premium</span>
-              <p className="empresas-tier-name">Aliado Estratégico</p>
-              <p className="empresas-tier-target">Corporativos · 300+ colaboradores</p>
-              <p className="empresas-tier-price">Cotización a medida</p>
-            </div>
-            <hr className="empresas-tier-divider" />
-            <ul className="empresas-tier-items">
+          <div className="ep-card">
+            <span className="ep-badge premium">Premium</span>
+            <p className="ep-card-name">Aliado Estratégico</p>
+            <p className="ep-card-target">Corporativos · 300+ colaboradores</p>
+            <p className="ep-card-price">Cotización a medida</p>
+            <hr className="ep-card-divider" />
+            <ul className="ep-card-items">
               <li><CheckIcon />Todo lo de Integral</li>
               <li><CheckIcon />Presencia semanal en instalaciones</li>
               <li><CheckIcon />Formación de líderes (programa estructurado)</li>
@@ -201,464 +178,244 @@ export default function EmpresasPage() {
       </section>
 
       {/* ── DISCLAIMER ── */}
-      <div className="empresas-disclaimer">
+      <div className="ep-disclaimer">
         <InfoIcon />
         <p>
-          Los tiempos de impacto varían según el tamaño de la organización, la
-          complejidad del problema identificado en el diagnóstico y el nivel de
-          apertura de la dirección al proceso. Lo que sí es constante: metodología
-          clara, entregables concretos y acompañamiento en cada etapa.
+          Los tiempos de impacto varían según el tamaño de la organización y la
+          complejidad del problema. Lo que sí garantizo: metodología estructurada,
+          entregables concretos y acompañamiento en cada etapa del proceso.
         </p>
       </div>
 
       {/* ── CTA FINAL ── */}
-      <section className="empresas-cta">
-        <h2 className="empresas-cta-h2">¿Listo para una conversación real?</h2>
-        <p className="empresas-cta-sub">
-          30 minutos para entender el contexto de tu empresa — sin venta, sin
-          compromiso.
-        </p>
-        <a
-          href={CALENDLY_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="empresas-btn-primary large"
-        >
+      <section className="ep-cta">
+        <h2 className="ep-cta-h2">¿Listo para una conversación real?</h2>
+        <p className="ep-cta-sub">30 minutos para entender tu empresa. Sin venta, sin compromiso.</p>
+        <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer" className="ep-btn-primary large">
           Agendar llamada gratuita
         </a>
-        <p className="empresas-cta-footer">
+        <p className="ep-cta-note">
           O escríbenos a{" "}
-          <a href={`mailto:${EMAIL}`} className="empresas-email-link">
-            {EMAIL}
-          </a>
+          <a href={`mailto:${EMAIL}`} className="ep-email-link">{EMAIL}</a>
         </p>
       </section>
 
       {/* ── ESTILOS ── */}
       <style>{`
-        /* ── Tokens de color ── */
-        .empresas-root {
-          --teal:       #0F6E56;
-          --teal-mid:   #1D9E75;
-          --teal-light: #E1F5EE;
-          --teal-text:  #085041;
-          --teal-dark:  #04342C;
-
-          background: var(--bg, #ffffff);
-          color: var(--fg, #1a1a1a);
+        .ep-root {
+          --teal:      #0F6E56;
+          --teal-mid:  #1D9E75;
+          --teal-lt:   #E1F5EE;
+          --teal-txt:  #085041;
           font-family: 'DM Sans', sans-serif;
           line-height: 1.6;
         }
-
-        /* Dark mode */
-        @media (prefers-color-scheme: dark) {
-          .empresas-root {
-            --bg: #0e1210;
-            --fg: #e8ede9;
-            --border-c: rgba(255,255,255,0.09);
-            --card-bg: #151c18;
-            --muted: #8a9e92;
-            --stat-bg: #131a16;
-          }
-        }
         @media (prefers-color-scheme: light) {
-          .empresas-root {
-            --bg: #ffffff;
-            --fg: #1a1a1a;
+          .ep-root {
+            --bg:       #ffffff;
+            --fg:       #1a1a1a;
             --border-c: rgba(0,0,0,0.08);
-            --card-bg: #f8faf9;
-            --muted: #6b7c74;
-            --stat-bg: #f2f7f4;
+            --card-bg:  #f8faf9;
+            --muted:    #6b7c74;
+            --proof-bg: #f2f7f4;
           }
         }
+        @media (prefers-color-scheme: dark) {
+          .ep-root {
+            --bg:       #0e1210;
+            --fg:       #e8ede9;
+            --border-c: rgba(255,255,255,0.09);
+            --card-bg:  #151c18;
+            --muted:    #8a9e92;
+            --proof-bg: #131a16;
+          }
+        }
+        .ep-root { background: var(--bg); color: var(--fg); }
 
-        /* ── NAV ── */
-        .empresas-nav {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 14px 40px;
-          border-bottom: 1px solid var(--border-c);
-          position: sticky;
-          top: 0;
-          background: var(--bg);
-          z-index: 50;
+        /* NAV */
+        .ep-nav {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 14px 40px; border-bottom: 1px solid var(--border-c);
+          position: sticky; top: 0; background: var(--bg); z-index: 50;
         }
-        .empresas-nav-logo {
-          font-size: 15px;
-          font-weight: 600;
-          color: var(--fg);
-          text-decoration: none;
-          letter-spacing: -0.01em;
-          display: flex;
-          align-items: baseline;
-          gap: 0;
+        .ep-logo {
+          font-size: 15px; font-weight: 600; color: var(--fg);
+          text-decoration: none; letter-spacing: -0.01em;
+          display: flex; align-items: baseline;
         }
-        .empresas-nav-logo-sep {
-          color: var(--muted);
-          font-weight: 400;
-          margin: 0 4px;
+        .ep-logo-sep { color: var(--muted); font-weight: 400; margin: 0 4px; }
+        .ep-logo-tag { color: var(--teal); font-weight: 500; font-size: 13px; }
+        .ep-nav-links { display: flex; align-items: center; gap: 28px; }
+        .ep-nav-links a {
+          font-size: 14px; color: var(--muted);
+          text-decoration: none; transition: color 0.15s;
         }
-        .empresas-nav-logo-tag {
-          color: var(--teal);
-          font-weight: 500;
-          font-size: 13px;
-          letter-spacing: 0.01em;
+        .ep-nav-links a:hover { color: var(--fg); }
+        .ep-nav-cta {
+          background: var(--teal) !important; color: #fff !important;
+          font-size: 13px !important; font-weight: 500 !important;
+          padding: 9px 20px !important; border-radius: 8px !important;
+          text-decoration: none !important; transition: background 0.15s !important;
         }
-        .empresas-nav-links {
-          display: flex;
-          align-items: center;
-          gap: 28px;
-        }
-        .empresas-nav-links a {
-          font-size: 14px;
-          color: var(--muted);
-          text-decoration: none;
-          transition: color 0.15s;
-        }
-        .empresas-nav-links a:hover {
-          color: var(--fg);
-        }
-        .empresas-nav-cta {
-          background: var(--teal) !important;
-          color: #fff !important;
-          font-size: 13px !important;
-          font-weight: 500 !important;
-          padding: 9px 20px !important;
-          border-radius: 8px !important;
-          text-decoration: none !important;
-          transition: background 0.15s !important;
-        }
-        .empresas-nav-cta:hover {
-          background: var(--teal-mid) !important;
-          color: #fff !important;
-        }
+        .ep-nav-cta:hover { background: var(--teal-mid) !important; color: #fff !important; }
 
-        /* ── HERO ── */
-        .empresas-hero {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 56px;
-          align-items: center;
-          padding: 72px 40px 64px;
+        /* HERO */
+        .ep-hero {
+          padding: 80px 40px 64px; text-align: center;
           border-bottom: 1px solid var(--border-c);
         }
-        .empresas-eyebrow {
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.09em;
-          text-transform: uppercase;
-          color: var(--teal);
-          margin-bottom: 18px;
+        .ep-eyebrow {
+          font-size: 11px; font-weight: 600; letter-spacing: 0.09em;
+          text-transform: uppercase; color: var(--teal); margin-bottom: 20px;
         }
-        .empresas-h1 {
-          font-size: 36px;
-          font-weight: 600;
-          line-height: 1.18;
-          letter-spacing: -0.025em;
-          color: var(--fg);
-          margin-bottom: 18px;
+        .ep-h1 {
+          font-size: 38px; font-weight: 600; line-height: 1.18;
+          letter-spacing: -0.025em; color: var(--fg);
+          margin-bottom: 20px; max-width: 640px; margin-left: auto; margin-right: auto;
         }
-        .empresas-h1 em {
-          font-style: normal;
-          color: var(--teal);
+        .ep-h1 em { font-style: normal; color: var(--teal); }
+        .ep-hero-sub {
+          font-size: 16px; color: var(--muted); line-height: 1.7;
+          max-width: 540px; margin: 0 auto 36px;
         }
-        .empresas-hero-sub {
-          font-size: 16px;
-          color: var(--muted);
-          line-height: 1.7;
-          margin-bottom: 32px;
-        }
-        .empresas-hero-actions {
-          display: flex;
-          gap: 14px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-        .empresas-btn-primary {
-          display: inline-block;
-          background: var(--teal);
-          color: #fff;
-          font-size: 14px;
-          font-weight: 500;
-          padding: 12px 24px;
-          border-radius: 8px;
-          text-decoration: none;
-          transition: background 0.15s;
+        .ep-hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .ep-btn-primary {
+          display: inline-block; background: var(--teal); color: #fff;
+          font-size: 14px; font-weight: 500; padding: 12px 26px;
+          border-radius: 8px; text-decoration: none; transition: background 0.15s;
           white-space: nowrap;
         }
-        .empresas-btn-primary:hover {
-          background: var(--teal-mid);
+        .ep-btn-primary:hover { background: var(--teal-mid); }
+        .ep-btn-primary.large { font-size: 15px; padding: 14px 34px; }
+        .ep-btn-secondary {
+          display: inline-block; font-size: 14px; color: var(--muted);
+          border: 1px solid var(--border-c); border-radius: 8px;
+          padding: 12px 22px; text-decoration: none; transition: color 0.15s, border-color 0.15s;
+          white-space: nowrap;
         }
-        .empresas-btn-primary.large {
-          font-size: 15px;
-          padding: 14px 32px;
-        }
-        .empresas-btn-ghost {
-          font-size: 14px;
-          color: var(--muted);
-          text-decoration: underline;
-          text-underline-offset: 3px;
-        }
-        .empresas-btn-ghost:hover {
-          color: var(--fg);
-        }
+        .ep-btn-secondary:hover { color: var(--fg); border-color: var(--muted); }
 
-        /* Stats box */
-        .empresas-hero-stats {
-          background: var(--stat-bg);
-          border: 1px solid var(--border-c);
-          border-radius: 14px;
-          padding: 32px;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-        .empresas-stat {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-        }
-        .empresas-stat-num {
-          font-size: 22px;
-          font-weight: 600;
-          color: var(--teal);
-          letter-spacing: -0.02em;
-        }
-        .empresas-stat-label {
-          font-size: 13px;
-          color: var(--muted);
-          line-height: 1.45;
-        }
-        .empresas-stat-divider {
-          border: none;
-          border-top: 1px solid var(--border-c);
-          margin: 0;
-        }
-
-        /* ── METODOLOGÍA STRIP ── */
-        .empresas-method {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+        /* PROOF BAR */
+        .ep-proof-bar {
+          display: grid; grid-template-columns: repeat(4, minmax(0,1fr));
           border-bottom: 1px solid var(--border-c);
+          background: var(--proof-bg);
         }
-        .empresas-method-step {
-          padding: 28px 24px;
-          border-right: 1px solid var(--border-c);
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-        .empresas-method-step.last {
-          border-right: none;
-        }
-        .empresas-step-letter {
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.07em;
-          text-transform: uppercase;
-          color: var(--teal);
-        }
-        .empresas-step-name {
-          font-size: 15px;
-          font-weight: 600;
-          color: var(--fg);
-        }
-        .empresas-step-desc {
-          font-size: 12px;
-          color: var(--muted);
-          line-height: 1.55;
-        }
-
-        /* ── PLANES ── */
-        .empresas-tiers {
-          padding: 56px 40px;
-          border-bottom: 1px solid var(--border-c);
-        }
-        .empresas-section-label {
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.09em;
-          text-transform: uppercase;
-          color: var(--muted);
-          margin-bottom: 28px;
-        }
-        .empresas-tiers-grid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 14px;
-        }
-        .empresas-tier-card {
-          background: var(--card-bg);
-          border: 1px solid var(--border-c);
-          border-radius: 14px;
-          padding: 22px 18px;
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
-        .empresas-tier-card.featured {
-          border: 2px solid var(--teal-mid);
-        }
-        .empresas-tier-badge {
-          display: inline-block;
-          font-size: 10px;
-          font-weight: 600;
-          padding: 3px 10px;
-          border-radius: 6px;
-          background: var(--teal-light);
-          color: var(--teal-text);
-          margin-bottom: 6px;
-        }
-        .empresas-tier-badge.premium {
-          background: #f0eefe;
-          color: #3C3489;
-        }
-        @media (prefers-color-scheme: dark) {
-          .empresas-tier-badge {
-            background: rgba(15, 110, 86, 0.25);
-            color: #5DCAA5;
-          }
-          .empresas-tier-badge.premium {
-            background: rgba(83, 74, 183, 0.25);
-            color: #AFA9EC;
-          }
-        }
-        .empresas-tier-name {
-          font-size: 15px;
-          font-weight: 600;
-          color: var(--fg);
-          margin: 0;
-        }
-        .empresas-tier-target {
-          font-size: 11px;
-          color: var(--muted);
-          margin: 3px 0 6px;
-        }
-        .empresas-tier-price {
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--teal);
-          margin: 0;
-        }
-        .empresas-tier-divider {
-          border: none;
-          border-top: 1px solid var(--border-c);
-          margin: 0;
-        }
-        .empresas-tier-items {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 7px;
-        }
-        .empresas-tier-items li {
-          font-size: 12px;
-          color: var(--muted);
-          display: flex;
-          gap: 7px;
-          align-items: flex-start;
-          line-height: 1.45;
-        }
-        .empresas-tier-items li svg {
-          flex-shrink: 0;
-          margin-top: 2px;
-          color: var(--teal-mid);
-        }
-
-        /* ── DISCLAIMER ── */
-        .empresas-disclaimer {
-          padding: 20px 40px;
-          background: var(--stat-bg);
-          border-bottom: 1px solid var(--border-c);
-          display: flex;
-          gap: 12px;
-          align-items: flex-start;
-        }
-        .empresas-disclaimer svg {
-          flex-shrink: 0;
-          margin-top: 2px;
-          color: var(--muted);
-        }
-        .empresas-disclaimer p {
-          font-size: 13px;
-          color: var(--muted);
-          line-height: 1.6;
-        }
-
-        /* ── CTA FINAL ── */
-        .empresas-cta {
-          padding: 80px 40px;
+        .ep-proof-item {
+          padding: 28px 24px; border-right: 1px solid var(--border-c);
+          display: flex; flex-direction: column; gap: 6px;
           text-align: center;
         }
-        .empresas-cta-h2 {
-          font-size: 28px;
-          font-weight: 600;
-          color: var(--fg);
+        .ep-proof-item.last { border-right: none; }
+        .ep-proof-num {
+          font-size: 20px; font-weight: 600; color: var(--teal);
           letter-spacing: -0.02em;
-          margin-bottom: 12px;
         }
-        .empresas-cta-sub {
-          font-size: 15px;
-          color: var(--muted);
-          margin-bottom: 32px;
-        }
-        .empresas-cta-footer {
-          font-size: 13px;
-          color: var(--muted);
-          margin-top: 16px;
-        }
-        .empresas-email-link {
-          color: var(--teal);
-          text-decoration: none;
-        }
-        .empresas-email-link:hover {
-          text-decoration: underline;
-        }
+        .ep-proof-label { font-size: 12px; color: var(--muted); line-height: 1.45; }
 
-        /* ── RESPONSIVE ── */
-        @media (max-width: 900px) {
-          .empresas-hero {
-            grid-template-columns: 1fr;
-            padding: 48px 24px;
-            gap: 36px;
-          }
-          .empresas-method {
-            grid-template-columns: repeat(2, 1fr);
-          }
-          .empresas-method-step {
-            border-right: 1px solid var(--border-c);
-            border-bottom: 1px solid var(--border-c);
-          }
-          .empresas-method-step.last {
-            border-right: none;
-          }
-          .empresas-tiers-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-          .empresas-nav {
-            padding: 14px 24px;
-          }
-          .empresas-tiers {
-            padding: 40px 24px;
-          }
-          .empresas-cta {
-            padding: 56px 24px;
-          }
-          .empresas-disclaimer {
-            padding: 20px 24px;
-          }
+        /* METODOLOGÍA */
+        .ep-method {
+          padding: 56px 40px; border-bottom: 1px solid var(--border-c);
         }
-        @media (max-width: 560px) {
-          .empresas-h1 { font-size: 26px; }
-          .empresas-method { grid-template-columns: 1fr; }
-          .empresas-method-step { border-right: none; }
-          .empresas-tiers-grid { grid-template-columns: 1fr; }
-          .empresas-nav-links a:not(.empresas-nav-cta) { display: none; }
+        .ep-section-label {
+          font-size: 11px; font-weight: 600; letter-spacing: 0.09em;
+          text-transform: uppercase; color: var(--muted); margin-bottom: 28px;
         }
+        .ep-method-table { display: flex; flex-direction: column; }
+        .ep-method-row {
+          display: grid; grid-template-columns: 160px 1fr 2fr;
+          gap: 28px; padding: 22px 0;
+          border-bottom: 1px solid var(--border-c);
+          align-items: start;
+        }
+        .ep-method-row.last { border-bottom: none; }
+        .ep-method-letter {
+          font-size: 10px; font-weight: 600; letter-spacing: 0.07em;
+          text-transform: uppercase; color: var(--teal); padding-top: 3px;
+        }
+        .ep-method-name { font-size: 15px; font-weight: 600; color: var(--fg); }
+        .ep-method-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
+        /* PLANES */
+        .ep-tiers { padding: 56px 40px; border-bottom: 1px solid var(--border-c); }
+        .ep-tiers-grid {
+          display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px;
+        }
+        .ep-card {
+          background: var(--card-bg); border: 1px solid var(--border-c);
+          border-radius: 14px; padding: 24px 20px;
+          display: flex; flex-direction: column; gap: 10px;
+        }
+        .ep-card.featured { border: 2px solid var(--teal-mid); }
+        .ep-badge {
+          display: inline-block; font-size: 10px; font-weight: 600;
+          padding: 3px 10px; border-radius: 6px;
+          background: var(--teal-lt); color: var(--teal-txt);
+          width: fit-content; margin-bottom: 4px;
+        }
+        .ep-badge.premium { background: #f0eefe; color: #3C3489; }
+        @media (prefers-color-scheme: dark) {
+          .ep-badge { background: rgba(15,110,86,0.25); color: #5DCAA5; }
+          .ep-badge.premium { background: rgba(83,74,183,0.25); color: #AFA9EC; }
+        }
+        .ep-card-name { font-size: 16px; font-weight: 600; color: var(--fg); margin: 0; }
+        .ep-card-target { font-size: 12px; color: var(--muted); margin: 2px 0 4px; }
+        .ep-card-price { font-size: 13px; font-weight: 600; color: var(--teal); margin: 0; }
+        .ep-card-divider { border: none; border-top: 1px solid var(--border-c); margin: 4px 0; }
+        .ep-card-items {
+          list-style: none; padding: 0; margin: 0;
+          display: flex; flex-direction: column; gap: 8px;
+        }
+        .ep-card-items li {
+          font-size: 13px; color: var(--muted);
+          display: flex; gap: 8px; align-items: flex-start; line-height: 1.45;
+        }
+        .ep-card-items li svg { flex-shrink: 0; margin-top: 2px; color: var(--teal-mid); }
+
+        /* DISCLAIMER */
+        .ep-disclaimer {
+          padding: 20px 40px; background: var(--proof-bg);
+          border-bottom: 1px solid var(--border-c);
+          display: flex; gap: 12px; align-items: flex-start;
+        }
+        .ep-disclaimer svg { flex-shrink: 0; margin-top: 3px; color: var(--muted); }
+        .ep-disclaimer p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+        /* CTA */
+        .ep-cta { padding: 88px 40px; text-align: center; }
+        .ep-cta-h2 {
+          font-size: 30px; font-weight: 600; color: var(--fg);
+          letter-spacing: -0.02em; margin-bottom: 12px;
+        }
+        .ep-cta-sub { font-size: 15px; color: var(--muted); margin-bottom: 32px; }
+        .ep-cta-note { font-size: 13px; color: var(--muted); margin-top: 16px; }
+        .ep-email-link { color: var(--teal); text-decoration: none; }
+        .ep-email-link:hover { text-decoration: underline; }
+
+        /* RESPONSIVE */
+        @media (max-width: 860px) {
+          .ep-hero { padding: 56px 24px 48px; }
+          .ep-h1 { font-size: 28px; }
+          .ep-proof-bar { grid-template-columns: repeat(2, 1fr); }
+          .ep-proof-item.last { border-right: 1px solid var(--border-c); }
+          .ep-proof-item:nth-child(2) { border-right: none; }
+          .ep-proof-item:nth-child(3) { border-top: 1px solid var(--border-c); }
+          .ep-proof-item:nth-child(4) { border-top: 1px solid var(--border-c); border-right: none; }
+          .ep-method { padding: 40px 24px; }
+          .ep-method-row { grid-template-columns: 1fr; gap: 6px; }
+          .ep-tiers { padding: 40px 24px; }
+          .ep-tiers-grid { grid-template-columns: 1fr; }
+          .ep-disclaimer { padding: 20px 24px; }
+          .ep-cta { padding: 56px 24px; }
+          .ep-nav { padding: 14px 24px; }
+          .ep-nav-links a:not(.ep-nav-cta) { display: none; }
+        }
+        @media (max-width: 480px) {
+          .ep-h1 { font-size: 24px; }
+          .ep-proof-bar { grid-template-columns: 1fr; }
+          .ep-proof-item,
+          .ep-proof-item.last { border-right: none; border-top: none; border-bottom: 1px solid var(--border-c); }
+        }
         @media (prefers-reduced-motion: reduce) {
           * { transition: none !important; }
         }
@@ -667,17 +424,10 @@ export default function EmpresasPage() {
   );
 }
 
-/* ── Íconos inline ── */
 function CheckIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-      <path
-        d="M2.5 6.5L5.5 9.5L10.5 4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M2.5 6.5L5.5 9.5L10.5 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
