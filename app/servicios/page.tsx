@@ -8,10 +8,37 @@ export const metadata: Metadata = {
   alternates: { canonical: "/servicios" },
 };
 
+// 👉 Para desactivar la promo después de julio, cambia esto a false
+const PROMO_ACTIVE = true;
+
 const serviciosPrincipales = [
-  { badge: "Individual", title: "Terapia individual", desc: "Sesión de 50 min. TCC para ansiedad, depresión y autoestima.", price: "$499", unit: "MXN · por sesión", popular: false },
-  { badge: "Mensual", title: "Paquete mensual", desc: "Sesiones ilimitadas durante un mes completo.", price: "$1,900", unit: "MXN · por mes", popular: true },
-  { badge: "Pareja", title: "Terapia de pareja", desc: "Sesión de 60 min. Comunicación y manejo de conflictos.", price: "$749", unit: "MXN · por sesión", popular: false },
+  {
+    badge: "Individual",
+    title: "Terapia individual",
+    desc: "Sesión de 50 min. TCC para ansiedad, depresión y autoestima.",
+    price: "$499",
+    promoPrice: "$250",
+    unit: "MXN · por sesión",
+    popular: false,
+  },
+  {
+    badge: "Mensual",
+    title: "Paquete mensual",
+    desc: "Sesiones ilimitadas durante un mes completo.",
+    price: "$1,900",
+    promoPrice: "$950",
+    unit: "MXN · por mes",
+    popular: true,
+  },
+  {
+    badge: "Pareja",
+    title: "Terapia de pareja",
+    desc: "Sesión de 60 min. Comunicación y manejo de conflictos.",
+    price: "$749",
+    promoPrice: null,
+    unit: "MXN · por sesión",
+    popular: false,
+  },
 ];
 
 const serviciosExtra = [
@@ -40,41 +67,71 @@ export default function ServiciosPage() {
           Opciones de atención
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          {serviciosPrincipales.map((s) => (
-            <div
-              key={s.title}
-              className="rounded-2xl overflow-hidden flex flex-col"
-              style={{
-                background: "var(--bg-card)",
-                border: s.popular ? "2px solid #1D9E75" : "0.5px solid var(--border)",
-              }}
-            >
-              {s.popular && (
-                <div className="text-center py-1.5 text-xs font-medium" style={{ background: "#1D9E75", color: "#fff" }}>
-                  Más popular
+          {serviciosPrincipales.map((s) => {
+            const showPromo = PROMO_ACTIVE && s.promoPrice;
+            return (
+              <div
+                key={s.title}
+                className="rounded-2xl overflow-hidden flex flex-col"
+                style={{
+                  background: "var(--bg-card)",
+                  border: s.popular ? "2px solid #1D9E75" : "0.5px solid var(--border)",
+                }}
+              >
+                {s.popular && (
+                  <div className="text-center py-1.5 text-xs font-medium" style={{ background: "#1D9E75", color: "#fff" }}>
+                    Más popular
+                  </div>
+                )}
+                <div className="p-5 flex flex-col flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span
+                      className="inline-block text-xs font-medium px-3 py-1 rounded-full w-fit"
+                      style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
+                    >
+                      {s.badge}
+                    </span>
+                    {showPromo && (
+                      <span
+                        className="inline-block text-xs font-medium px-3 py-1 rounded-full w-fit"
+                        style={{ background: "#3D2020", color: "#E8C88A" }}
+                      >
+                        Julio Regalado
+                      </span>
+                    )}
+                  </div>
+                  <h2 className="text-sm font-medium mb-2" style={{ color: "var(--text-primary)" }}>{s.title}</h2>
+                  <p className="text-xs leading-relaxed flex-1 mb-4" style={{ color: "var(--text-secondary)" }}>{s.desc}</p>
+
+                  {showPromo ? (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-base font-medium line-through" style={{ color: "var(--text-tertiary)" }}>
+                        {s.price}
+                      </span>
+                      <span className="text-2xl font-medium" style={{ color: "#8B1A1A" }}>
+                        {s.promoPrice}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="text-2xl font-medium" style={{ color: "var(--text-primary)" }}>{s.price}</div>
+                  )}
+                  <div className="text-xs mb-5" style={{ color: "var(--text-tertiary)" }}>{s.unit}</div>
+
+                  <Link
+                    href="/agenda"
+                    className="rounded-full text-xs font-medium px-4 py-2.5 text-center transition-colors w-fit"
+                    style={
+                      showPromo
+                        ? { background: "#8B1A1A", color: "#E8C88A" }
+                        : { background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }
+                    }
+                  >
+                    Agendar
+                  </Link>
                 </div>
-              )}
-              <div className="p-5 flex flex-col flex-1">
-                <span
-                  className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4 w-fit"
-                  style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
-                >
-                  {s.badge}
-                </span>
-                <h2 className="text-sm font-medium mb-2" style={{ color: "var(--text-primary)" }}>{s.title}</h2>
-                <p className="text-xs leading-relaxed flex-1 mb-4" style={{ color: "var(--text-secondary)" }}>{s.desc}</p>
-                <div className="text-2xl font-medium" style={{ color: "var(--text-primary)" }}>{s.price}</div>
-                <div className="text-xs mb-5" style={{ color: "var(--text-tertiary)" }}>{s.unit}</div>
-                <Link
-                  href="/agenda"
-                  className="rounded-full text-xs font-medium px-4 py-2.5 text-center transition-colors w-fit"
-                  style={{ background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }}
-                >
-                  Agendar
-                </Link>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
