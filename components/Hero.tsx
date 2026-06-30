@@ -3,6 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+// 👉 Para desactivar la promo después de julio, cambia esto a false
+const PROMO_ACTIVE = true;
+
 function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?: string; prefix?: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
@@ -49,12 +52,22 @@ export default function Hero() {
           className="flex flex-col justify-center px-6 py-14 md:pr-12"
           style={{ borderRight: "0.5px solid var(--border)" }}
         >
-          <span
-            className="inline-block rounded-full text-sm font-medium px-4 py-1.5 mb-6 w-fit"
-            style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
-          >
-            Psicólogo · Monterrey
-          </span>
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <span
+              className="inline-block rounded-full text-sm font-medium px-4 py-1.5 w-fit"
+              style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
+            >
+              Psicólogo · Monterrey
+            </span>
+            {PROMO_ACTIVE && (
+              <span
+                className="inline-block rounded-full text-sm font-medium px-4 py-1.5 w-fit"
+                style={{ background: "#3D2020", color: "#E8C88A" }}
+              >
+                Julio Regalado
+              </span>
+            )}
+          </div>
           <h1
             className="text-4xl md:text-[2.75rem] font-medium leading-[1.15] tracking-tight"
             style={{ color: "var(--text-primary)" }}
@@ -67,13 +80,22 @@ export default function Hero() {
           >
             Pero con las herramientas correctas, deja de controlarte.
           </p>
+          {PROMO_ACTIVE && (
+            <p className="mt-2 text-sm font-medium" style={{ color: "#8B1A1A" }}>
+              Sesiones online a $250 MXN — todo julio
+            </p>
+          )}
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/servicios"
               className="rounded-full text-sm px-5 py-2.5 transition-colors"
-              style={{ background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }}
+              style={
+                PROMO_ACTIVE
+                  ? { background: "#8B1A1A", color: "#E8C88A" }
+                  : { background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }
+              }
             >
-              Agendar sesión
+              {PROMO_ACTIVE ? "Agendar con descuento" : "Agendar sesión"}
             </Link>
             <Link
               href="/tienda"
