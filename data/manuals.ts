@@ -3,9 +3,9 @@ export type Manual = { slug: string; title: string; price: number; description?:
 
 export const MANUALS: Manual[] = [
   { slug: "como-apagar-la-mente", title: "Cómo Apagar la Mente", price: 249,
-    description: "Guía práctica para calmar el ruido mental." },
+    description: "Deja de revivir la misma conversación a las 3am. Técnicas concretas de TCC para que tu mente por fin te deje descansar — y tú puedas volver a dormir tranquilo." },
   { slug: "el-arte-de-creer-en-ti", title: "El Arte de Creer en Ti", price: 249,
-    description: "Estrategias simples para potenciar tu autoestima." },
+    description: "Deja de pedir permiso para ser tú. Un método paso a paso para confiar en tus decisiones, poner límites y dejar de depender de la aprobación de los demás." },
 ];
 
 // alias públicos aceptados en la URL

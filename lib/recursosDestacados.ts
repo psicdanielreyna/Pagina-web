@@ -12,7 +12,7 @@ export const recursosDestacados: Recurso[] = [
   {
     titulo: "Cómo Apagar tu Mente",
     descripcion:
-      "Workbook práctico para calmar el sobrepensamiento con técnicas simples y efectivas.",
+      "Deja de revivir la misma conversación a las 3am. Técnicas concretas para que tu mente por fin te deje descansar.",
     precio: 249,
     moneda: "MXN",
     imagen: "/manuales/apagar-mente.png",
@@ -21,7 +21,7 @@ export const recursosDestacados: Recurso[] = [
   {
     titulo: "El Arte de Creer en Ti",
     descripcion:
-      "Estrategias y ejercicios para fortalecer tu autoestima y confianza personal.",
+      "Deja de pedir permiso para ser tú. Un método paso a paso para confiar en tus decisiones sin necesitar la aprobación de nadie.",
     precio: 249,
     moneda: "MXN",
     imagen: "/manuales/el-arte-de-creer-en-ti.png",

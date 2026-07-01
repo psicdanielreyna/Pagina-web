@@ -20,7 +20,7 @@ const productos: Producto[] = [
     manualSlug: "como-apagar-la-mente",
     title: "Cómo Apagar tu Mente",
     price: "$249 MXN",
-    short: "Técnicas efectivas para calmar el sobrepensamiento.",
+    short: "Deja de revivir la misma conversación a las 3am. Técnicas concretas para que tu mente por fin te deje descansar.",
     img: "/images/tienda/apagar-mente.png",
     alt: "Portada Cómo Apagar tu Mente",
     badge: "Manual",
@@ -30,7 +30,7 @@ const productos: Producto[] = [
     manualSlug: "el-arte-de-creer-en-ti",
     title: "El Arte de Creer en Ti",
     price: "$249 MXN",
-    short: "Estrategias para fortalecer tu autoestima y confianza.",
+    short: "Deja de pedir permiso para ser tú. Un método paso a paso para confiar en tus decisiones sin necesitar la aprobación de nadie.",
     img: "/images/tienda/el-arte-de-creer-en-ti.png",
     alt: "Portada El Arte de Creer en Ti",
     badge: "Manual",
@@ -39,7 +39,7 @@ const productos: Producto[] = [
 
 const bundle = {
   title: "Pack completo — los 2 manuales",
-  desc: "Ahorra $100 MXN comprando los dos juntos. Entrega inmediata por correo.",
+  desc: "La mente en calma + la confianza para actuar. Los dos manuales que se complementan, con $100 de descuento.",
   priceOld: "$498 MXN",
   price: "$398 MXN",
   manualSlug: "bundle-completo",
@@ -98,10 +98,10 @@ export default function TiendaPage() {
               Tienda
             </p>
             <h1 className="text-3xl font-medium tracking-tight" style={{ color: "var(--text-primary)" }}>
-              Recursos para tu bienestar
+              Herramientas que cambian cómo te sientes
             </h1>
             <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
-              Manuales prácticos en PDF · Entrega inmediata por correo
+              Del sobrepensamiento a la calma, de la duda a la confianza. Empiezas hoy mismo.
             </p>
           </div>
           <div className="flex gap-2">

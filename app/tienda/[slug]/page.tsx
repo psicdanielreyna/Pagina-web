@@ -28,10 +28,10 @@ const COVERS: Record<string, { src: string; alt: string }> = {
 };
 
 const INCLUYE = [
-  "PDF descargable de alta calidad",
+  "Lo lees a tu ritmo, desde cualquier dispositivo",
   "Ejercicios prácticos aplicables desde el día 1",
-  "Técnicas basadas en Terapia Cognitivo-Conductual",
-  "Entrega inmediata por correo electrónico",
+  "Técnicas de TCC — las mismas que uso en consulta",
+  "Empiezas hoy: te llega al correo en segundos",
 ];
 
 function Inner({ slug }: { slug: string }) {
