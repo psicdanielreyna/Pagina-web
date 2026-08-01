@@ -8,7 +8,7 @@ import { useTheme } from "@/components/ThemeProvider";
 // 👉 Para desactivar la promo después de julio, cambia esto a false.
 //    La barra seguirá apareciendo pero con el CTA normal sin precio.
 //    Si quieres quitar la barra por completo, cambia BAR_ACTIVE a false.
-const PROMO_ACTIVE = true;
+const PROMO_ACTIVE = false;
 const BAR_ACTIVE = true;
 
 // Rutas donde NO debe aparecer la barra (ya tienen su propio CTA o son flujos de pago)

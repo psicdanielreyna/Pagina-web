@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 // 👉 Para desactivar la promo después de julio, cambia esto a false
-const PROMO_ACTIVE = true;
+const PROMO_ACTIVE = false;
 
 const serviciosPrincipales = [
   {

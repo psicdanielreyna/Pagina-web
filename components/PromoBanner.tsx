@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useTheme } from "@/components/ThemeProvider";
 
 // 👉 Para desactivar la promo después de julio, cambia esto a false
-const PROMO_ACTIVE = true;
+const PROMO_ACTIVE = false;
 
 export default function PromoBanner() {
   const { resolvedTheme } = useTheme();

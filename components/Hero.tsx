@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 // 👉 Para desactivar la promo después de julio, cambia esto a false
-const PROMO_ACTIVE = true;
+const PROMO_ACTIVE = false;
 
 function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?: string; prefix?: string }) {
   const [count, setCount] = useState(0);
