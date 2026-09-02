@@ -1,5 +1,5 @@
 // app/layout.tsx
-import "@/styles/globals.css";
+import "./globals.css";
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
