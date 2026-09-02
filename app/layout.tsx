@@ -5,6 +5,7 @@ import { DM_Sans, Playfair_Display } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import StickyCTA from "@/components/StickyCTA";
+import MetaPixel from "@/components/Metapixel";
 import Analytics from "./analytics";
 import TrackCTAs from "@/components/TrackCTAs";
 import { Suspense } from "react";
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
           <StickyCTA />
           <Suspense fallback={null}>
+            <MetaPixel />
             <Analytics />
             <TrackCTAs />
           </Suspense>
