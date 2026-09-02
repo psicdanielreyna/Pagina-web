@@ -4,8 +4,8 @@ import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-// 👉 Tu Pixel ID de Meta
-export const META_PIXEL_ID = "233510745";
+// 👉 Tu Pixel ID de Meta (conjunto de datos "Daniel Reyna Web")
+export const META_PIXEL_ID = "1058905127054237";
 
 // Helper para disparar eventos desde cualquier parte del sitio.
 // Uso: import { fbq } from "@/components/MetaPixel"; fbq("track", "Purchase", {...})
