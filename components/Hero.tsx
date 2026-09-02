@@ -3,8 +3,42 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-// 👉 Para desactivar la promo después de julio, cambia esto a false
-const PROMO_ACTIVE = false;
+const DOLORES = [
+  "Sentir que la ansiedad decide por ti",
+  "Repetir los mismos patrones",
+  "Cargar con todo en silencio",
+  "Sentir que nada avanza",
+  "Vivir en pausa",
+];
+
+function HookRotante() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % DOLORES.length);
+        setVisible(true);
+      }, 250);
+    }, 2600);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span
+      style={{
+        color: "#0F6E56",
+        borderBottom: "2px solid #9FE1CB",
+        transition: "opacity 0.25s ease",
+        opacity: visible ? 1 : 0,
+      }}
+    >
+      {DOLORES[index]}
+    </span>
+  );
+}
 
 function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?: string; prefix?: string }) {
   const [count, setCount] = useState(0);
@@ -52,58 +86,50 @@ export default function Hero() {
           className="flex flex-col justify-center px-6 py-14 md:pr-12"
           style={{ borderRight: "0.5px solid var(--border)" }}
         >
-          <div className="flex flex-wrap items-center gap-2 mb-6">
-            <span
-              className="inline-block rounded-full text-sm font-medium px-4 py-1.5 w-fit"
-              style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
-            >
-              Psicólogo · Monterrey
-            </span>
-            {PROMO_ACTIVE && (
-              <span
-                className="inline-block rounded-full text-sm font-medium px-4 py-1.5 w-fit"
-                style={{ background: "#3D2020", color: "#E8C88A" }}
-              >
-                Julio Regalado
-              </span>
-            )}
-          </div>
+          <span
+            className="inline-block rounded-full text-sm font-medium px-4 py-1.5 mb-6 w-fit"
+            style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
+          >
+            Psicólogo · Monterrey
+          </span>
           <h1
-            className="text-4xl md:text-[2.75rem] font-medium leading-[1.15] tracking-tight"
+            className="text-3xl md:text-[2.5rem] font-medium leading-[1.18] tracking-tight"
             style={{ color: "var(--text-primary)" }}
           >
-            La ansiedad no desaparece sola.
+            <HookRotante /> no tiene por qué ser para siempre.
           </h1>
           <p
             className="mt-4 text-base leading-relaxed max-w-md"
             style={{ color: "var(--text-secondary)" }}
           >
-            Pero con las herramientas correctas, deja de controlarte.
+            Hay una salida, y no tienes que encontrarla solo. Terapia con método, a tu ritmo.
           </p>
-          {PROMO_ACTIVE && (
-            <p className="mt-2 text-sm font-medium" style={{ color: "#8B1A1A" }}>
-              Sesiones online a $250 MXN — todo julio
-            </p>
-          )}
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-3 items-center">
             <Link
               href="/servicios"
-              className="rounded-full text-sm px-5 py-2.5 transition-colors"
-              style={
-                PROMO_ACTIVE
-                  ? { background: "#8B1A1A", color: "#E8C88A" }
-                  : { background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }
-              }
+              className="rounded-full text-sm px-6 py-3 transition-colors font-medium"
+              style={{ background: "var(--btn-primary-bg)", color: "var(--btn-primary-text)" }}
             >
-              {PROMO_ACTIVE ? "Agendar con descuento" : "Agendar sesión"}
+              Agenda tu primera sesión
             </Link>
             <Link
-              href="/tienda"
+              href="/sobre-mi"
               className="text-sm px-2 py-2.5 transition-colors"
               style={{ color: "var(--text-secondary)" }}
             >
-              Ver tienda →
+              Ver cómo trabajo →
             </Link>
+          </div>
+          {/* Señales de confianza */}
+          <div className="mt-6 flex flex-wrap gap-5 text-xs" style={{ color: "var(--text-tertiary)" }}>
+            <span className="flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+              +500 pacientes atendidos
+            </span>
+            <span className="flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="7" width="15" height="10" rx="2" ry="2" /><polygon points="17 9 22 7 22 17 17 15" /></svg>
+              Online o presencial
+            </span>
           </div>
         </div>
 
